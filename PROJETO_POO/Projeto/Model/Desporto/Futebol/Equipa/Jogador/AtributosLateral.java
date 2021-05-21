@@ -1,4 +1,4 @@
-package Futebol.Equipa.Jogador;
+package Desporto.Futebol.Equipa.Jogador;
 
 /**
  *

@@ -1,5 +1,6 @@
-package Futebol.Equipa.Jogador;
+package Desporto.Futebol.Equipa.Jogador;
 
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -15,19 +16,19 @@ public class Jogador {
             this.numero = numero;
             this.nome = nome;
             this.posicao = posicao;
-            this.historial = historial;
+            this.historial = new ArrayList<>(historial);
             this.atributos = atributos;
         }
         else
             throw new PosicaoInvalidaException("A posição "+posicao+" não existe.\n"); 
     }
 
-    public Jogador (Jogador outroJogador){
-        this.numero = outroJogador.getNumero();
-        this.nome = outroJogador.getNome();
-        this.posicao = outroJogador.getPosicao();
-        this.historial = outroJogador.getHistorial();
-        this.atributos = outroJogador.getAtributos();
+    public Jogador (Jogador oJ){
+        this.numero = oJ.getNumero();
+        this.nome = oJ.getNome();
+        this.posicao = oJ.getPosicao();
+        this.historial = new ArrayList <>(oJ.getHistorial());
+        this.atributos = oJ.getAtributos();
     }
 
     private boolean posicaoValida (String posicao){
@@ -47,11 +48,12 @@ public class Jogador {
     }
 
     public Atributos getAtributos() {
-        return atributos;
+        return atributos.clone();
     }
 
     public List<String> getHistorial() {
-        return historial;
+        List<String> hist = new ArrayList<>(this.historial);
+        return hist;
     }
 
     public String getPosicao() {
@@ -66,12 +68,12 @@ public class Jogador {
         this.numero = numero;
     }
 
-    public void setHistorial(List<String> historial) {
-        this.historial = historial;
+    public void addEquipaHistorial (String equipa){
+        this.historial.add(equipa);
     }
 
     public void setAtributos(Atributos atributos) {
-        this.atributos = atributos;
+        this.atributos = atributos.clone();
     }
 
     public void setPosicao(String posicao) {
@@ -88,7 +90,7 @@ public class Jogador {
         if (o == null || this.getClass() != o.getClass())
             return false;
         Jogador j = (Jogador) o;
-        return this.nome == j.nome && this.numero == j.numero && this.posicao == j.posicao
+        return this.nome.equals(j.nome) && this.numero == j.numero && this.posicao.equals(j.posicao)
                 && this.historial.equals(j.historial) && this.atributos.equals(j.atributos);
     }
     public String toString() {

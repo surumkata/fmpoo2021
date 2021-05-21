@@ -1,4 +1,4 @@
-package Futebol.Equipa;
+package Desporto.Futebol.Equipa;
 
 public class Tatica {
     private int nGR;
@@ -75,12 +75,14 @@ public class Tatica {
     }
 
     public Tatica clone() {
-        return new Tatica(this);
+        Tatica tatica = new Tatica(this);
+        return tatica;
     }
 
     public boolean equals(Object o) {
-        if (this == o)
+        if (this == o) {
             return true;
+        }
         if (o == null || this.getClass() != o.getClass())
             return false;
         Tatica t = (Tatica) o;

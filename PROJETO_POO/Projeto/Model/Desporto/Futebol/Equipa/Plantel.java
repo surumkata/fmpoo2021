@@ -1,12 +1,15 @@
-package Futebol.Equipa;
+package Desporto.Futebol.Equipa;
 
-import Futebol.Equipa.Jogador.*;
+import Desporto.Futebol.Equipa.Jogador.Jogador;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Map;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 public class Plantel {
-    private Map<Integer,Jogador> titulares;
+    private Map<Integer, Jogador> titulares;
     private Map<Integer,Jogador> suplentes;
     private int nJogadoresNoPlantel;
     private Tatica tatica;
@@ -30,19 +33,44 @@ public class Plantel {
     }
 
     public Map<Integer, Jogador> getTitulares() {
-        return titulares;
-    }
-
-    public void setTitulares(Map<Integer, Jogador> titulares) {
-        this.titulares = titulares;
+        return this.titulares.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(),
+                        e -> e.getValue().clone()));
     }
 
     public Map<Integer, Jogador> getSuplentes() {
-        return suplentes;
+        return this.suplentes.entrySet().stream()
+                .collect(Collectors.toMap(e -> e.getKey(),
+                        e -> e.getValue().clone()));
     }
 
-    public void setSuplentes(Map<Integer, Jogador> suplentes) {
-        this.suplentes = suplentes;
+    public void adicionaTitular(Jogador j) throws JogadorInvalidoException, TitularesFullException {
+        if(this.titulares.size() == 11)
+            throw new TitularesFullException("Não pode haver mais do que 11 titulares.");
+        else if (this.titulares.containsKey(j.getNumero()) || this.suplentes.containsKey(j.getNumero()))
+            throw new JogadorInvalidoException("Este número"+j.getNumero()+"já se encontra no plantel(nos titulares ou nos suplentes)");
+        else
+            this.titulares.put(j.getNumero(),j.clone());
+    }
+
+    public void adicionaSuplente(Set<Jogador> js) throws JogadorInvalidoException {
+        for(Jogador j: js)
+            adicionaSuplente(j);
+    }
+
+    public void adicionaSuplente(Jogador j) throws JogadorInvalidoException {
+        if (this.titulares.containsKey(j.getNumero()) || this.suplentes.containsKey(j.getNumero()))
+            throw new JogadorInvalidoException("Este número"+j.getNumero()+"já se encontra no plantel(nos titulares ou nos suplentes)");
+        else
+            this.suplentes.put(j.getNumero(),j.clone());
+    }
+
+    public Jogador getTitular (int numero){
+        return this.titulares.get(numero).clone();
+    }
+
+    public Jogador getSuplentes (int numero){
+        return this.suplentes.get(numero).clone();
     }
 
     public int getnJogadoresNoPlantel() {
@@ -54,11 +82,11 @@ public class Plantel {
     }
 
     public Tatica getTatica() {
-        return tatica;
+        return tatica.clone();
     }
 
     public void setTatica(Tatica tatica) {
-        this.tatica = tatica;
+        this.tatica = tatica.clone();
     }
 
     public String toString() {
@@ -93,10 +121,12 @@ public class Plantel {
 
     public boolean substituicao(int titular, int suplente) {
         if (existeTitular(titular) && existeSuplente(suplente)){
+            Jogador t = getTitular(titular);
+            Jogador s = getTitular(suplente);
             this.titulares.remove(titular);
             this.suplentes.remove(suplente);
-            this.titulares.put(suplente,this.suplentes.get(suplente));
-            this.suplentes.put(titular,this.titulares.get(titular));
+            this.titulares.put(suplente,s);
+            this.suplentes.put(titular,t);
             return true;
         }
         else
