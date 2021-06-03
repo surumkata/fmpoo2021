@@ -45,6 +45,13 @@ public class PartidaFutebol {
         this.tempo += tempo;
     }
 
+    public void incGolos(boolean visitada){
+        if (visitada) {
+            this.golosVisitados++;
+        }
+        else this.golosVisitante++;
+    }
+
 }
 
 
