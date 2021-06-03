@@ -1,12 +1,23 @@
 package Desporto.Futebol.Equipa;
 
-import Desporto.Equipa;
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
 import java.util.Set;
 
-public class EquipaFutebol extends Equipa {
+public class EquipaFutebol{
+    private String nome;
     private Plantel plantel;
+
+
+    public EquipaFutebol(String nome, Plantel plantel){
+        this.nome = nome;
+        this.plantel = plantel.clone();
+    }
+
+    public EquipaFutebol (EquipaFutebol equipa){
+        this.nome = equipa.nome;
+        this.plantel = equipa.plantel.clone();
+    }
 
     public Plantel getPlantel() {
         return plantel.clone();
@@ -26,4 +37,9 @@ public class EquipaFutebol extends Equipa {
     public void adicionaPlantel(Set<Jogador> js) throws JogadorInvalidoException {
         plantel.adicionaSuplente(js);
     }
+
+    public EquipaFutebol clone (){
+        return new EquipaFutebol(this);
+    }
+
 }

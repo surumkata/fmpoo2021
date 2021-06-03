@@ -69,7 +69,7 @@ public class Plantel {
         return this.titulares.get(numero).clone();
     }
 
-    public Jogador getSuplentes (int numero){
+    public Jogador getSuplente (int numero){
         return this.suplentes.get(numero).clone();
     }
 

@@ -52,8 +52,7 @@ public class Jogador {
     }
 
     public List<String> getHistorial() {
-        List<String> hist = new ArrayList<>(this.historial);
-        return hist;
+        return new ArrayList<>(this.historial);
     }
 
     public String getPosicao() {
