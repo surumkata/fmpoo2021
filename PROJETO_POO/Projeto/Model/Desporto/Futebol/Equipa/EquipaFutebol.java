@@ -8,6 +8,10 @@ public class EquipaFutebol{
     private String nome;
     private Plantel plantel;
 
+    public EquipaFutebol(String nome){
+        this.nome = nome;
+        this.plantel = new Plantel();
+    }
 
     public EquipaFutebol(String nome, Plantel plantel){
         this.nome = nome;

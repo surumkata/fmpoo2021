@@ -2,7 +2,6 @@ package Desporto.Futebol.Partida;
 
 import Desporto.Futebol.Equipa.Jogador.*;
 
-import java.util.Map;
 import java.util.Random;
 
 public class ExecutaPartida {
@@ -21,9 +20,6 @@ public class ExecutaPartida {
     }
 
     public void run (){
-        //Map<Integer,Jogador> titularesVistado = this.partida.getEquipaTitualares(true);
-        //Map<Integer,Jogador> titularesVistante = this.partida.getEquipaTitualares(false);
-
         if(this.jogadorAtual.getPosicao().equals("Defesa")){
             runDefesa();
         }
@@ -34,7 +30,7 @@ public class ExecutaPartida {
             runGuardaRedes();
         }
         else if (this.jogadorAtual.getPosicao().equals("Avancado")){
-            //runAvancado();
+            runAvancado();
         }
         else if (this.jogadorAtual.getPosicao().equals("Lateral")){
             runLateral();
@@ -98,7 +94,6 @@ public class ExecutaPartida {
         }
     }
 
-
     public void runAvancado(){
         Jogador adversarioGR = partida.getJogador(!this.casa, "Guarda-Redes");
         Jogador adversarioDF = partida.getJogador(!this.casa, "Guarda-Redes");
@@ -114,7 +109,6 @@ public class ExecutaPartida {
             tentaChutar(adversarioGR);
         }
     }
-
 
     public void runGuardaRedes(){
         Random random = new Random();
