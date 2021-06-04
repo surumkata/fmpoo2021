@@ -80,6 +80,12 @@ public class View {
         this.disponivel.set(i-1,b);
     }
 
+    public void setPreCondition(int[] is, PreCondition b) {
+        for(int i : is) {
+            this.disponivel.set(i - 1, b);
+        }
+    }
+
     /**
      * Método para registar um handler numa opção do NewMenu.
      *

@@ -11,6 +11,13 @@ public class Jogador {
     private List <String> historial;
     private Atributos atributos;
 
+    public Jogador(){
+        this.numero = 0;
+        this.nome ="";
+        this.posicao="";
+        this.historial = new ArrayList<>();
+    }
+
     public Jogador(int numero, String nome, String posicao, List<String> historial, Atributos atributos) throws PosicaoInvalidaException{
         if (posicaoValida(posicao)){
             this.numero = numero;
