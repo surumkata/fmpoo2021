@@ -22,7 +22,7 @@ public class Plantel {
     }
 
     public Plantel(){
-        this(Collections.emptyMap(), Collections.emptyMap(), 0, new Tatica());
+        this(new HashMap<>(), new HashMap<>(), 0, new Tatica());
     }
 
     public Plantel (Plantel outroPlantel){
@@ -44,25 +44,25 @@ public class Plantel {
                         e -> e.getValue().clone()));
     }
 
-    public void adicionaTitular(Jogador j) throws JogadorInvalidoException, TitularesFullException {
-        if(this.titulares.size() == 11)
-            throw new TitularesFullException("Não pode haver mais do que 11 titulares.");
-        else if (this.titulares.containsKey(j.getNumero()) || this.suplentes.containsKey(j.getNumero()))
-            throw new JogadorInvalidoException("Este número"+j.getNumero()+"já se encontra no plantel(nos titulares ou nos suplentes)");
-        else
-            this.titulares.put(j.getNumero(),j.clone());
+    public void adicionaTitular(Jogador j){
+        int numero = j.getNumero();
+        while (this.numeroOcupado(numero))
+            numero++;
+        j.setNumero(numero);
+        this.titulares.put(j.getNumero(),j.clone());
     }
 
-    public void adicionaSuplente(Set<Jogador> js) throws JogadorInvalidoException {
+    public void adicionaSuplente(Set<Jogador> js){
         for(Jogador j: js)
             adicionaSuplente(j);
     }
 
-    public void adicionaSuplente(Jogador j) throws JogadorInvalidoException {
-        if (this.titulares.containsKey(j.getNumero()) || this.suplentes.containsKey(j.getNumero()))
-            throw new JogadorInvalidoException("Este número"+j.getNumero()+"já se encontra no plantel(nos titulares ou nos suplentes)");
-        else
-            this.suplentes.put(j.getNumero(),j.clone());
+    public void adicionaSuplente(Jogador j){
+        int numero = j.getNumero();
+        while (this.numeroOcupado(numero))
+            numero++;
+        j.setNumero(numero);
+        this.suplentes.put(j.getNumero(),j.clone());
     }
 
     public Jogador getTitular (int numero){
@@ -87,6 +87,29 @@ public class Plantel {
 
     public void setTatica(Tatica tatica) {
         this.tatica = tatica.clone();
+    }
+
+    public boolean numeroOcupado (int numero){
+        return (this.titulares.containsKey(numero) || this.suplentes.containsKey(numero));
+    }
+
+    public boolean temPosicao (String posicao){
+        return (this.titulares.values().stream().anyMatch(j -> j.getPosicao().equals(posicao)));
+    }
+
+    public int quantasPosicoesFaltam (){
+        int i = 0;
+        if(!temPosicao("Defesa"))
+            i++;
+        if(!temPosicao("Medio"))
+            i++;
+        if(!temPosicao("Lateral"))
+            i++;
+        if(!temPosicao("Guarda-Redes"))
+            i++;
+        if(!temPosicao("Avancado"))
+            i++;
+        return i;
     }
 
     public String toString() {

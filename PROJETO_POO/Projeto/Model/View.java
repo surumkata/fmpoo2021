@@ -67,7 +67,7 @@ public class View {
                 // executar handler
                 this.handlers.get(op-1).execute();
             }
-        } while (op != 0 || !continuacao);
+        } while (op != 0 && continuacao);
     }
 
     /**
@@ -77,12 +77,12 @@ public class View {
      * @param b pré-condição a registar
      */
     public void setPreCondition(int i, PreCondition b) {
-        this.disponivel.set(i-1,b);
+        this.disponivel.set(i,b);
     }
 
     public void setPreCondition(int[] is, PreCondition b) {
         for(int i : is) {
-            this.disponivel.set(i - 1, b);
+            this.disponivel.set(i, b);
         }
     }
 
@@ -100,9 +100,9 @@ public class View {
 
     /** Apresentar o NewMenu */
     private void show() {
-        System.out.println("\n *** NewMenu *** ");
-        for (int i=0; i<this.opcoes.size(); i++) {
-            System.out.print(i+1);
+        System.out.println("\n *** "+this.opcoes.get(0)+" *** ");
+        for (int i=1; i<this.opcoes.size(); i++) {
+            System.out.print(i);
             System.out.print(" - ");
             System.out.println(this.disponivel.get(i).validate()?this.opcoes.get(i):"---");
         }
@@ -122,7 +122,7 @@ public class View {
         catch (NumberFormatException e) { // Não foi inscrito um int
             op = -1;
         }
-        if (op<0 || op>this.opcoes.size()) {
+        if (op<0 || op>=this.opcoes.size()) {
             System.out.println("Opção Inválida!!!");
             op = -1;
         }
@@ -139,5 +139,18 @@ public class View {
 
     public void lerequipa(){
         System.out.println("Qual o nome da Equipa: ");
+    }
+
+
+    public void atributosmessagerror(){
+        System.out.println("O valor inserido não está de [0-99]\n");
+    }
+
+    public void atributosmessage(String atributo){
+        System.out.println("Classifique o "+atributo+" do Jogador de [0-99]: ");
+    }
+
+    public void stop(){
+        this.continuacao = false;
     }
 }

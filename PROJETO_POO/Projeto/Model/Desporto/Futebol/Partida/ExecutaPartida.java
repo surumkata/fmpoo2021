@@ -86,7 +86,7 @@ public class ExecutaPartida {
             tentaPassar("Avancado","Defesa");
         }
         else{
-            if(tentaRoubarLateral()){
+            if(tentaRoubarLateral(adversario)){
                 this.casa = !this.casa;
                 this.jogadorAtual = adversario;
             }
@@ -96,7 +96,7 @@ public class ExecutaPartida {
 
     public void runAvancado(){
         Jogador adversarioGR = partida.getJogador(!this.casa, "Guarda-Redes");
-        Jogador adversarioDF = partida.getJogador(!this.casa, "Guarda-Redes");
+        Jogador adversarioDF = partida.getJogador(!this.casa, "Defesa");
         double overalldif = jogadorAtual.getAtributos().overall() - adversarioDF.getAtributos().overall();
         if(overalldif > 15){
             tentaChutar(adversarioGR);
@@ -114,10 +114,10 @@ public class ExecutaPartida {
         Random random = new Random();
         int irandom = random.nextInt(101);
 
-        if(irandom <= 50){
+        if(irandom <= 70){
             tentaPassar("Medio","Medio");
         }
-        else if (irandom <= 75){
+        else if (irandom <= 85){
             tentaPassar("Lateral","Lateral");
         }
         else{
@@ -127,11 +127,11 @@ public class ExecutaPartida {
 
     public void tentaChutar(Jogador adversario){
         Random random = new Random();
-        int irandom = random.nextInt(20);
+        int irandom = random.nextInt(201);
 
         AtributosGR atrGR = (AtributosGR) adversario.getAtributos();
 
-        int dif = this.jogadorAtual.getAtributos().getRemate() - ((atrGR.getElasticidade()+atrGR.getReflexos())/2);
+        int dif = 100 + this.jogadorAtual.getAtributos().getRemate() - ((atrGR.getElasticidade()+atrGR.getReflexos())/2);
 
         if(dif >= irandom){
             partida.incGolos(this.casa);
@@ -159,61 +159,48 @@ public class ExecutaPartida {
 
     public boolean tentaRoubarAvancado(Jogador adversario){
         Random random = new Random();
-        int irandom = random.nextInt(30);
+        int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         AtributosDefesa AtrD = (AtributosDefesa) adversario.getAtributos();
 
-        int dif = this.jogadorAtual.getAtributos().getVelocidade() - AtrD.getCortes();
+        int dif = 100 + this.jogadorAtual.getAtributos().getVelocidade() - AtrD.getCortes();
 
-        if(dif >= 0){
-            return false;
-        }
-        else
-            return (irandom <= -dif);
-
+        return (dif >= irandom);
     }
 
 
     public boolean tentaRoubarDefesa(Jogador adversario){
         Random random = new Random();
-        int irandom = random.nextInt(30);
+        int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
-        int veldif = this.jogadorAtual.getAtributos().getVelocidade() - adversario.getAtributos().getVelocidade();
+        int dif = 100 + this.jogadorAtual.getAtributos().getVelocidade() - adversario.getAtributos().getVelocidade();
 
-        if(veldif >= 0){
-            return false;
-        }
-        else
-            return (irandom <= -veldif);
+        return (dif >= irandom);
     }
 
-    public boolean tentaRoubarLateral(){
+    public boolean tentaRoubarLateral(Jogador adversario){
         Random random = new Random();
-        int irandom = random.nextInt(30);
+        int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         AtributosLateral advAtrL = (AtributosLateral) this.jogadorAtual.getAtributos();
 
-        int drible = advAtrL.getDrible();
+        int dif = 100 + advAtrL.getDrible() - adversario.getAtributos().getVelocidade();
 
-        return (irandom <= drible);
+        return (dif >= irandom);
     }
 
     public boolean tentaRoubarMedio(Jogador adversario){
         Random random = new Random();
-        int irandom = random.nextInt(30);
+        int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         AtributosMedio advAtrM = (AtributosMedio) adversario.getAtributos();
 
-        int dif = this.jogadorAtual.getAtributos().getControloDePasse() - advAtrM.getRecuperacaoDeBolas();
+        int dif = 100 + this.jogadorAtual.getAtributos().getControloDePasse() - advAtrM.getRecuperacaoDeBolas();
 
-        if(dif >= 0){
-            return false;
-        }
-        else
-            return (irandom <= -dif);
+        return (dif >= irandom);
     }
 }

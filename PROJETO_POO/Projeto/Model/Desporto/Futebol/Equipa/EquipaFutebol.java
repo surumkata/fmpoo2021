@@ -8,6 +8,11 @@ public class EquipaFutebol{
     private String nome;
     private Plantel plantel;
 
+
+    public EquipaFutebol(){
+        this("");
+    }
+
     public EquipaFutebol(String nome){
         this.nome = nome;
         this.plantel = new Plantel();
@@ -23,6 +28,22 @@ public class EquipaFutebol{
         this.plantel = equipa.plantel.clone();
     }
 
+    public boolean equipaPronta(){
+        return this.plantel.getTitulares().size() == 11 && this.plantel.getTatica().taticaValida();
+    }
+
+    public String getNome() {
+        return nome;
+    }
+
+    public void setNome(String nome) {
+        this.nome = nome;
+    }
+
+    public void setTatica (Tatica t){
+        this.plantel.setTatica(t);
+    }
+
     public Plantel getPlantel() {
         return plantel.clone();
     }
@@ -31,14 +52,26 @@ public class EquipaFutebol{
         this.plantel = plantel.clone();
     }
 
-    public void adicionaPlantel(Jogador j) throws JogadorInvalidoException{
-        if (this.plantel.getTitulares().containsKey(j.getNumero()) || this.plantel.getSuplentes().containsKey(j.getNumero()))
-            throw new JogadorInvalidoException("Este número"+j.getNumero()+"já se encontra no plantel.");
-        else
-            this.plantel.adicionaSuplente(j); //o adicionaSuplente já faz um clone do Jogador.
-    }
+    public void adicionaPlantel(Jogador j){
+        boolean x = false;
+        int numero = j.getNumero();
+        while(this.plantel.numeroOcupado(numero)) {
+            if(!x){
+                System.out.println("O número do jogador já está ocupado, a gerar um novo\n");
+                x = true;
+            }
+            numero++;
+        }
+        j.setNumero(numero);
 
-    public void adicionaPlantel(Set<Jogador> js) throws JogadorInvalidoException {
+        int sizeDisponivel = 11 - this.plantel.getTitulares().size() + this.plantel.quantasPosicoesFaltam();
+        if(!this.plantel.temPosicao(j.getPosicao()) || sizeDisponivel > 0)
+            this.plantel.adicionaTitular(j);
+        else
+            this.plantel.adicionaSuplente(j);
+        }
+
+    public void adicionaPlantel(Set<Jogador> js){
         plantel.adicionaSuplente(js);
     }
 

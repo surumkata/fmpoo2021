@@ -8,7 +8,7 @@ public class Tatica {
     private int nPL;
 
     public Tatica(){
-        this(0,0,0,0,0);
+        this(1,2,2,4,2);
     }
 
     public Tatica(int nGR, int nDF, int nLT, int nMD, int nPL){

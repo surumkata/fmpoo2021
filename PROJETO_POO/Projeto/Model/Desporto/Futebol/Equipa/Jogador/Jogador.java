@@ -18,16 +18,15 @@ public class Jogador {
         this.historial = new ArrayList<>();
     }
 
-    public Jogador(int numero, String nome, String posicao, List<String> historial, Atributos atributos) throws PosicaoInvalidaException{
+    public Jogador(int numero, String nome, String posicao, List<String> historial, Atributos atributos){
         if (posicaoValida(posicao)){
-            this.numero = numero;
-            this.nome = nome;
-            this.posicao = posicao;
-            this.historial = new ArrayList<>(historial);
-            this.atributos = atributos;
+            this.posicao = "Guarda-Redes";
         }
-        else
-            throw new PosicaoInvalidaException("A posição "+posicao+" não existe.\n"); 
+        else this.posicao = posicao;
+        this.numero = numero;
+        this.nome = nome;
+        this.historial = new ArrayList<>(historial);
+        this.atributos = atributos.clone();
     }
 
     public Jogador (Jogador oJ){
@@ -39,11 +38,11 @@ public class Jogador {
     }
 
     private boolean posicaoValida (String posicao){
-        return this.posicao.equals("Guarda-Redes") || 
-               this.posicao.equals("Defesa") ||
-               this.posicao.equals("Lateral") ||
-               this.posicao.equals("Medio") ||
-               this.posicao.equals("Avancado");
+        return posicao.equals("Guarda-Redes") ||
+               posicao.equals("Defesa") ||
+               posicao.equals("Lateral") ||
+               posicao.equals("Medio") ||
+               posicao.equals("Avancado");
     }
 
     public String getNome() {
@@ -84,6 +83,20 @@ public class Jogador {
 
     public void setPosicao(String posicao) {
         this.posicao = posicao;
+        if (this.posicao.equals("Defesa")){
+            this.atributos = new AtributosDefesa();
+        }
+        else if(this.posicao.equals("Medio")){
+            this.atributos = new AtributosMedio();
+        }
+        else if(this.posicao.equals("Lateral")){
+            this.atributos = new AtributosLateral();
+        }
+        else if(this.posicao.equals("Avancado")){
+            this.atributos = new AtributosAvancado();
+        }
+        else
+            this.atributos = new AtributosGR();
     }
 
     public Jogador clone() {
