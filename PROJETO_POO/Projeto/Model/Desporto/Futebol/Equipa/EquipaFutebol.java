@@ -41,7 +41,7 @@ public class EquipaFutebol{
     }
 
     public void setTatica (Tatica t){
-        this.plantel.setTatica(t);
+        if(this.podeUsarTatica(t)) this.plantel.setTatica(t);
     }
 
     public Plantel getPlantel() {
@@ -69,6 +69,18 @@ public class EquipaFutebol{
             return this.plantel.getSuplente(numero);
         }
         else return null;
+    }
+
+    public int contaPorPosicao (String posicao){
+        return this.plantel.contaPorPosicaoTitulares(posicao) + this.plantel.contaPorPosicaoSuplentes(posicao);
+    }
+
+    public boolean podeUsarTatica (Tatica tatica){
+        return (this.contaPorPosicao("Guarda-Redes") >= tatica.getnGR() &&
+                this.contaPorPosicao("Defesa")  >= tatica.getnDF() &&
+                this.contaPorPosicao("Lateral") >= tatica.getnLT() &&
+                this.contaPorPosicao("Medio")   >= tatica.getnMD() &&
+                this.contaPorPosicao("Avancado") >= tatica.getnPL());
     }
 
     public void adicionaPlantel(Jogador j){
@@ -110,7 +122,7 @@ public class EquipaFutebol{
         String[][] jogadores = new String [2][titulares[0].length+supelentes[0].length];
         int i = 0, j = 0;
         for(String s : titulares[0]){
-            jogadores[0][i] = s;
+            jogadores[0][i] = "(T) "+s;
             i++;
         }
         for(String s : titulares[1]){
@@ -118,7 +130,7 @@ public class EquipaFutebol{
             j++;
         }
         for(String s : supelentes[0]){
-            jogadores[0][i] = s;
+            jogadores[0][i] = "(S) "+s;
             i++;
         }
         for(String s : supelentes[1]){

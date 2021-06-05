@@ -1,6 +1,7 @@
 import Desporto.Futebol.ControloDados;
 import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.*;
+import Desporto.Futebol.Equipa.Plantel;
 import Desporto.Futebol.Equipa.Tatica;
 
 import java.io.IOException;
@@ -28,6 +29,7 @@ public class Controlo {
             "Editar Jogadores",
             "Editar Tatica",
             "Escolher Titulares",
+            "Eliminar Equipa",
     };
 
     private final String[] menuEditarJogador = new String[]{
@@ -37,6 +39,7 @@ public class Controlo {
             "Editar Posicao",
             "Editar Atributos",
             "Transferir Jogador",
+            "Eliminar Jogador",
     };
 
 
@@ -63,7 +66,7 @@ public class Controlo {
 
 
     private final String[] menuEscolheTatica = new String[]{
-            "menuEscolheTatica",
+            "Tatica",
             "4-4-2 (1GR|2LT|2DF|4MD|2AV)",
             "4-3-3 (1GR|2LT|2DF|3MD|3AV)",
             "3-5-2 (1GR|2LT|3DF|3MD|2AV)",
@@ -72,7 +75,7 @@ public class Controlo {
             "5-3-2 (1GR|2LT|3DF|3MD|2AV)"};
 
     public final String[] menuatributosGR = new String[]{
-            "menuatributosGR",
+            "Atributos",
             "Velocidade:",
             "Resistência:",
             "Destreza:",
@@ -85,7 +88,7 @@ public class Controlo {
             "Voltar e Gravar"};
 
     public final String[] menuatributosDF = new String[]{
-            "menuatributosDF",
+            "Atributos",
             "Velocidade:",
             "Resistência:",
             "Destreza:",
@@ -98,7 +101,7 @@ public class Controlo {
             "Voltar e Gravar"};
 
     public final String[] menuatributosMD = new String[]{
-            "menuatributosMD",
+            "Atributos",
             "Velocidade:",
             "Resistência:",
             "Destreza:",
@@ -111,7 +114,7 @@ public class Controlo {
             "Voltar e Gravar"};
 
     public final String[] menuatributosLT = new String[]{
-            "menuatributosLT",
+            "Atributos",
             "Velocidade:",
             "Resistência:",
             "Destreza:",
@@ -124,7 +127,7 @@ public class Controlo {
             "Voltar e Gravar"};
 
     public final String[] menuatributosAV = new String[]{
-            "menuatributosAV",
+            "Atributos",
             "Velocidade:",
             "Resistência:",
             "Destreza:",
@@ -180,24 +183,66 @@ public class Controlo {
         v.run();
     }
     public void editarEquipa(String nome, View v){
-        menuEditarEquipa[0] = "Editar "+nome;
-        View menuequipa = new View(menuEditarEquipa);
         EquipaFutebol e = cd.getEquipaFutebol(nome);
         cd.removeEquipa(nome);
-        menuequipa.setPreCondition(2,()->e.getPlantel().getnJogadoresNoPlantel() > 0);
-        menuequipa.setHandler(1,()->e.setNome(nomeEquipa()));
-        menuequipa.setHandler(2,()->editarJogadores(e));
-        menuequipa.run();
-        cd.criarEquipa(e);
+
+        String [] es = new String[6];
+        es[0] = menuEditarEquipa[0];
+        es[1] = menuEditarEquipa[1]+" ["+e.getNome()+"]";
+        es[2] = menuEditarEquipa[2];
+        if(e.podeUsarTatica(e.getPlantel().getTatica()))
+            es[3] = menuEditarEquipa[3]+" ["+e.getPlantel().getTatica().toString()+"]";
+        else es[3] = menuEditarEquipa[3];
+        es[4] = menuEditarEquipa[4];
+        es[5] = menuEditarEquipa[5];
+        AtomicBoolean eliminacao = new AtomicBoolean(false);
+        while(auxEditarEquipa(es,e,eliminacao)){
+            if(!e.getNome().equals(""))
+                es[1] = menuEditarJogador[1]+" ["+e.getNome()+"]";
+            if(e.podeUsarTatica(e.getPlantel().getTatica()))
+                es[3] = menuEditarEquipa[3]+" ["+e.getPlantel().getTatica().toString()+"]";
+            else es[3] = menuEditarEquipa[3];
+        }
+        if(!eliminacao.get()) cd.criarEquipa(e);
         v.stop();
     }
 
-    public void editarJogadores (EquipaFutebol e){
+    public boolean auxEditarEquipa(String [] ss, EquipaFutebol e, AtomicBoolean eliminacao){
+        View v = new View(ss);
+        AtomicBoolean control = new AtomicBoolean(false);
+        v.setPreCondition(2,()->e.getPlantel().getnJogadoresNoPlantel() > 0);
+        v.setPreCondition(3,()->e.getPlantel().getTitulares().size() == 11);
+        v.setPreCondition(4,()->e.podeUsarTatica(e.getPlantel().getTatica()));
+        v.setHandler(1,()->e.setNome(auxScan(v,control)));
+        v.setHandler(2,()->editarJogadores(e,control,v));
+        v.setHandler(3,()->escolheTatica(e,control,v));
+        v.setHandler(4,()->escolheTitulares(e,control,v));
+        v.setHandler(5,()->eliminar(eliminacao,v));
+        v.run();
+        return control.get();
+    }
+
+    public void escolheTitulares(EquipaFutebol e, AtomicBoolean control, View menuEquipa){
+        menuEquipa.stop();
+        control.set(true);
+        Plantel p = e.getPlantel();
+        p.limpaTitulares();
+
+        String [][] grs = p.nomesSuplentes("Guarda-Redes");
+
+
+
+        e.setPlantel(p);
+    }
+
+    public void editarJogadores (EquipaFutebol e, AtomicBoolean control, View menuEquipa){
+        menuEquipa.stop();
+        control.set(true);
         int x = 0;
         String [][] jogadores = e.nomesJogadores();
-        int size = jogadores[0].length;
-        size++;
-        String [] menu = new String[size];
+        int tam = jogadores[0].length;
+        tam++;
+        String [] menu = new String[tam];
         menu[0] = "";
         for (String j : jogadores[0]){
             x++;
@@ -209,7 +254,7 @@ public class Controlo {
             menu[x] = menu[x]+"["+j+"]";
         }
         View v = new View(menu);
-        for(int i = 1; i < size; i++){
+        for(int i = 1; i < tam; i++){
             int finalI = i-1;
             v.setHandler(i,()->editarJogador(e, Integer.parseInt(jogadores[1][finalI]),v));
         }
@@ -217,18 +262,19 @@ public class Controlo {
     }
 
     public void editarJogador(EquipaFutebol e, int numero, View v){
-        System.out.println("Ola "+numero);
         Jogador j = e.getJogador(numero);
         e.removePlantel(numero);
 
-        String [] js = new String[6];
+        String [] js = new String[7];
         js[0] = menuEditarJogador[0];
         js[1] = menuEditarJogador[1] + " [" +j.getNome()+ "]";
         js[2] = menuEditarJogador[2] + " [" +j.getNumero()+ "]";
         js[3] = menuEditarJogador[3] + " [" + j.getPosicao()+ "]";
         js[4] = menuEditarJogador[4] + " [" + j.getAtributos().overall()+ "]";
         js[5] = menuEditarJogador[5];
-        while(auxEditarJogador(js,j)){
+        js[6] = menuEditarJogador[6];
+        AtomicBoolean transferencia = new AtomicBoolean(false);
+        while(auxEditarJogador(js,j,transferencia)){
             if(!j.getNome().equals(""))
                 js[1] = menuEditarJogador[1]+" ["+j.getNome()+"]";
             if(j.getNumero() != 0)
@@ -238,21 +284,36 @@ public class Controlo {
                 js[4] = menuEditarJogador[4] + " [" + j.getAtributos().overall() + "]";
             }
         }
+        if(!transferencia.get()) e.adicionaPlantel(j);
 
-        e.adicionaPlantel(j);
         v.stop();
     }
 
-    public boolean auxEditarJogador(String[] ss, Jogador j){
+    public boolean auxEditarJogador(String[] ss, Jogador j, AtomicBoolean transferencia){
         View editJ = new View(ss);
         AtomicBoolean control = new AtomicBoolean(false);
         editJ.setHandler(1,()->j.setNome(auxScan(editJ,control)));
         editJ.setHandler(2,()-> j.setNumero(auxScanInt(editJ,control)));
         editJ.setHandler(3,()-> j.setPosicao(escolhePosicao(editJ,control)));
         editJ.setHandler(4,()->j.setAtributos(getAtributos(j.getPosicao(),editJ,control)));
+        editJ.setHandler(5,()->transferencia(j,transferencia,editJ));
+        editJ.setHandler(6,()->eliminar(transferencia,editJ));
         editJ.run();
         return control.get();
+    }
 
+    public void eliminar (AtomicBoolean transferencia, View editJ){
+        transferencia.set(true);
+        editJ.stop();
+    }
+
+    public void transferencia (Jogador j, AtomicBoolean transferencia, View editJ){
+        transferencia.set(true);
+        View v = new View();
+        v.lerequipa();
+        String nomeEquipa = this.scan.nextLine();
+        cd.colocaJogador(j,nomeEquipa);
+        editJ.stop();
     }
 
     public String auxScan(View v, AtomicBoolean control){
@@ -344,7 +405,9 @@ public class Controlo {
     }
 
 
-    public Tatica escolheTatica(){
+    public void escolheTatica(EquipaFutebol e, AtomicBoolean control, View v){
+        v.stop();
+        control.set(true);
         View taticamenu = new View(menuEscolheTatica);
         Tatica[] taticas = {new Tatica(1,2,2,4,2),
                             new Tatica(1,2,2,3,3),
@@ -354,14 +417,14 @@ public class Controlo {
                             new Tatica(1,3,2,3,2)};
 
         AtomicInteger x = new AtomicInteger();
-        taticamenu.setHandler(1, ()->x.set(auxEscolhe(0,taticamenu)));
-        taticamenu.setHandler(2, ()->x.set(auxEscolhe(1,taticamenu)));
-        taticamenu.setHandler(3, ()->x.set(auxEscolhe(2,taticamenu)));
-        taticamenu.setHandler(4, ()->x.set(auxEscolhe(3,taticamenu)));
-        taticamenu.setHandler(5, ()->x.set(auxEscolhe(4,taticamenu)));
-        taticamenu.setHandler(6, ()->x.set(auxEscolhe(5,taticamenu)));
+        int i;
+        for(i = 1; i <= 6; i++){
+            int finalI = i;
+            taticamenu.setPreCondition(i,()->e.podeUsarTatica(taticas[finalI -1]));
+            taticamenu.setHandler(i, ()->x.set(auxEscolhe(finalI-1,taticamenu)));
+        }
         taticamenu.run();
-        return taticas[x.intValue()];
+        e.setTatica(taticas[x.intValue()]);
     }
 
     public int auxEscolhe (int i, View v){

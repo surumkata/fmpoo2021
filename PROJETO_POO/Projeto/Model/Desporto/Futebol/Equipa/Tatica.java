@@ -69,8 +69,7 @@ public class Tatica {
 
     public String toString(){
         final StringBuilder sb = new StringBuilder();
-        sb.append("Esquema tático: ").
-                append(this.getnDF() + this.getnLT()).append("-").append(this.getnMD()).append("-").append(this.getnPL()).append("\n");
+        sb.append(this.getnDF() + this.getnLT()).append("-").append(this.getnMD()).append("-").append(this.getnPL());
         return sb.toString();
     }
 

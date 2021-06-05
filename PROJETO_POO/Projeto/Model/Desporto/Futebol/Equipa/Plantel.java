@@ -69,6 +69,14 @@ public class Plantel {
         return this.suplentes.get(numero).clone();
     }
 
+    public void limpaTitulares (){
+        for(Jogador j : this.titulares.values()){
+            this.suplentes.put(j.getNumero(),j);
+        }
+        this.titulares.clear();
+        this.titulares = new HashMap<>();
+    }
+
     public int getnJogadoresNoPlantel() {
         return this.nJogadoresNoPlantel;
     }
@@ -79,6 +87,32 @@ public class Plantel {
 
     public void setTatica(Tatica tatica) {
         this.tatica = tatica.clone();
+        this.limpaTitulares();
+        for(int i = 0; i < tatica.getnGR(); i++){
+            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Guarda-Redes")).findAny().get();
+            removeSuplente(jgd.getNumero());
+            adicionaTitular(jgd);
+        }
+        for(int i = 0; i < tatica.getnDF(); i++){
+            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Defesa")).findAny().get();
+            removeSuplente(jgd.getNumero());
+            adicionaTitular(jgd);
+        }
+        for(int i = 0; i < tatica.getnLT(); i++){
+            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Lateral")).findAny().get();
+            removeSuplente(jgd.getNumero());
+            adicionaTitular(jgd);
+        }
+        for(int i = 0; i < tatica.getnMD(); i++){
+            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Medio")).findAny().get();
+            removeSuplente(jgd.getNumero());
+            adicionaTitular(jgd);
+        }
+        for(int i = 0; i < tatica.getnPL(); i++){
+            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Avancado")).findAny().get();
+            removeSuplente(jgd.getNumero());
+            adicionaTitular(jgd);
+        }
     }
 
     public boolean numeroOcupado (int numero){
@@ -134,6 +168,14 @@ public class Plantel {
         this.titulares.remove(id);
     }
 
+    public int contaPorPosicaoTitulares(String posicao){
+        return (int) this.titulares.values().stream().filter(j -> j.getPosicao().equals(posicao)).count();
+    }
+
+    public int contaPorPosicaoSuplentes(String posicao){
+        return (int) this.suplentes.values().stream().filter(j -> j.getPosicao().equals(posicao)).count();
+    }
+
     public boolean existeTitular(int id){
         return this.titulares.containsKey(id);
     }
@@ -176,6 +218,34 @@ public class Plantel {
             nomes[i] = j.getNome();
             numeros[i] = Integer.toString(j.getNumero());
             i++;
+        }
+        return new String[][]{nomes, numeros};
+    }
+
+    public String[][] nomesTitulares(String posicao){
+        String [] nomes = new String[this.titulares.size()];
+        String [] numeros = new String[this.titulares.size()];
+        int i = 0;
+        for(Jogador j : this.titulares.values()){
+            if(j.getPosicao().equals(posicao)) {
+                nomes[i] = j.getNome();
+                numeros[i] = Integer.toString(j.getNumero());
+                i++;
+            }
+        }
+        return new String[][]{nomes, numeros};
+    }
+
+    public String[][] nomesSuplentes(String posicao){
+        String [] nomes = new String[this.suplentes.size()];
+        String [] numeros = new String[this.suplentes.size()];
+        int i = 0;
+        for(Jogador j : this.suplentes.values()){
+            if(j.getPosicao().equals(posicao)) {
+                nomes[i] = j.getNome();
+                numeros[i] = Integer.toString(j.getNumero());
+                i++;
+            }
         }
         return new String[][]{nomes, numeros};
     }
