@@ -2,6 +2,7 @@ import java.util.*;
 
 public class View {
 
+
     // Interfaces auxiliares
 
     /** Functional interface para handlers. */

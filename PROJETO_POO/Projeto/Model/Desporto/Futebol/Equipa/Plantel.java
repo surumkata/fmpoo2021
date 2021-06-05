@@ -2,7 +2,6 @@ package Desporto.Futebol.Equipa;
 
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Set;
@@ -50,11 +49,7 @@ public class Plantel {
             numero++;
         j.setNumero(numero);
         this.titulares.put(j.getNumero(),j.clone());
-    }
-
-    public void adicionaSuplente(Set<Jogador> js){
-        for(Jogador j: js)
-            adicionaSuplente(j);
+        this.nJogadoresNoPlantel++;
     }
 
     public void adicionaSuplente(Jogador j){
@@ -63,6 +58,7 @@ public class Plantel {
             numero++;
         j.setNumero(numero);
         this.suplentes.put(j.getNumero(),j.clone());
+        this.nJogadoresNoPlantel++;
     }
 
     public Jogador getTitular (int numero){
@@ -74,11 +70,7 @@ public class Plantel {
     }
 
     public int getnJogadoresNoPlantel() {
-        return nJogadoresNoPlantel;
-    }
-
-    public void setnJogadoresNoPlantel(int nJogadoresNoPlantel) {
-        this.nJogadoresNoPlantel = nJogadoresNoPlantel;
+        return this.nJogadoresNoPlantel;
     }
 
     public Tatica getTatica() {
@@ -134,6 +126,14 @@ public class Plantel {
     }
 
 
+    public void removeSuplente(int id){
+        this.suplentes.remove(id);
+    }
+
+    public void removeTitular(int id){
+        this.titulares.remove(id);
+    }
+
     public boolean existeTitular(int id){
         return this.titulares.containsKey(id);
     }
@@ -145,7 +145,7 @@ public class Plantel {
     public boolean substituicao(int titular, int suplente) {
         if (existeTitular(titular) && existeSuplente(suplente)){
             Jogador t = getTitular(titular);
-            Jogador s = getTitular(suplente);
+            Jogador s = getSuplente(suplente);
             this.titulares.remove(titular);
             this.suplentes.remove(suplente);
             this.titulares.put(suplente,s);
@@ -156,23 +156,27 @@ public class Plantel {
             return false;
     }
 
-    public String[] nomesSupelentes (){
-        String [] ss = new String[this.suplentes.size()];
+    public String[][] nomesSupelentes (){
+        String [] nomes = new String[this.suplentes.size()];
+        String [] numeros = new String[this.suplentes.size()];
         int i = 0;
         for(Jogador j : this.suplentes.values()){
-            ss[i] = j.getNome()+" ["+j.getNumero()+"]";
+            nomes[i] = j.getNome();
+            numeros[i] = Integer.toString(j.getNumero());
             i++;
         }
-        return ss;
+        return new String[][]{nomes, numeros};
     }
 
-    public String[] nomesTitulares (){
-        String [] ss = new String[this.titulares.size()];
+    public String[][] nomesTitulares (){
+        String [] nomes = new String[this.titulares.size()];
+        String [] numeros = new String[this.titulares.size()];
         int i = 0;
         for(Jogador j : this.titulares.values()){
-            ss[i] = j.getNome()+" ["+j.getNumero()+"]";
+            nomes[i] = j.getNome();
+            numeros[i] = Integer.toString(j.getNumero());
             i++;
         }
-        return ss;
+        return new String[][]{nomes, numeros};
     }
 }

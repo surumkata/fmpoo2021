@@ -19,7 +19,7 @@ public class Jogador {
     }
 
     public Jogador(int numero, String nome, String posicao, List<String> historial, Atributos atributos){
-        if (posicaoValida(posicao)){
+        if (!posicaoValida(posicao)){
             this.posicao = "Guarda-Redes";
         }
         else this.posicao = posicao;
