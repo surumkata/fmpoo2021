@@ -62,11 +62,11 @@ public class View {
             show();
             op = readOption();
             // testar pré-condição
-            if (op>0 && !this.disponivel.get(op-1).validate()) {
+            if (op>0 && !this.disponivel.get(op).validate()) {
                 System.out.println("Opção indisponível! Tente novamente.");
             } else if (op>0) {
                 // executar handler
-                this.handlers.get(op-1).execute();
+                this.handlers.get(op).execute();
             }
         } while (op != 0 && continuacao);
     }
@@ -94,7 +94,7 @@ public class View {
      * @param h handlers a registar
      */
     public void setHandler(int i, Handler h) {
-        this.handlers.set(i-1, h);
+        this.handlers.set(i, h);
     }
 
     // Métodos auxiliares
@@ -139,7 +139,7 @@ public class View {
     }
 
     public void lerequipa(){
-        System.out.println("Qual o nome da Equipa: ");
+        System.out.print("Qual o nome da Equipa: ");
     }
 
 
@@ -148,7 +148,7 @@ public class View {
     }
 
     public void atributosmessage(String atributo){
-        System.out.println("Classifique o "+atributo+" do Jogador de [0-99]: ");
+        System.out.print("Classifique o "+atributo+" do Jogador de [0-99]: ");
     }
 
     public void stop(){

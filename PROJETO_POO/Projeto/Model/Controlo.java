@@ -1,9 +1,7 @@
 import Desporto.Futebol.ControloDados;
 import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.*;
-import Desporto.Futebol.Equipa.JogadorInvalidoException;
 import Desporto.Futebol.Equipa.Tatica;
-import Desporto.Futebol.Equipa.TitularesFullException;
 
 import java.io.IOException;
 import java.util.Scanner;
@@ -151,7 +149,6 @@ public class Controlo {
         menu.setPreCondition(2,()->cd.simulacaoPossivel());
         menu.setHandler(1, this::carregarDados);
         //menu.setHandler(2,()->EnterState());
-        menu.setHandler(3, this::terminar);
         menu.run();
     }
 
@@ -250,18 +247,23 @@ public class Controlo {
         View editJ = new View(ss);
         AtomicBoolean control = new AtomicBoolean(false);
         editJ.setHandler(1,()->j.setNome(auxScan(editJ,control)));
+        editJ.setHandler(2,()-> j.setNumero(auxScanInt(editJ,control)));
+        editJ.setHandler(3,()-> j.setPosicao(escolhePosicao(editJ,control)));
+        editJ.setHandler(4,()->j.setAtributos(getAtributos(j.getPosicao(),editJ,control)));
         editJ.run();
         return control.get();
 
     }
 
     public String auxScan(View v, AtomicBoolean control){
+        System.out.print("@: ");
         v.stop();
         control.set(true);
         return this.scan.nextLine();
     }
 
     public int auxScanInt(View v, AtomicBoolean control){
+        System.out.print("@: ");
         int i = scan.nextInt();
         if(i > 0 && i <= 99){
             v.stop();
@@ -304,7 +306,7 @@ public class Controlo {
         AtomicBoolean control = new AtomicBoolean(false);
         jogadormenu.setPreCondition(new int []{2,3,4},()->!j.getNome().equals(""));
         jogadormenu.setPreCondition(4,()->!j.getPosicao().equals(""));
-        jogadormenu.setPreCondition(5,()->!j.getPosicao().equals("") && j.getAtributos().overall() != 0);
+        jogadormenu.setPreCondition(5,()->j.getNumero()!=0 && !j.getPosicao().equals("") && j.getAtributos().overall() != 0);
         jogadormenu.setHandler(1,()->j.setNome(auxScan(jogadormenu,control)));
         jogadormenu.setHandler(2,()-> j.setNumero(auxScanInt(jogadormenu,control)));
         jogadormenu.setHandler(3,()-> j.setPosicao(escolhePosicao(jogadormenu,control)));
@@ -315,7 +317,8 @@ public class Controlo {
     }
 
     public void colocaJogadarNaEquipa (Jogador j, View v){
-        System.out.println("Nome da equipa: ");
+        View aux = new View();
+        v.lerequipa();
         String nome = scan.nextLine();
         while(nome.equals("")){
             nome = scan.nextLine();
@@ -334,7 +337,6 @@ public class Controlo {
         posicaomenu.setHandler(3, ()->x.set(auxEscolhe(3,posicaomenu)));
         posicaomenu.setHandler(4, ()->x.set(auxEscolhe(4,posicaomenu)));
         posicaomenu.setHandler(5, ()->x.set(auxEscolhe(5,posicaomenu)));
-        posicaomenu.setHandler(6, ()->x.set(auxEscolhe(6,posicaomenu)));
         posicaomenu.run();
         v.stop();
         control.set(true);
