@@ -155,4 +155,24 @@ public class Plantel {
         else
             return false;
     }
+
+    public String[] nomesSupelentes (){
+        String [] ss = new String[this.suplentes.size()];
+        int i = 0;
+        for(Jogador j : this.suplentes.values()){
+            ss[i] = j.getNome()+" ["+j.getNumero()+"]";
+            i++;
+        }
+        return ss;
+    }
+
+    public String[] nomesTitulares (){
+        String [] ss = new String[this.titulares.size()];
+        int i = 0;
+        for(Jogador j : this.titulares.values()){
+            ss[i] = j.getNome()+" ["+j.getNumero()+"]";
+            i++;
+        }
+        return ss;
+    }
 }

@@ -10,6 +10,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 public class ControloDados {
     private Map<String, EquipaFutebol> equipas;
@@ -81,8 +82,25 @@ public class ControloDados {
         return this.equipas.containsKey(equipa);
     }
 
+    public EquipaFutebol getEquipaFutebol (String equipa){
+        if(!existeEquipa(equipa)){
+            criarEquipa(equipa);
+        }
+        return this.equipas.get(equipa).clone();
+    }
+
+    public void criarEquipa(EquipaFutebol e){
+        this.equipas.put(e.getNome(),e);
+    }
+
     public void criarEquipa(String nome){
         this.equipas.put(nome,new EquipaFutebol(nome));
+    }
+
+    public void removeEquipa (String nome){
+        if(existeEquipa(nome)){
+            this.equipas.remove(nome);
+        }
     }
 
     public void colocaJogador (Jogador j, String equipa) {
@@ -91,4 +109,9 @@ public class ControloDados {
         }
         this.equipas.get(equipa).adicionaPlantel(j);
     }
+
+    public String[] nomesEquipas (){
+        return this.equipas.keySet().toArray(new String[0]);
+    }
+
 }

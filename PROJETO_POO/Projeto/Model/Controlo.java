@@ -23,16 +23,28 @@ public class Controlo {
             "Criar dados",
             "Editar dados"};
 
+    private final String[] menuEditarEquipa = new String[]{
+            "Editar Equipa",
+            "Editar Nome",
+            "Editar Jogadores",
+            "Editar Tatica",
+            "Escolher Titulares",
+    };
+
+    private final String[] menuEditarJogador = new String[]{
+            "Editar Jogador",
+            "Editar Nome",
+            "Editar Numero",
+            "Editar Posicao",
+            "Editar Atributos",
+            "Transferir Jogador",
+    };
+
+
     private final String[] menuCriarDados = new String[]{
             "Criar Dados",
             "Criar Jogador",
             "Criar Equipa"};
-
-    private final String[] menuCriarEquipa = new String[]{
-            "Criar Equipa",
-            "Nome",
-            "Tatica",
-            "Selecionar Titulares"};
 
     private final String[] menuCriarJogador = new String[]{
             "menuCriarJogador",
@@ -151,7 +163,57 @@ public class Controlo {
     }
 
     public void editarDados(){
-        System.out.println("Para ja nao da amg\n");
+        int x = 0;
+        String [] equipas = cd.nomesEquipas();
+        int size = equipas.length;
+        size++;
+        String [] menu = new String[size];
+        menu[0] = "Editar Equipas";
+        for (String e : equipas){
+            x++;
+            menu[x] = e;
+        }
+        View v = new View(menu);
+        for(int i = 1; i < size; i++){
+            int finalI = i;
+            v.setHandler(i,()->editarEquipa(menu[finalI],v));
+        }
+        v.run();
+    }
+    public void editarEquipa(String nome, View v){
+        menuEditarEquipa[0] = "Editar "+nome;
+        View menuequipa = new View(menuEditarEquipa);
+        EquipaFutebol e = cd.getEquipaFutebol(nome);
+        cd.removeEquipa(nome);
+        menuequipa.setHandler(1,()->e.setNome(nomeEquipa()));
+        menuequipa.setHandler(2,()->editarJogadores(e));
+        menuequipa.run();
+        cd.criarEquipa(e);
+        v.stop();
+    }
+
+    public void editarJogadores (EquipaFutebol e){
+        int x = 0;
+        String [] jogadores = e.nomesJogadores();
+        int size = jogadores.length;
+        size++;
+        String [] menu = new String[size];
+        menu[0] = "";
+        for (String j : jogadores){
+            x++;
+            menu[x] = j;
+        }
+        View v = new View(menu);
+        for(int i = 1; i < size; i++){
+            int finalI = i;
+            v.setHandler(i,()->editarJogador(menu[finalI],v));
+        }
+        v.run();
+    }
+
+    public void editarJogador(String nome, View v){
+        System.out.println("Ola "+nome);
+        v.stop();
     }
 
     public void criarDados(){
@@ -183,17 +245,6 @@ public class Controlo {
         }
         cd.colocaJogador(j,nome);
         v.stop();
-    }
-
-    public void criarEquipa(){
-        View equipamenu = new View(menuCriarEquipa);
-        EquipaFutebol e = new EquipaFutebol();
-        equipamenu.setPreCondition(new int []{2,3},()->!e.getNome().equals("") && e.getPlantel().getTitulares().size() == 11);
-        equipamenu.setHandler(1, () -> e.setNome(nomeEquipa()));
-        equipamenu.setHandler(2, () -> e.setTatica(escolheTatica()));
-        //equipamenu.setHandler(3, () -> e.setTatica(escolheTatica())); //escolher titulares
-        equipamenu.run();
-        cd.criarEquipa(e.getNome());
     }
 
     public String escolhePosicao(){
@@ -237,12 +288,19 @@ public class Controlo {
         return i;
     }
 
+    public void criarEquipa(){
+        System.out.println("Escolhe um nome para a tua equipa.");
+        String nome = nomeEquipa();
+        cd.criarEquipa(nome);
+        System.out.println("Equipa criada com sucesso.");
+    }
+
     public String nomeEquipa(){
         String nome = scan.nextLine();
         if(!cd.existeEquipa(nome))
             return nome;
         else {
-            System.out.println("Esse nome já pertence a uma equipa, escolhe outro.\n");
+            System.out.println("Esse nome já pertence a uma equipa, escolhe outro.");
             return nomeEquipa();
         }
     }

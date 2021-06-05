@@ -79,4 +79,21 @@ public class EquipaFutebol{
         return new EquipaFutebol(this);
     }
 
+    public String[] nomesJogadores (){
+        String[] titulares = this.plantel.nomesTitulares();
+        String[] supelentes = this.plantel.nomesSupelentes();
+        String[] jogadores = new String [titulares.length+supelentes.length];
+        int i = 0;
+        for(String s : titulares){
+            jogadores[i] = s;
+            i++;
+        }
+        for(String s : supelentes){
+            jogadores[i] = s;
+            i++;
+        }
+        return jogadores;
+    }
+
+
 }

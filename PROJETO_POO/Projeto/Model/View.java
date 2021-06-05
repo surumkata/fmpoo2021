@@ -153,4 +153,14 @@ public class View {
     public void stop(){
         this.continuacao = false;
     }
+
+    public void comentariosJogo (int i, String j1, String j2){
+        if(i == 0)
+            System.out.println(j2+" tenta roubar a bola a "+j1+" mas este passa por ele.\n");
+        else if(i == 1)
+            System.out.println(j2+" rouba a bola ao "+j1);
+        else if(i == 2)
+            System.out.println(j1+" passa para "+j2);
+    }
+
 }
