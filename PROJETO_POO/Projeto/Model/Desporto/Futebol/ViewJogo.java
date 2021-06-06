@@ -1,6 +1,8 @@
+package Desporto.Futebol;
+
 import java.util.*;
 
-public class View {
+public class ViewJogo {
 
 
     // Interfaces auxiliares
@@ -31,14 +33,14 @@ public class View {
     /**
      * Constructor for objects of class NewMenu
      */
-    public View(){
+    public ViewJogo(){
         this.continuacao = false;
         this.opcoes = new ArrayList<>();
         this.disponivel = new ArrayList<>();
         this.handlers = new ArrayList<>();
     }
 
-    public View(String[] opcoes) {
+    public ViewJogo(String[] opcoes) {
         this.continuacao = true;
         this.opcoes = Arrays.asList(opcoes);
         this.disponivel = new ArrayList<>();
@@ -155,13 +157,9 @@ public class View {
         this.continuacao = false;
     }
 
-    public void comentariosJogo (int i, String j1, String j2){
-        if(i == 0)
-            System.out.println(j2+" tenta roubar a bola a "+j1+" mas este passa por ele.\n");
-        else if(i == 1)
-            System.out.println(j2+" rouba a bola ao "+j1);
-        else if(i == 2)
-            System.out.println(j1+" passa para "+j2);
+    public void comentariosJogo (double tempo, String comentario){
+        if(tempo < 10) System.out.println("0"+tempo+"': "+comentario);
+        else System.out.println(tempo+"': "+comentario);
     }
 
 }
