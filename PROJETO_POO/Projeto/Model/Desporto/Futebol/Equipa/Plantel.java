@@ -2,9 +2,7 @@ package Desporto.Futebol.Equipa;
 
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 public class Plantel {
@@ -14,10 +12,16 @@ public class Plantel {
     private Tatica tatica;
 
     public Plantel(Map<Integer,Jogador> titulares, Map<Integer,Jogador> suplentes, int nJogadoresNoPlantel, Tatica tatica){
-        this.titulares = titulares;
-        this.suplentes = suplentes;
+        this.titulares = new HashMap<>();
+        this.suplentes = new HashMap<>();
+        for(Jogador j : titulares.values()){
+            this.adicionaTitular(j);
+        }
+        for(Jogador j : suplentes.values()){
+            this.adicionaSuplente(j);
+        }
         this.nJogadoresNoPlantel = nJogadoresNoPlantel;
-        this.tatica = tatica;
+        this.tatica = tatica.clone();
     }
 
     public Plantel(){
@@ -33,13 +37,13 @@ public class Plantel {
 
     public Map<Integer, Jogador> getTitulares() {
         return this.titulares.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey(),
+                .collect(Collectors.toMap(Map.Entry::getKey,
                         e -> e.getValue().clone()));
     }
 
     public Map<Integer, Jogador> getSuplentes() {
         return this.suplentes.entrySet().stream()
-                .collect(Collectors.toMap(e -> e.getKey(),
+                .collect(Collectors.toMap(Map.Entry::getKey,
                         e -> e.getValue().clone()));
     }
 
@@ -70,10 +74,11 @@ public class Plantel {
     }
 
     public void limpaTitulares (){
-        for(Jogador j : this.titulares.values()){
-            this.suplentes.put(j.getNumero(),j);
+        List<Jogador> l = new ArrayList<>(this.titulares.values());
+        for(Jogador j : l){
+            this.removeTitular(j.getNumero());
+            this.adicionaSuplente(j);
         }
-        this.titulares.clear();
         this.titulares = new HashMap<>();
     }
 
@@ -237,16 +242,20 @@ public class Plantel {
     }
 
     public String[][] nomesSuplentes(String posicao){
-        String [] nomes = new String[this.suplentes.size()];
-        String [] numeros = new String[this.suplentes.size()];
+        List<Jogador> js =  this.suplentes.values().stream().map(Jogador::clone).filter(j -> j.getPosicao().equals(posicao)).collect(Collectors.toList());
+        System.out.println(js.stream().map(j -> j.getNome()).collect(Collectors.toList()));
+        int tam = js.size();
+        String [] nomes = new String[tam];
+        String [] numeros = new String[tam];
         int i = 0;
-        for(Jogador j : this.suplentes.values()){
+        for(Jogador j : js){
             if(j.getPosicao().equals(posicao)) {
                 nomes[i] = j.getNome();
                 numeros[i] = Integer.toString(j.getNumero());
                 i++;
             }
         }
+        System.out.println(Arrays.toString(nomes));
         return new String[][]{nomes, numeros};
     }
 }

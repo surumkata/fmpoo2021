@@ -227,31 +227,69 @@ public class Controlo {
         control.set(true);
         Plantel p = e.getPlantel();
         p.limpaTitulares();
+        Tatica t = p.getTatica();
 
-        String [][] grs = p.nomesSuplentes("Guarda-Redes");
+        String[] posicoes = {"Guarda-Redes","Defesa","Lateral","Medio","Avancado"};
+        int [] nposicoes = {t.getnGR(),t.getnDF(),t.getnLT(),t.getnMD(),t.getnPL()};
 
-
+        int x;
+        for(x = 0; x < 5; x++){
+            picaTitulares(p,posicoes[x],nposicoes[x]);
+        }
 
         e.setPlantel(p);
+    }
+
+    public void picaTitulares (Plantel p, String posicao, int np){
+        int x;
+
+        while (np > 0){
+            String [][] jogadores = p.nomesSuplentes(posicao);
+            int tam = jogadores[0].length;
+            tam++;
+            String [] menu = new String[tam];
+            menu[0] = posicao;
+            for(x = 0; x < jogadores[0].length;){
+                x++;
+                menu[x] = jogadores[0][x-1]+"["+jogadores[1][x-1]+"]";
+                System.out.println(menu[x]);
+            }
+            int n = auxPicaTitulares(menu, jogadores[1]);
+            Jogador j = p.getSuplente(n);
+            p.removeSuplente(n);
+            p.adicionaTitular(j);
+            np--;
+        }
+    }
+
+    public int auxPicaTitulares(String[] menu, String[] numeros){
+        AtomicInteger x = new AtomicInteger(Integer.parseInt(numeros[0]));
+        View v = new View(menu);
+        for(int i = 1; i < menu.length; i++){
+            int finalI = i-1;
+            v.setHandler(i,()->auxAtomicInteger(v, Integer.parseInt(numeros[finalI]),x));
+        }
+        v.run();
+        return x.get();
+    }
+
+    public void auxAtomicInteger(View v, int i, AtomicInteger x){
+        v.stop();
+        x.set(i);
     }
 
     public void editarJogadores (EquipaFutebol e, AtomicBoolean control, View menuEquipa){
         menuEquipa.stop();
         control.set(true);
-        int x = 0;
+        int x;
         String [][] jogadores = e.nomesJogadores();
         int tam = jogadores[0].length;
         tam++;
         String [] menu = new String[tam];
         menu[0] = "";
-        for (String j : jogadores[0]){
+        for(x = 0; x < jogadores[0].length;){
             x++;
-            menu[x] = j;
-        }
-        x=0;
-        for (String j : jogadores[1]){
-            x++;
-            menu[x] = menu[x]+"["+j+"]";
+            menu[x] = jogadores[0][x-1]+"["+jogadores[1][x-1]+"]";
         }
         View v = new View(menu);
         for(int i = 1; i < tam; i++){
