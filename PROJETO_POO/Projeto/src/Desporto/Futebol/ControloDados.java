@@ -6,6 +6,9 @@ import Desporto.Futebol.Equipa.Tatica;
 import Desporto.Futebol.Partida.ExecutaPartida;
 import Desporto.Futebol.Partida.PartidaFutebol;
 
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +18,34 @@ import java.util.stream.Collectors;
 public class ControloDados {
     private Map<String, EquipaFutebol> equipas;
     private List<PartidaFutebol> partidas;
+
+    public void lerFicheiro() throws IOException, PosicaoInvalidaException {
+        BufferedReader reader = new BufferedReader(new FileReader("../inputFiles/logs.txt"));
+        EquipaFutebol e = new EquipaFutebol();
+        boolean primeiraEquipa = true;
+        while (reader.ready()) {
+            String l = reader.readLine();
+            if (l.startsWith("Equipa:")){
+                if (!primeiraEquipa)
+                    criarEquipa(e);     
+                else
+                    primeiraEquipa = false;
+                String[] eq = l.split(":");
+                e = new EquipaFutebol(eq[1]);
+            }
+            else if (l.contains("Jogo:")){
+                //a fazer parse
+            }
+            else{
+                System.out.println(l);
+                Jogador j = new Jogador(l);
+                e.adicionaPlantel(j);
+            }
+        }
+        if (!primeiraEquipa)
+            criarEquipa(e);
+        reader.close();
+    }
 
     public ControloDados() {
         this.equipas = new HashMap<>();

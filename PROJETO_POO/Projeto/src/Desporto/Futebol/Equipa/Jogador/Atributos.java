@@ -180,4 +180,8 @@ public abstract class Atributos {
         sb.append("Controlo de Passe: ").append(this.controloDePasse).append("\n");
         return sb.toString();
     }
+
+    public int media (){
+        return (getVelocidade()+getControloDePasse()+getDestreza()+getImpulsao()+getRemate()+getResistencia()+getJogoDeCabeca())/7;
+    }
 }

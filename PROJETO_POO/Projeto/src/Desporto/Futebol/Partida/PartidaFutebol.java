@@ -3,6 +3,8 @@ package Desporto.Futebol.Partida;
 import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -15,6 +17,18 @@ public class PartidaFutebol {
     private int golosVisitado;
     private int substituicoesVisitante, substituicoesVisitados;
     private EquipaFutebol equipaVisitante, equipaVisitada;
+    private LocalDate data;
+
+    public PartidaFutebol (){
+        this.tempo = 0.0;
+        this.golosVisitante = 0;
+        this.golosVisitado = 0;
+        this.substituicoesVisitante = 0;
+        this.substituicoesVisitados = 0;
+        this.data = null;
+        this.equipaVisitante = new EquipaFutebol();
+        this.equipaVisitante = new EquipaFutebol();
+    }
 
     public PartidaFutebol (PartidaFutebol partida){
         this.tempo = partida.tempo;
@@ -22,6 +36,7 @@ public class PartidaFutebol {
         this.golosVisitante = partida.golosVisitante;
         this.substituicoesVisitados = partida.substituicoesVisitados;
         this.substituicoesVisitante = partida.substituicoesVisitante;
+        this.data = partida.data; //clone?
         this.equipaVisitada = partida.equipaVisitada.clone();
         this.equipaVisitante = partida.equipaVisitante.clone();
     }
@@ -32,6 +47,19 @@ public class PartidaFutebol {
         this.golosVisitante = 0;
         this.substituicoesVisitante = 3;
         this.substituicoesVisitados = 3;
+        this.data = LocalDate.now();
+        this.equipaVisitada = equipaVisitada.clone();
+        this.equipaVisitante = equipaVisitante.clone();
+    }
+
+    //Talvez nao seja necessario
+    public PartidaFutebol(EquipaFutebol equipaVisitada, EquipaFutebol equipaVisitante, LocalDate d) {
+        this.tempo = 0;
+        this.golosVisitado = 0;
+        this.golosVisitante = 0;
+        this.substituicoesVisitante = 3;
+        this.substituicoesVisitados = 3;
+        this.data = d;
         this.equipaVisitada = equipaVisitada.clone();
         this.equipaVisitante = equipaVisitante.clone();
     }
@@ -96,6 +124,25 @@ public class PartidaFutebol {
         else this.golosVisitante++;
     }
 
+    public LocalDate stringToLocalDateTime(String s) {
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+        return LocalDate.parse(s, formatter);
+    }
+
+    //                                  ******       *****     ***     
+    // Jogo:<EquipaCasa>,<EquipaFora>,<ScoreCasa>,<ScoreFora>,<Data>,<JogadoresCasa>,<SubstituicoesCasa>,<JogadoresFora>,<SubstituicoesFora>
+    // Jogo:Sporting Club Shostakovich,Mendelssohn F. C.,0,0,2021-03-30,43,30,1,22,33,11,38,31,39,6,12,22->37,43->25,25->3,2,1,40,16,25,49,41,17,14,33,36,1->42,49->31,14->45
+
+    public PartidaFutebol (String l){
+        this();
+        String[] parametros = l.split(",");
+        this.golosVisitado = Integer.parseInt(parametros[2]);
+        this.golosVisitante = Integer.parseInt(parametros[3]);
+        this.data = stringToLocalDateTime(parametros[4]);
+        //completar
+
+
+    }
 }
 
 

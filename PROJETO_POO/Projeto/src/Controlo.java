@@ -204,7 +204,15 @@ public class Controlo {
             x++;
             menuEquipas[x] = e;
         }
-        //menu.setHandler(1,()->lerFicheiro());
+        menu.setHandler(1,()->{
+            try {
+                cd.lerFicheiro();
+            } catch (IOException e1) {
+                e1.printStackTrace();
+            } catch (PosicaoInvalidaException e1) {
+                e1.printStackTrace();
+            }
+        });
         menu.setPreCondition(3,()->cd.existeEquipas());
         menu.setHandler(2, this::criarDados);
         menu.setHandler(3, ()->editarDados(menuEquipas, size,false));
