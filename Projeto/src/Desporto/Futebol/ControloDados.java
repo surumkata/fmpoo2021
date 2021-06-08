@@ -15,7 +15,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-public class ControloDados {
+public class ControloDados implements Serializable{
     private Map<String, EquipaFutebol> equipas;
     private Map<String, List<PartidaFutebol>> partidas;
 
@@ -199,7 +199,7 @@ public class ControloDados {
     }
 
     public void escreverFicheiro(String ficheiro) throws IOException{
-        BufferedWriter writer = new BufferedWriter(new FileWriter("inputFiles\\"+ficheiro));
+        BufferedWriter writer = new BufferedWriter(new FileWriter("inputFiles/"+ficheiro));
         for(EquipaFutebol e : this.equipas.values()){
             writer.append("Equipa:");
             writer.append(e.toFicheiro());
@@ -213,7 +213,7 @@ public class ControloDados {
     }
 
     public void lerFicheiro(String ficheiro) throws IOException, PosicaoInvalidaException {
-        BufferedReader reader = new BufferedReader(new FileReader("inputFiles\\"+ficheiro));
+        BufferedReader reader = new BufferedReader(new FileReader("inputFiles/"+ficheiro));
         EquipaFutebol e = new EquipaFutebol();
         boolean primeiraEquipa = true;
         while (reader.ready()) {
@@ -328,5 +328,22 @@ public class ControloDados {
         return LocalDate.parse(s, formatter);
     }
 
+    public ControloDados lerFicheiroObjeto(String filename) throws IOException, ClassNotFoundException,FileNotFoundException {
+        File f = new File("inputFiles/"+filename);
+        FileInputStream fis = new FileInputStream(f);
+        ObjectInputStream ois = new ObjectInputStream(fis);
+        ControloDados cd;
+        if((cd = (ControloDados) ois.readObject())!=null) return cd;
+        return null;
+    }
+
+    public void gravarFicheiroObjeto (String filename) throws IOException {
+        File f = new File("inputFiles/"+filename);
+        FileOutputStream fos = new FileOutputStream(f);
+        ObjectOutputStream oos = new ObjectOutputStream(fos);
+        oos.writeObject(this);
+        oos.flush();
+        oos.close();
+    }
 
 }

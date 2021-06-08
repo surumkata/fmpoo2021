@@ -142,12 +142,12 @@ public class ViewJogo {
     }
 
 
-    public void atributosmessagerror(){
-        System.out.println("O valor inserido não está de [0-99]\n");
+    public void atributosMessageError(){
+        System.out.println("O valor inserido não está de [1-100]\n");
     }
 
-    public void atributosmessage(String atributo){
-        System.out.print("Classifique o "+atributo+" do Jogador de [0-99]: ");
+    public void atributosMessage(String atributo){
+        System.out.print("Classifique o "+atributo+" do Jogador de [1-100]: ");
     }
 
     public void stop(){

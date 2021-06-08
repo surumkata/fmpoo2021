@@ -1,5 +1,7 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.io.Serializable;
+
 /**
  *
  */
@@ -38,10 +40,16 @@ public class AtributosGR extends Atributos {
         this.setReflexos(oAtrGR.getReflexos());
     }
 
-    public AtributosGR(Atributos oAtr){
-        super(oAtr);
-        this.setElasticidade(1);
-        this.setReflexos(1);
+    public AtributosGR(Atributos atributos) {
+        super(atributos);
+        if(atributos instanceof AtributosGR){
+            this.setReflexos(((AtributosGR) atributos).getReflexos());
+            this.setElasticidade(((AtributosGR) atributos).getElasticidade());
+        }
+        else{
+            this.setReflexos(1);
+            this.setElasticidade(1);
+        }
     }
 
     /**
@@ -99,7 +107,7 @@ public class AtributosGR extends Atributos {
     }
 
     public void desgaste(){
-        int r = (int) ((100 - getResistencia()) * 0.05) + 1;
+        int r = (int) ((100 - getResistencia()) * 0.015) + 1;
         this.setElasticidade(getElasticidade()-r);
         this.setReflexos(getReflexos()-r);
         this.setDestreza(getDestreza()-r);

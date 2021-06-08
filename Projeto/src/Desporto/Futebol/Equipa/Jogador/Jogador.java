@@ -1,11 +1,12 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
 
-public class Jogador {
+public class Jogador implements Serializable {
     private int numero;
     private String nome;
     private String posicao;
@@ -167,20 +168,38 @@ public class Jogador {
 
     public void setPosicao(String posicao) {
         this.posicao = posicao;
-        if (this.posicao.equals("Defesa")){
-            this.atributos = new AtributosDefesa();
+        switch (this.posicao) {
+            case "Defesa":
+                if(this.atributos != null)
+                    this.atributos = new AtributosDefesa(this.atributos);
+                else
+                    this.atributos = new AtributosDefesa();
+                break;
+            case "Medio":
+                if(this.atributos != null)
+                    this.atributos = new AtributosMedio(this.atributos);
+                else
+                    this.atributos = new AtributosMedio();
+                break;
+            case "Lateral":
+                if(this.atributos != null)
+                    this.atributos = new AtributosLateral(this.atributos);
+                else
+                    this.atributos = new AtributosLateral();
+                break;
+            case "Avancado":
+                if(this.atributos != null)
+                    this.atributos = new AtributosAvancado(this.atributos);
+                else
+                    this.atributos = new AtributosAvancado();
+                break;
+            default:
+                if(this.atributos != null)
+                    this.atributos = new AtributosGR(this.atributos);
+                else
+                    this.atributos = new AtributosGR();
+                break;
         }
-        else if(this.posicao.equals("Medio")){
-            this.atributos = new AtributosMedio();
-        }
-        else if(this.posicao.equals("Lateral")){
-            this.atributos = new AtributosLateral();
-        }
-        else if(this.posicao.equals("Avancado")){
-            this.atributos = new AtributosAvancado();
-        }
-        else
-            this.atributos = new AtributosGR();
     }
 
     public Jogador clone() {

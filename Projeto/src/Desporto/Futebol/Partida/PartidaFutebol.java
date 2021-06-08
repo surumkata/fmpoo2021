@@ -4,6 +4,7 @@ import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 import Desporto.Futebol.Equipa.Plantel;
 
+import java.io.Serializable;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
@@ -12,7 +13,7 @@ import java.util.Map;
 import java.util.Random;
 import java.util.stream.Collectors;
 
-public class PartidaFutebol {
+public class PartidaFutebol implements Serializable {
     private double tempo;
     private int golosVisitante;
     private int golosVisitado;
@@ -83,6 +84,14 @@ public class PartidaFutebol {
         else return substituicoesVisitante;
     }
 
+    public EquipaFutebol getEquipaVisitada() {
+        return equipaVisitada.clone();
+    }
+
+    public EquipaFutebol getEquipaVisitante() {
+        return equipaVisitante.clone();
+    }
+
     public void decSubstituicoes(boolean visitada, int n1, int n2){
         if (visitada) {
             this.subsVisitada[0][3-substituicoesVisitados] = n1;
@@ -96,9 +105,11 @@ public class PartidaFutebol {
         }
     }
 
-    public void desgasteEquipas(){
-        this.equipaVisitada.desgasteJogo();
-        this.equipaVisitante.desgasteJogo();
+    public void desgastaDurantePartida(boolean visitada, int numero){
+        if(visitada){
+            this.equipaVisitada.desgastaJogadorTitular(numero);
+        }
+        else this.equipaVisitante.desgastaJogadorTitular(numero);
     }
 
     public void setTempo(double tempo) {

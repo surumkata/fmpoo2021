@@ -2,9 +2,10 @@ package Desporto.Futebol.Equipa;
 
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
+import java.io.Serializable;
 import java.util.Set;
 
-public class EquipaFutebol{
+public class EquipaFutebol implements Serializable {
     private String nome;
     private Plantel plantel;
 
@@ -87,6 +88,10 @@ public class EquipaFutebol{
 
     public void desgasteJogo (){
         this.plantel.desgasteTitulares();
+    }
+
+    public void desgastaJogadorTitular(int numero){
+        this.plantel.desgasteTitular(numero);
     }
 
     public void adicionaPlantel(Jogador j){

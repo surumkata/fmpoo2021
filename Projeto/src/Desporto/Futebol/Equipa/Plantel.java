@@ -2,10 +2,11 @@ package Desporto.Futebol.Equipa;
 
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
+import java.io.Serializable;
 import java.util.*;
 import java.util.stream.Collectors;
 
-public class Plantel {
+public class Plantel implements Serializable {
     private Map<Integer, Jogador> titulares;
     private Map<Integer,Jogador> suplentes;
     private int nJogadoresNoPlantel;
@@ -50,6 +51,12 @@ public class Plantel {
     public void desgasteTitulares(){
         for(Jogador j : this.titulares.values()){
             j.desgastaJogador();
+        }
+    }
+
+    public void desgasteTitular(int numero){
+        if(this.titulares.containsKey(numero)){
+            this.titulares.get(numero).desgastaJogador();
         }
     }
 
@@ -257,28 +264,32 @@ public class Plantel {
         String [] nomes = new String[this.suplentes.size()];
         String [] numeros = new String[this.suplentes.size()];
         String [] posicoes = new String[this.titulares.size()];
+        String [] overall = new String[this.titulares.size()];
         int i = 0;
         for(Jogador j : this.suplentes.values()){
             nomes[i] = j.getNome();
             numeros[i] = Integer.toString(j.getNumero());
             posicoes[i] = abvPosicao(j.getPosicao());
+            overall[i] = Integer.toString(j.getAtributos().overall());
             i++;
         }
-        return new String[][]{nomes, numeros, posicoes};
+        return new String[][]{nomes, numeros, posicoes, overall};
     }
 
     public String[][] nomesTitulares (){
         String [] nomes = new String[this.titulares.size()];
         String [] numeros = new String[this.titulares.size()];
         String [] posicoes = new String[this.titulares.size()];
+        String [] overall = new String[this.titulares.size()];
         int i = 0;
         for(Jogador j : this.titulares.values()){
             nomes[i] = j.getNome();
             numeros[i] = Integer.toString(j.getNumero());
             posicoes[i] = abvPosicao(j.getPosicao());
+            overall[i] = Integer.toString(j.getAtributos().overall());
             i++;
         }
-        return new String[][]{nomes, numeros, posicoes};
+        return new String[][]{nomes, numeros, posicoes, overall};
     }
 
     public String[][] nomesTitulares(String posicao){

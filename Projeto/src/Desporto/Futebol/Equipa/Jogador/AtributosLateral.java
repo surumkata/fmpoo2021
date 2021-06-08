@@ -1,9 +1,11 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.io.Serializable;
+
 /**
  *
  */
-public class AtributosLateral extends Atributos {
+public class AtributosLateral extends Atributos{
     private int precisaoCruzamentos;
     private int drible;
 
@@ -37,6 +39,18 @@ public class AtributosLateral extends Atributos {
         int m = this.media();
         this.setDrible((int)((x+0.10)*m));
         this.setPrecisaoCruzamentos((int)((x+0.10)*m));
+    }
+
+    public AtributosLateral(Atributos atributos) {
+        super(atributos);
+        if(atributos instanceof AtributosLateral){
+            this.setPrecisaoCruzamentos(((AtributosLateral) atributos).getPrecisaoCruzamentos());
+            this.setDrible(((AtributosLateral) atributos).getDrible());
+        }
+        else{
+            this.setPrecisaoCruzamentos(1);
+            this.setDrible(1);
+        }
     }
 
     /**
@@ -94,7 +108,7 @@ public class AtributosLateral extends Atributos {
     }
 
     public void desgaste(){
-        int r = (int) ((100 - getResistencia()) * 0.05) + 1;
+        int r = (int) ((100 - getResistencia()) * 0.025) + 1;
         this.setDrible(getDrible()-r);
         this.setPrecisaoCruzamentos(getPrecisaoCruzamentos()-r);
         this.setDestreza(getDestreza()-r);

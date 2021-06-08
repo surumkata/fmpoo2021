@@ -1,6 +1,8 @@
 package Desporto.Futebol.Equipa;
 
-public class Tatica {
+import java.io.Serializable;
+
+public class Tatica implements Serializable {
     private int nGR;
     private int nDF;
     private int nLT;

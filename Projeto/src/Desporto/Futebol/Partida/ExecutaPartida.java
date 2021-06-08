@@ -74,8 +74,6 @@ public class ExecutaPartida {
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "O árbitro apita, ambas as equipas saem para o intervalo." + ANSI_RESET);
             } else if (this.partida.getTempo() >= 90)
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "O árbitro apita, é o final do encontro." + ANSI_RESET);
-            else
-                this.partida.desgasteEquipas();
             return (this.partida.getTempo() >= 90);
         }
         return false;
@@ -85,10 +83,13 @@ public class ExecutaPartida {
         Jogador adversario = partida.getJogador(!this.casa, "Avancado");
         double overalldif = jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
         if(overalldif > 15){
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" tenta passar a bola.");
             tentaPassar("Medio","Medio",v);
         }
         else{
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
+            this.partida.desgastaDurantePartida(!this.casa,adversario.getNumero());
             if(tentaRoubarDefesa(adversario,v)){
                 v.comentariosJogo(partida.getTempo(),"A pressão alta resultou.");
                 this.casa = !this.casa;
@@ -109,6 +110,7 @@ public class ExecutaPartida {
         boolean lateral = random.nextBoolean();
 
         if(overalldif > 15){
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" pode passar a bola.");
             if(lateral) {
                 tentaPassar("Lateral","Lateral",v);
@@ -116,6 +118,8 @@ public class ExecutaPartida {
             else tentaPassar("Avancado","Defesa",v);
         }
         else{
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
+            this.partida.desgastaDurantePartida(!this.casa,adversario.getNumero());
             if(tentaRoubarMedio(adversario,v)) {
                 this.casa = !this.casa;
                 this.jogadorAtual = adversario;
@@ -135,10 +139,13 @@ public class ExecutaPartida {
         double overalldif = jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
 
         if(overalldif > 15){
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" pode cruzar para a área.");
             tentaPassar("Avancado","Defesa",v);
         }
         else{
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
+            this.partida.desgastaDurantePartida(!this.casa,adversario.getNumero());
             if(tentaRoubarLateral(adversario,v)){
                 this.casa = !this.casa;
                 v.comentariosJogo(partida.getTempo(),adversario.getNome()+" ganha o duelo com "+jogadorAtual.getNome()+".");
@@ -156,9 +163,13 @@ public class ExecutaPartida {
         Jogador adversarioDF = partida.getJogador(!this.casa, "Defesa");
         double overalldif = jogadorAtual.getAtributos().overall() - adversarioDF.getAtributos().overall();
         if(overalldif > 15){
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
+            this.partida.desgastaDurantePartida(!this.casa,adversarioGR.getNumero());
             tentaChutar(adversarioGR,v);
         }
         else{
+            this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
+            this.partida.desgastaDurantePartida(!this.casa,adversarioDF.getNumero());
             if(tentaRoubarAvancado(adversarioDF,v)){
                 Random random = new Random();
                 this.casa = !this.casa;
@@ -173,6 +184,7 @@ public class ExecutaPartida {
 
     public void runGuardaRedes(ViewJogo v){
         int irandom = random.nextInt(101);
+        this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
 
         if(irandom <= 70){
             v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" chuta a bola para o meio campo.");

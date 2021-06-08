@@ -1,5 +1,7 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.io.Serializable;
+
 /**
  *
  */
@@ -37,6 +39,18 @@ public class AtributosDefesa extends Atributos {
         int m = this.media();
         this.setCortes((int)((x+0.15)*m));
         this.setPosicionamentoDefensivo((int)((x+0.05)*m));
+    }
+
+    public AtributosDefesa(Atributos atributos) {
+        super(atributos);
+        if(atributos instanceof AtributosDefesa){
+            this.setCortes(((AtributosDefesa) atributos).getCortes());
+            this.setPosicionamentoDefensivo(((AtributosDefesa) atributos).getPosicionamentoDefensivo());
+        }
+        else{
+            this.setCortes(1);
+            this.setPosicionamentoDefensivo(1);
+        }
     }
 
     /**
@@ -94,7 +108,7 @@ public class AtributosDefesa extends Atributos {
     }
 
     public void desgaste(){
-        int r = (int) ((100 - getResistencia()) * 0.05) + 1;
+        int r = (int) ((100 - getResistencia()) * 0.025) + 1;
         this.setPosicionamentoDefensivo(getPosicionamentoDefensivo()-r);
         this.setCortes(getCortes()-r);
         this.setDestreza(getDestreza()-r);

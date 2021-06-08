@@ -1,9 +1,11 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.io.Serializable;
+
 /**
  *
  */
-public abstract class Atributos {
+public abstract class Atributos implements Serializable {
     int velocidade;
     int resistencia;
     int destreza;

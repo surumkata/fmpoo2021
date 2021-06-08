@@ -26,7 +26,18 @@ public class Controlo {
             "Carregar dados",
             "Criar dados",
             "Ver/Editar dados",
-            "Gravar dados"};
+            "Gravar dados",
+            "Reset dados"};
+
+    private final String[] gravarDados = new String[]{
+            "Gravar Dados",
+            "Gravar ficheiro",
+            "Gravar objeto",};
+
+    private final String[] lerDados = new String[]{
+            "Ler Dados",
+            "Ler ficheiro",
+            "Ler objeto",};
 
     private final String[] menuSimulacao = new String[]{
             "Simulacao",
@@ -86,7 +97,7 @@ public class Controlo {
             "5-4-1 (1GR|4LT|3DF|2MD|1AV)",
             "5-3-2 (1GR|2LT|3DF|3MD|2AV)"};
 
-    public final String[] menuatributosGR = new String[]{
+    public final String[] menuAtributos = new String[]{
             "Atributos",
             "Velocidade:",
             "Resistência:",
@@ -95,61 +106,27 @@ public class Controlo {
             "Jogo de cabeça:",
             "Remate:",
             "Controlo de passe:",
+            "Gravar"};
+
+    public final String[] menuatributosGR = new String[]{
             "Elasticidade:",
-            "Reflexos:",
-            "Voltar e Gravar"};
+            "Reflexos:"};
 
     public final String[] menuatributosDF = new String[]{
-            "Atributos",
-            "Velocidade:",
-            "Resistência:",
-            "Destreza:",
-            "Impulsão:",
-            "Jogo de cabeça:",
-            "Remate:",
-            "Controlo de passe:",
             "Posicionamento Defensivo:",
-            "Cortes:",
-            "Voltar e Gravar"};
+            "Cortes:"};
 
     public final String[] menuatributosMD = new String[]{
-            "Atributos",
-            "Velocidade:",
-            "Resistência:",
-            "Destreza:",
-            "Impulsão:",
-            "Jogo de cabeça:",
-            "Remate:",
-            "Controlo de passe:",
             "Recuperação de Bolas:",
-            "Visão de Jogo:",
-            "Voltar e Gravar"};
+            "Visão de Jogo:"};
 
     public final String[] menuatributosLT = new String[]{
-            "Atributos",
-            "Velocidade:",
-            "Resistência:",
-            "Destreza:",
-            "Impulsão:",
-            "Jogo de cabeça:",
-            "Remate:",
-            "Controlo de passe:",
             "Precisão de cruzamentos:",
-            "Drible:",
-            "Voltar e Gravar"};
+            "Drible:"};
 
     public final String[] menuatributosAV = new String[]{
-            "Atributos",
-            "Velocidade:",
-            "Resistência:",
-            "Destreza:",
-            "Impulsão:",
-            "Jogo de cabeça:",
-            "Remate:",
-            "Controlo de passe:",
             "Desmarcação:",
-            "Penáltis:",
-            "Voltar e Gravar"};
+            "Penáltis:"};
 
     private final String[] simulacao = new String[]{
             "Simulacao",
@@ -168,7 +145,7 @@ public class Controlo {
         menu.welcome();
         menu.setPreCondition(2,()->cd.simulacaoPossivel());
         menu.setHandler(1, this::simularJogo);
-        menu.setHandler(2, this::carregarDados);
+        menu.setHandler(2, this::dados);
         menu.run();
     }
 
@@ -181,7 +158,10 @@ public class Controlo {
             equipasVisitadas[x] = e;
             x++;
         }
-        String equipaVisitada = picaEquipa(equipasVisitadas);
+        AtomicBoolean control = new AtomicBoolean(false);
+        String equipaVisitada = picaEquipa(equipasVisitadas,control);
+        if(!control.get())
+            return;
         es.remove(equipaVisitada);
 
         String [] equipasVisitantes = new String[1+es.size()];
@@ -191,8 +171,10 @@ public class Controlo {
             equipasVisitantes[x] = e;
             x++;
         }
-        String equipaVisitante = picaEquipa(equipasVisitantes);
-
+        control.set(false);
+        String equipaVisitante = picaEquipa(equipasVisitantes, control);
+        if(!control.get())
+            return;
         System.out.println("Jogo entre "+equipaVisitada+" e "+equipaVisitante);
 
         ViewJogo v = new ViewJogo(menuSimulacao);
@@ -207,10 +189,7 @@ public class Controlo {
         EquipaFutebol visitadaO = this.cd.getEquipaFutebol(equipaVisitada);
         EquipaFutebol visitanteO = this.cd.getEquipaFutebol(equipaVisitante);
 
-        EquipaFutebol visitada = visitadaO.clone();
-        EquipaFutebol visitante = visitanteO.clone();
-
-        ExecutaPartida exp = new ExecutaPartida(visitada,visitante);
+        ExecutaPartida exp = new ExecutaPartida(visitadaO,visitanteO);
         AtomicBoolean intervalo = new AtomicBoolean(false);
         boolean posIntervalo = false;
 
@@ -218,19 +197,27 @@ public class Controlo {
         AtomicBoolean substituicoes = new AtomicBoolean(false);
 
         while(!exp.run(intervalo,substituicoes)){
-            substituicoes.set(false);
+            EquipaFutebol finalVisitada = exp.getPartida().getEquipaVisitada();
+            EquipaFutebol finalVisitante = exp.getPartida().getEquipaVisitante();
             resultado = exp.getPartida().resultado();
             if(!posIntervalo && intervalo.get()) {
                 posIntervalo = true;
                 simulacao[0] = "Intervalo " + resultado;
             }
-            else
-                simulacao[0] = "Simulacao "+resultado;
+            else{
+                simulacao[0] = "Simulacao " + resultado;
+            }
+            //if(!substituicoes.get()){
+            //    visitada.desgasteJogo();
+            //    visitante.desgasteJogo();
+            //}
+            //else substituicoes.set(false);
+            substituicoes.set(false);
 
             AtomicInteger s1 = new AtomicInteger(exp.getSubsRestantes(true));
             AtomicInteger s2 = new AtomicInteger(exp.getSubsRestantes(false));
-            simulacao[2] = "Substituicoes "+visitada.getNome()+" ["+s1.get()+" substituições restantes]";
-            simulacao[3] = "Substituicoes "+visitante.getNome()+" ["+s2.get()+" substituições restantes]";
+            simulacao[2] = "Substituicoes "+finalVisitada.getNome()+" ["+s1.get()+" substituições restantes]";
+            simulacao[3] = "Substituicoes "+finalVisitante.getNome()+" ["+s2.get()+" substituições restantes]";
             ViewJogo menuS = new ViewJogo(simulacao);
             AtomicBoolean substituicao = new AtomicBoolean(false);
             menuS.setPreCondition(2,()->(s1.get() > 0));
@@ -239,26 +226,26 @@ public class Controlo {
             AtomicInteger n2 = new AtomicInteger(0);
             menuS.setHandler(1, menuS::stop);
             menuS.setHandler(2, ()->{
-                String comentario = substituicoes(visitada,substituicao,n1,n2);
+                String comentario = substituicoes(finalVisitada,substituicao,n1,n2);
                 if(substituicao.get()) {
                     s1.set(s1.get() - 1);
                     substituicoes.set(true);
                     exp.decSubs(true,comentario,n1.get(),n2.get());
-                    exp.atualizaEquipa(true,visitada);
                     menuS.stop();
                 }
             });
             menuS.setHandler(3, ()->{
-                String comentario = substituicoes(visitante,substituicao,n1,n2);
+                String comentario = substituicoes(finalVisitante,substituicao,n1,n2);
                 if(substituicao.get()) {
                     s2.set(s2.get() - 1);
                     substituicoes.set(true);
                     exp.decSubs(false,comentario,n1.get(),n2.get());
-                    exp.atualizaEquipa(false,visitante);
                     menuS.stop();
                 }
             });
             menuS.run();
+            exp.atualizaEquipa(true,finalVisitada);
+            exp.atualizaEquipa(false,finalVisitante);
         }
 
         exp.atualizaEquipa(false,visitanteO);
@@ -280,7 +267,12 @@ public class Controlo {
         String [] menu = new String[tamT+1];
         menu[0] = "1º Jogador da troca";
         for(x = 1; x <= tamT;x++){
-            menu[x] = titulares[0][x-1]+" ["+titulares[1][x-1]+"] ["+titulares[2][x-1]+"]";
+            int overall = Integer.parseInt(titulares[3][x-1]);
+            if(overall >= 70)
+                menu[x] = "\u001B[32m["+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")\u001B[0m";
+            else if (overall >= 40)
+                menu[x] = "\u001B[33m["+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")\u001B[0m";
+            else menu[x] = "\u001B[31m["+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")\u001B[0m";
         }
         ViewJogo mT = new ViewJogo(menu);
         AtomicInteger index = new AtomicInteger(0);
@@ -293,70 +285,80 @@ public class Controlo {
             });
         }
         mT.run();
-        menu = new String[tamT+tamS];
-        menu[0] = "2º Jogador da troca ["+titulares[2][index.get()]+"]";
-        int y = 0;
-        if(index.get() == 0) y++;
-        for(x = 1; y < tamT;x++,y++){
-            if (titulares[2][index.get()].equals(titulares[2][y]))
-                menu[x] = "\u001B[32m" + titulares[0][y] + " [" + titulares[1][y] + "] [" + titulares[2][y] + "]\u001B[0m";
-            else
-                menu[x] = "\u001B[33m" + titulares[0][y] + " [" + titulares[1][y] + "] [" + titulares[2][y] + "]\u001B[0m";
-            if(y == index.get()-1) {
-                y++;
-            }
-        }
-        menu[x-1] = menu[x-1]+"\n**Suplentes**";
-        for(y = 0; y < tamS;y++){
-            if(titulares[2][index.get()].equals(suplentes[2][y]))
-                menu[y+x] = "\u001B[32m"+suplentes[0][y]+" ["+suplentes[1][y]+"] ["+suplentes[2][y]+"]\u001B[0m";
-            else
-                menu[y+x] = "\u001B[33m"+suplentes[0][y]+" ["+suplentes[1][y]+"] ["+suplentes[2][y]+"]\u001B[0m";
-        }
-        AtomicBoolean suplente = new AtomicBoolean(false);
-        int i;
-        ViewJogo mS = new ViewJogo(menu);
-        for(i = 1; i < tamT; i++){
-            int finalI = i;
-            mS.setHandler(i,()-> {
-                mS.stop();
-                numeroATrocar.set(Integer.parseInt(titulares[1][finalI-1]));
-            });
-        }
-        for(; i < tamT+tamS; i++){
-            int finalI = i-tamT;
-            mS.setHandler(i,()-> {
-                mS.stop();
-                numeroATrocar.set(Integer.parseInt(suplentes[1][finalI]));
-                suplente.set(true);
-            });
-        }
-        mS.run();
+        if(numeroTitular.get() != 0) {
+            menu = new String[tamT + tamS];
+            menu[0] = "2º Jogador da troca [" + titulares[2][index.get()] + "]";
+            int y = 0;
+            if (index.get() == 0) y++;
+            int overallT = Integer.parseInt(titulares[3][index.get()]);
+            for (x = 1; y < tamT; x++, y++) {
+                int overallS = Integer.parseInt(titulares[3][y]);
+                if (overallS > overallT && titulares[2][index.get()].equals(titulares[2][y]))
+                    menu[x] = "\u001B[32m[" + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ")\u001B[0m";
+                else if (titulares[2][index.get()].equals(titulares[2][y]))
+                    menu[x] = "\u001B[33m[" + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ")\u001B[0m";
+                else
+                    menu[x] = "\u001B[31m[" + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ")\u001B[0m";
 
-        String posicaoT = e.getJogador(numeroTitular.get()).getPosicao();
-        String posicaoS = e.getJogador(numeroATrocar.get()).getPosicao();
-        int n1 = numeroTitular.get(), n2 = numeroATrocar.get();
-        String nomeT = e.getJogador(n1).getNome();
-        String nomeS = e.getJogador(n2).getNome();
-        if(!posicaoT.equals(posicaoS) && !suplente.get()){
-            e.trocaPosicao(n2,posicaoT);
-            e.trocaPosicao(n1,posicaoS);
-        }
-        else if(!posicaoT.equals(posicaoS)){
-            e.substiuicaoJogo(n1,n2);
-            e.trocaPosicao(n2,posicaoT);
-            substituicao.set(true);
-            return "\u001B[31mSai o número "+n1+", "+nomeT+". \u001B[32mEntra para o seu lugar, o número "+n2+", "+nomeS+".\u001B[0m";
-        }
-        else if(suplente.get()) {
-            e.substiuicaoJogo(n1, n2);
-            substituicao.set(true);
-            return "\u001B[31mSai o número "+n1+", "+nomeT+". \u001B[32mEntra para o seu lugar, o número "+n2+", "+nomeS+".\u001B[0m";
+                if (y == index.get() - 1) {
+                    y++;
+                }
+            }
+            menu[x - 1] = menu[x - 1] + "\n**Suplentes**";
+            for (y = 0; y < tamS; y++) {
+                int overallS = Integer.parseInt(suplentes[3][y]);
+                if (overallS > overallT && titulares[2][index.get()].equals(suplentes[2][y]))
+                    menu[y + x] = "\u001B[32m[" + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ")\u001B[0m";
+                else if (titulares[2][index.get()].equals(suplentes[2][y]))
+                    menu[y + x] = "\u001B[33m[" + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ")\u001B[0m";
+                else
+                    menu[y + x] = "\u001B[31m[" + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ")\u001B[0m";
+
+            }
+            AtomicBoolean suplente = new AtomicBoolean(false);
+            int i;
+            ViewJogo mS = new ViewJogo(menu);
+            for (i = 1; i < tamT; i++) {
+                int finalI = i;
+                mS.setHandler(i, () -> {
+                    mS.stop();
+                    numeroATrocar.set(Integer.parseInt(titulares[1][finalI - 1]));
+                });
+            }
+            for (; i < tamT + tamS; i++) {
+                int finalI = i - tamT;
+                mS.setHandler(i, () -> {
+                    mS.stop();
+                    numeroATrocar.set(Integer.parseInt(suplentes[1][finalI]));
+                    suplente.set(true);
+                });
+            }
+            mS.run();
+            int n1 = numeroTitular.get(), n2 = numeroATrocar.get();
+            if(n2 != 0) {
+                String posicaoT = e.getJogador(numeroTitular.get()).getPosicao();
+                String posicaoS = e.getJogador(numeroATrocar.get()).getPosicao();
+                String nomeT = e.getJogador(n1).getNome();
+                String nomeS = e.getJogador(n2).getNome();
+                if (!posicaoT.equals(posicaoS) && !suplente.get()) {
+                    e.trocaPosicao(n2, posicaoT);
+                    e.trocaPosicao(n1, posicaoS);
+                } else if (!posicaoT.equals(posicaoS)) {
+                    e.substiuicaoJogo(n1, n2);
+                    e.trocaPosicao(n2, posicaoT);
+                    substituicao.set(true);
+                    return "\u001B[31mSai o número " + n1 + ", " + nomeT + ". \u001B[32mEntra para o seu lugar, o número " + n2 + ", " + nomeS + ".\u001B[0m";
+                } else if (suplente.get()) {
+                    e.substiuicaoJogo(n1, n2);
+                    substituicao.set(true);
+                    return "\u001B[31mSai o número " + n1 + ", " + nomeT + ". \u001B[32mEntra para o seu lugar, o número " + n2 + ", " + nomeS + ".\u001B[0m";
+                }
+            }
         }
         return "";
     }
 
-    public void carregarDados(){
+    public void dados(){
         ViewJogo menu = new ViewJogo(menuDados);
         String [] equipas = cd.nomesEquipas();
         int size = equipas.length+1, x = 0;
@@ -365,20 +367,18 @@ public class Controlo {
             x++;
             menuEquipas[x] = e;
         }
-        menu.setHandler(1,()->{
-            try {
-                System.out.println("Nome do ficheiro: ");
-                String ficheiro = scan.nextLine();
-                cd.lerFicheiro(ficheiro);
-                menu.stop();
-            } catch (IOException | PosicaoInvalidaException e1) {
-                e1.printStackTrace();
-            }
-        });
+        menu.setHandler(1,()->{lerDados();menu.stop();});
         menu.setPreCondition(3,()->cd.existeEquipas());
         menu.setHandler(2, this::criarDados);
         menu.setHandler(3, ()->{editarDados(menuEquipas, size,false);menu.stop();});
-        menu.setHandler(4, ()->{
+        menu.setHandler(4, ()->{gravarDados();menu.stop();});
+        menu.setHandler(5,()->{resetDados();menu.stop();});
+        menu.run();
+    }
+
+    public void gravarDados(){
+        ViewJogo v = new ViewJogo(gravarDados);
+        v.setHandler(1,()->{
             System.out.println("Nome do ficheiro: ");
             String ficheiro = scan.nextLine();
             try {
@@ -386,9 +386,48 @@ public class Controlo {
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            menu.stop();
+            v.stop();
         });
-        menu.run();
+        v.setHandler(2,()->{
+            System.out.println("Nome do ficheiro objeto: ");
+            String ficheiro = scan.nextLine();
+            try {
+                cd.gravarFicheiroObjeto(ficheiro);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            v.stop();
+        });
+        v.run();
+    }
+
+    public void lerDados(){
+        ViewJogo v = new ViewJogo(lerDados);
+        v.setHandler(1,()->{
+            try {
+                System.out.println("Nome do ficheiro: ");
+                String ficheiro = scan.nextLine();
+                cd.lerFicheiro(ficheiro);
+                v.stop();
+            } catch (IOException | PosicaoInvalidaException e1) {
+                e1.printStackTrace();
+            }
+        });
+        v.setHandler(2,()->{
+            try {
+                System.out.println("Nome do ficheiro objeto: ");
+                String ficheiro = scan.nextLine();
+                cd = cd.lerFicheiroObjeto(ficheiro);
+                v.stop();
+            } catch (IOException | ClassNotFoundException e1) {
+                e1.printStackTrace();
+            }
+        });
+        v.run();
+    }
+
+    public void resetDados(){
+        this.cd = new ControloDados();
     }
 
     public void editarDados(String[] menu, int size, boolean simulacao){
@@ -396,11 +435,14 @@ public class Controlo {
         ViewJogo v = new ViewJogo(menu);
         for(int i = 1; i < size; i++){
             int finalI = i;
-            v.setHandler(i,()->editarEquipa(menu[finalI],v,simulacao));
+            v.setHandler(i,()->{
+                editarEquipa(menu[finalI],simulacao);
+                v.stop();
+            });
         }
         v.run();
     }
-    public void editarEquipa(String nome, ViewJogo v, boolean simulacao){
+    public void editarEquipa(String nome, boolean simulacao){
         EquipaFutebol e = cd.getEquipaFutebol(nome);
         cd.removeEquipa(nome);
 
@@ -423,7 +465,6 @@ public class Controlo {
             else es[3] = menuEditarEquipa[3];
         }
         if(!eliminacao.get()) cd.criarEquipa(e);
-        v.stop();
     }
 
     public boolean auxEditarEquipa(String [] ss, EquipaFutebol e, AtomicBoolean eliminacao, boolean simulacao){
@@ -433,10 +474,26 @@ public class Controlo {
         v.setPreCondition(3,()->e.getPlantel().getTitulares().size() == 11);
         v.setPreCondition(4,()->e.podeUsarTatica(e.getPlantel().getTatica()));
         v.setPreCondition(new int[]{1,5,6},()->!simulacao);
-        v.setHandler(1,()->e.setNome(auxScan(v,control)));
-        v.setHandler(2,()->editarJogadores(e,control,v));
-        v.setHandler(3,()->escolheTatica(e,control,v));
-        v.setHandler(4,()->escolheTitulares(e,control,v));
+        v.setHandler(1,()->{
+            e.setNome(auxScan());
+            v.stop();
+            control.set(true);
+        });
+        v.setHandler(2,()->{
+            editarJogadores(e);
+            v.stop();
+        });
+        v.setHandler(3,()->{
+            escolheTatica(e);
+            v.stop();
+            control.set(true);
+
+        });
+        v.setHandler(4,()->{
+            escolheTitulares(e);
+            control.set(true);
+            v.stop();
+        });
         v.setHandler(5,()->mostrarHistorico(e.getNome()));
         v.setHandler(6,()->{eliminacao.set(true);v.stop();});
         v.run();
@@ -458,9 +515,7 @@ public class Controlo {
         m.run();
     }
 
-    public void escolheTitulares(EquipaFutebol e, AtomicBoolean control, ViewJogo menuEquipa){
-        menuEquipa.stop();
-        control.set(true);
+    public void escolheTitulares(EquipaFutebol e){
         Plantel p = e.getPlantel();
         p.limpaTitulares();
         Tatica t = p.getTatica();
@@ -476,12 +531,16 @@ public class Controlo {
         e.setPlantel(p);
     }
 
-    public String picaEquipa (String[] equipasAEscolher){
+    public String picaEquipa (String[] equipasAEscolher, AtomicBoolean control){
         AtomicInteger x = new AtomicInteger(1);
         ViewJogo v = new ViewJogo(equipasAEscolher);
         for(int i = 1; i < equipasAEscolher.length; i++){
             int finalI = i;
-            v.setHandler(i,()->auxAtomicInteger(v, finalI,x));
+            v.setHandler(i,()->{
+                v.stop();
+                x.set(finalI);
+                control.set(true);
+            });
         }
         v.run();
 
@@ -515,20 +574,16 @@ public class Controlo {
         ViewJogo v = new ViewJogo(menu);
         for(int i = 1; i < menu.length; i++){
             int finalI = i-1;
-            v.setHandler(i,()->auxAtomicInteger(v, Integer.parseInt(numeros[finalI]),x));
+            v.setHandler(i,()->{
+                v.stop();
+                x.set(Integer.parseInt(numeros[finalI]));
+            });
         }
         v.run();
         return x.get();
     }
 
-    public void auxAtomicInteger(ViewJogo v, int i, AtomicInteger x){
-        v.stop();
-        x.set(i);
-    }
-
-    public void editarJogadores (EquipaFutebol e, AtomicBoolean control, ViewJogo menuEquipa){
-        menuEquipa.stop();
-        control.set(false);
+    public void editarJogadores (EquipaFutebol e){
         int x;
         String [][] jogadores = e.nomesJogadores();
         int tam = jogadores[0].length;
@@ -542,12 +597,15 @@ public class Controlo {
         ViewJogo v = new ViewJogo(menu);
         for(int i = 1; i < tam; i++){
             int finalI = i-1;
-            v.setHandler(i,()->editarJogador(e, Integer.parseInt(jogadores[1][finalI]),v));
+            v.setHandler(i,()->{
+                editarJogador(e, Integer.parseInt(jogadores[1][finalI]));
+                v.stop();
+            });
         }
         v.run();
     }
 
-    public void editarJogador(EquipaFutebol e, int numero, ViewJogo v){
+    public void editarJogador(EquipaFutebol e, int numero){
         Jogador j = e.getJogador(numero);
         e.removePlantel(numero);
 
@@ -572,14 +630,16 @@ public class Controlo {
             }
         }
         if(!transferencia.get()) e.adicionaPlantel(j);
-
-        v.stop();
     }
 
     public boolean auxEditarJogador(String[] ss, Jogador j, AtomicBoolean transferencia){
         ViewJogo editJ = new ViewJogo(ss);
         AtomicBoolean control = new AtomicBoolean(false);
-        editJ.setHandler(1,()->j.setNome(auxScan(editJ,control)));
+        editJ.setHandler(1,()->{
+            j.setNome(auxScan());
+            editJ.stop();
+            control.set(true);
+        });
         editJ.setHandler(2,()-> {
             j.setNumero(auxScanInt());
             editJ.stop();
@@ -591,7 +651,7 @@ public class Controlo {
             control.set(true);
         });
         editJ.setHandler(4,()->{
-            j.setAtributos(getAtributos(j.getPosicao()));
+            j.setAtributos(getAtributos(j.getAtributos()));
             editJ.stop();
             control.set(true);
         });
@@ -607,15 +667,16 @@ public class Controlo {
             ViewJogo aux = new ViewJogo(new String[] {""});
             aux.run();
         });
-        editJ.setHandler(7,()->{transferencia.set(true);editJ.stop();});
+        editJ.setHandler(7,()->{
+            transferencia.set(true);
+            editJ.stop();
+        });
         editJ.run();
         return control.get();
     }
 
-    public String auxScan(ViewJogo v, AtomicBoolean control){
+    public String auxScan(){
         System.out.print("@: ");
-        v.stop();
-        control.set(true);
         return this.scan.nextLine();
     }
 
@@ -658,30 +719,31 @@ public class Controlo {
 
     public boolean auxCriarJogador (String[] ss, Jogador j){
         ViewJogo jogadormenu = new ViewJogo(ss);
-        AtomicBoolean control = new AtomicBoolean(false);
+        AtomicBoolean control = new AtomicBoolean(true);
         jogadormenu.setPreCondition(new int []{2,3,4},()->!j.getNome().equals(""));
         jogadormenu.setPreCondition(4,()->!j.getPosicao().equals(""));
         jogadormenu.setPreCondition(5,()->j.getNumero()!=0 && !j.getPosicao().equals("") && j.getAtributos().overall() != 0);
-        jogadormenu.setHandler(1,()->j.setNome(auxScan(jogadormenu,control)));
+        jogadormenu.setHandler(1,()->{
+            j.setNome(auxScan());
+            jogadormenu.stop();
+        });
         jogadormenu.setHandler(2,()->{
             j.setNumero(auxScanInt());
             jogadormenu.stop();
-            control.set(true);
         });
         jogadormenu.setHandler(3,()->{
             j.setPosicao(escolhePosicao());
             jogadormenu.stop();
-            control.set(true);
         });
         jogadormenu.setHandler(4,()->{
-            j.setAtributos(getAtributos(j.getPosicao()));
-            jogadormenu.stop();
-            control.set(true);});
+            j.setAtributos(getAtributos(j.getAtributos()));
+            jogadormenu.stop();});
         jogadormenu.setHandler(5,()->{
             jogadormenu.lerEquipa();
             String nome = scan.nextLine();
             colocaJogadarNaEquipa(j,nome);
             jogadormenu.stop();
+            control.set(false);
         });
         jogadormenu.run();
         return control.get();
@@ -695,24 +757,22 @@ public class Controlo {
     }
 
     public String escolhePosicao(){
-        ViewJogo posicaomenu = new ViewJogo(menuPosicao);
+        ViewJogo menu = new ViewJogo(menuPosicao);
         String [] posicoes = {"","Guarda-Redes", "Defesa", "Lateral", "Medio","Avancado"};
 
         AtomicInteger x = new AtomicInteger(0);
-        posicaomenu.setHandler(1, ()->{ x.set(1);posicaomenu.stop(); });
-        posicaomenu.setHandler(2, ()->{ x.set(2);posicaomenu.stop(); });
-        posicaomenu.setHandler(3, ()->{ x.set(3);posicaomenu.stop(); });
-        posicaomenu.setHandler(4, ()->{ x.set(4);posicaomenu.stop(); });
-        posicaomenu.setHandler(5, ()->{ x.set(5);posicaomenu.stop(); });
-        posicaomenu.run();
+        menu.setHandler(1, ()->{ x.set(1);menu.stop(); });
+        menu.setHandler(2, ()->{ x.set(2);menu.stop(); });
+        menu.setHandler(3, ()->{ x.set(3);menu.stop(); });
+        menu.setHandler(4, ()->{ x.set(4);menu.stop(); });
+        menu.setHandler(5, ()->{ x.set(5);menu.stop(); });
+        menu.run();
         return posicoes[x.intValue()];
     }
 
 
-    public void escolheTatica(EquipaFutebol e, AtomicBoolean control, ViewJogo v){
-        v.stop();
-        control.set(true);
-        ViewJogo taticamenu = new ViewJogo(menuEscolheTatica);
+    public void escolheTatica(EquipaFutebol e){
+        ViewJogo menu = new ViewJogo(menuEscolheTatica);
         Tatica[] taticas = {new Tatica(1,2,2,4,2),
                             new Tatica(1,2,2,3,3),
                             new Tatica(1,3,2,3,2),
@@ -724,10 +784,10 @@ public class Controlo {
         int i;
         for(i = 1; i <= 6; i++){
             int finalI = i;
-            taticamenu.setPreCondition(i,()->e.podeUsarTatica(taticas[finalI -1]));
-            taticamenu.setHandler(i, ()->{x.set(finalI-1);taticamenu.stop();});
+            menu.setPreCondition(i,()->e.podeUsarTatica(taticas[finalI -1]));
+            menu.setHandler(i, ()->{x.set(finalI-1);menu.stop();});
         }
-        taticamenu.run();
+        menu.run();
         e.setTatica(taticas[x.intValue()]);
     }
 
@@ -750,114 +810,146 @@ public class Controlo {
 
     public int scanAtributo(String atributo){
         ViewJogo v = new ViewJogo();
-        v.atributosmessage(atributo);
+        v.atributosMessage(atributo);
         int i = this.scan.nextInt();
-        if(i >= 0 && i <= 99)
+        if(i >= 1 && i <= 100)
             return i;
         else {
-            v.atributosmessagerror();
+            v.atributosMessageError();
             return scanAtributo(atributo);
         }
     }
 
-    public Atributos getAtributosGR(){
-        ViewJogo menu = new ViewJogo(menuatributosGR);
-        AtributosGR atr = new AtributosGR();
-        menu.setHandler(1,()->atr.setVelocidade(scanAtributo("Velocidade")));
-        menu.setHandler(2,()->atr.setResistencia(scanAtributo("Resistência")));
-        menu.setHandler(3,()->atr.setDestreza(scanAtributo("Destreza")));
-        menu.setHandler(4,()->atr.setImpulsao(scanAtributo("Impulsão")));
-        menu.setHandler(5,()->atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça")));
-        menu.setHandler(6,()->atr.setRemate(scanAtributo("Remate")));
-        menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
-        menu.setHandler(8,()->atr.setReflexos(scanAtributo("Reflexos")));
-        menu.setHandler(9,()->atr.setElasticidade(scanAtributo("Elastecidade")));
-        menu.setHandler(10, menu::stop);
-        menu.run();
+    public Atributos getAtributosGR(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
+        ViewJogo v = new ViewJogo(menu);
+        AtributosGR atr = new AtributosGR(aot);
+        v.setHandler(1,()->{atr.setVelocidade(scanAtributo("Velocidade"));v.stop();control.set(true);});
+        v.setHandler(2,()->{atr.setResistencia(scanAtributo("Resistência"));v.stop();control.set(true);});
+        v.setHandler(3,()->{atr.setDestreza(scanAtributo("Destreza"));v.stop();control.set(true);});
+        v.setHandler(4,()->{atr.setImpulsao(scanAtributo("Impulsão"));v.stop();control.set(true);});
+        v.setHandler(5,()->{atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça"));v.stop();control.set(true);});
+        v.setHandler(6,()->{atr.setRemate(scanAtributo("Remate"));v.stop();control.set(true);});
+        v.setHandler(7,()->{atr.setControloDePasse(scanAtributo("Controlo de Passe"));v.stop();control.set(true);});
+        v.setHandler(8,()->{atr.setReflexos(scanAtributo("Reflexos"));v.stop();control.set(true);});
+        v.setHandler(9,()->{atr.setElasticidade(scanAtributo("Elastecidade"));v.stop();control.set(true);});
+        v.setHandler(10,()->{gravar.set(true);v.stop();});
+        v.run();
         return atr;
     }
 
-    public Atributos getAtributosDF(){
-        ViewJogo menu = new ViewJogo(menuatributosDF);
-        AtributosDefesa atr = new AtributosDefesa();
-        menu.setHandler(1,()->atr.setVelocidade(scanAtributo("Velocidade")));
-        menu.setHandler(2,()->atr.setResistencia(scanAtributo("Resistência")));
-        menu.setHandler(3,()->atr.setDestreza(scanAtributo("Destreza")));
-        menu.setHandler(4,()->atr.setImpulsao(scanAtributo("Impulsão")));
-        menu.setHandler(5,()->atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça")));
-        menu.setHandler(6,()->atr.setRemate(scanAtributo("Remate")));
-        menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
-        menu.setHandler(8,()->atr.setCortes(scanAtributo("Cortes")));
-        menu.setHandler(9,()->atr.setPosicionamentoDefensivo(scanAtributo("Posicionamento Defensivo")));
-        menu.setHandler(10, menu::stop);
-        menu.run();
+    public Atributos getAtributosDF(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
+        ViewJogo v = new ViewJogo(menu);
+        AtributosDefesa atr = new AtributosDefesa(aot);
+        v.setHandler(1,()->{atr.setVelocidade(scanAtributo("Velocidade"));v.stop();control.set(true);});
+        v.setHandler(2,()->{atr.setResistencia(scanAtributo("Resistência"));v.stop();control.set(true);});
+        v.setHandler(3,()->{atr.setDestreza(scanAtributo("Destreza"));v.stop();control.set(true);});
+        v.setHandler(4,()->{atr.setImpulsao(scanAtributo("Impulsão"));v.stop();control.set(true);});
+        v.setHandler(5,()->{atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça"));v.stop();control.set(true);});
+        v.setHandler(6,()->{atr.setRemate(scanAtributo("Remate"));v.stop();control.set(true);});
+        v.setHandler(7,()->{atr.setControloDePasse(scanAtributo("Controlo de Passe"));v.stop();control.set(true);});
+        v.setHandler(8,()->{atr.setCortes(scanAtributo("Cortes"));v.stop();control.set(true);});
+        v.setHandler(9,()->{atr.setPosicionamentoDefensivo(scanAtributo("Posicionamento Defensivo"));v.stop();control.set(true);});
+        v.setHandler(10,()->{gravar.set(true);v.stop();});
+        v.run();
         return atr;
     }
 
-    public Atributos getAtributosMD(){
-        ViewJogo menu = new ViewJogo(menuatributosMD);
-        AtributosMedio atr = new AtributosMedio();
-        menu.setHandler(1,()->atr.setVelocidade(scanAtributo("Velocidade")));
-        menu.setHandler(2,()->atr.setResistencia(scanAtributo("Resistência")));
-        menu.setHandler(3,()->atr.setDestreza(scanAtributo("Destreza")));
-        menu.setHandler(4,()->atr.setImpulsao(scanAtributo("Impulsão")));
-        menu.setHandler(5,()->atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça")));
-        menu.setHandler(6,()->atr.setRemate(scanAtributo("Remate")));
-        menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
-        menu.setHandler(8,()->atr.setRecuperacaoDeBolas(scanAtributo("Recuperação de Bolas")));
-        menu.setHandler(9,()->atr.setVisaoDeJogo(scanAtributo("Visão de Jogo")));
-        menu.setHandler(10, menu::stop);
-        menu.run();
+    public Atributos getAtributosMD(String[] menu,Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
+        ViewJogo v = new ViewJogo(menu);
+        AtributosMedio atr = new AtributosMedio(aot);
+        v.setHandler(1,()->{atr.setVelocidade(scanAtributo("Velocidade"));v.stop();control.set(true);});
+        v.setHandler(2,()->{atr.setResistencia(scanAtributo("Resistência"));v.stop();control.set(true);});
+        v.setHandler(3,()->{atr.setDestreza(scanAtributo("Destreza"));v.stop();control.set(true);});
+        v.setHandler(4,()->{atr.setImpulsao(scanAtributo("Impulsão"));v.stop();control.set(true);});
+        v.setHandler(5,()->{atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça"));v.stop();control.set(true);});
+        v.setHandler(6,()->{atr.setRemate(scanAtributo("Remate"));v.stop();control.set(true);});
+        v.setHandler(7,()->{atr.setControloDePasse(scanAtributo("Controlo de Passe"));v.stop();control.set(true);});
+        v.setHandler(8,()->{atr.setRecuperacaoDeBolas(scanAtributo("Recuperação de Bolas"));v.stop();control.set(true);});
+        v.setHandler(9,()->{atr.setVisaoDeJogo(scanAtributo("Visão de Jogo"));v.stop();control.set(true);});
+        v.setHandler(10,()->{gravar.set(true);v.stop();});
+        v.run();
         return atr;
     }
 
-    public Atributos getAtributosAV(){
-        ViewJogo menu = new ViewJogo(menuatributosAV);
-        AtributosAvancado atr = new AtributosAvancado();
-        menu.setHandler(1,()->atr.setVelocidade(scanAtributo("Velocidade")));
-        menu.setHandler(2,()->atr.setResistencia(scanAtributo("Resistência")));
-        menu.setHandler(3,()->atr.setDestreza(scanAtributo("Destreza")));
-        menu.setHandler(4,()->atr.setImpulsao(scanAtributo("Impulsão")));
-        menu.setHandler(5,()->atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça")));
-        menu.setHandler(6,()->atr.setRemate(scanAtributo("Remate")));
-        menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
-        menu.setHandler(8,()->atr.setDesmarcacao(scanAtributo("Desmarcação")));
-        menu.setHandler(9,()->atr.setPenaltis(scanAtributo("Penáltis")));
-        menu.setHandler(10, menu::stop);
-        menu.run();
+    public Atributos getAtributosAV(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
+        ViewJogo v = new ViewJogo(menu);
+        AtributosAvancado atr = new AtributosAvancado(aot);
+        v.setHandler(1,()->{atr.setVelocidade(scanAtributo("Velocidade"));v.stop();control.set(true);});
+        v.setHandler(2,()->{atr.setResistencia(scanAtributo("Resistência"));v.stop();control.set(true);});
+        v.setHandler(3,()->{atr.setDestreza(scanAtributo("Destreza"));v.stop();control.set(true);});
+        v.setHandler(4,()->{atr.setImpulsao(scanAtributo("Impulsão"));v.stop();control.set(true);});
+        v.setHandler(5,()->{atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça"));v.stop();control.set(true);});
+        v.setHandler(6,()->{atr.setRemate(scanAtributo("Remate"));v.stop();control.set(true);});
+        v.setHandler(7,()->{atr.setControloDePasse(scanAtributo("Controlo de Passe"));v.stop();control.set(true);});
+        v.setHandler(8,()->{atr.setDesmarcacao(scanAtributo("Desmarcação"));v.stop();control.set(true);});
+        v.setHandler(9,()->{atr.setPenaltis(scanAtributo("Penáltis"));v.stop();control.set(true);});
+        v.setHandler(10,()->{gravar.set(true);v.stop();});
+        v.run();
         return atr;
     }
 
-    public Atributos getAtributosLT(){
-        ViewJogo menu = new ViewJogo(menuatributosLT);
-        AtributosLateral atr = new AtributosLateral();
-        menu.setHandler(1,()->atr.setVelocidade(scanAtributo("Velocidade")));
-        menu.setHandler(2,()->atr.setResistencia(scanAtributo("Resistência")));
-        menu.setHandler(3,()->atr.setDestreza(scanAtributo("Destreza")));
-        menu.setHandler(4,()->atr.setImpulsao(scanAtributo("Impulsão")));
-        menu.setHandler(5,()->atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça")));
-        menu.setHandler(6,()->atr.setRemate(scanAtributo("Remate")));
-        menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
-        menu.setHandler(8,()->atr.setPrecisaoCruzamentos(scanAtributo("Precisão de Cruzamentos")));
-        menu.setHandler(9,()->atr.setDrible(scanAtributo("Drible")));
-        menu.setHandler(10, menu::stop);
-        menu.run();
+    public Atributos getAtributosLT(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
+        ViewJogo v = new ViewJogo(menu);
+        AtributosLateral atr = new AtributosLateral(aot);
+        v.setHandler(1,()->{atr.setVelocidade(scanAtributo("Velocidade"));v.stop();control.set(true);});
+        v.setHandler(2,()->{atr.setResistencia(scanAtributo("Resistência"));v.stop();control.set(true);});
+        v.setHandler(3,()->{atr.setDestreza(scanAtributo("Destreza"));v.stop();control.set(true);});
+        v.setHandler(4,()->{atr.setImpulsao(scanAtributo("Impulsão"));v.stop();control.set(true);});
+        v.setHandler(5,()->{atr.setJogoDeCabeca(scanAtributo("Jogo de Cabeça"));v.stop();control.set(true);});
+        v.setHandler(6,()->{atr.setRemate(scanAtributo("Remate"));v.stop();control.set(true);});
+        v.setHandler(7,()->{atr.setControloDePasse(scanAtributo("Controlo de Passe"));v.stop();control.set(true);});
+        v.setHandler(8,()->{atr.setPrecisaoCruzamentos(scanAtributo("Precisão de Cruzamentos"));v.stop();control.set(true);});
+        v.setHandler(9,()->{atr.setDrible(scanAtributo("Drible"));v.stop();control.set(true);});
+        v.setHandler(10,()->{gravar.set(true);v.stop();});
+        v.run();
         return atr;
     }
 
 
-    public Atributos getAtributos(String posicao){
-        switch (posicao) {
-            case "Guarda-Redes":
-                return getAtributosGR();
-            case "Defesa":
-                return getAtributosDF();
-            case "Medio":
-                return getAtributosMD();
-            case "Avancado":
-                return getAtributosAV();
-            default:
-                return getAtributosLT();
+    public Atributos getAtributos(Atributos aot){
+        String [] menu = new String[11];
+        menu[0] = menuAtributos[0];
+        menu[10] = menuAtributos[8];
+        AtomicBoolean control = new AtomicBoolean(true);
+        AtomicBoolean gravar = new AtomicBoolean(false);
+        Atributos novos = aot.clone();
+        while(control.get()) {
+            control.set(false);
+            menu[1] = menuAtributos[1]+" ["+novos.getVelocidade()+"]";
+            menu[2] = menuAtributos[2]+" ["+novos.getResistencia()+"]";
+            menu[3] = menuAtributos[3]+" ["+novos.getDestreza()+"]";
+            menu[4] = menuAtributos[4]+" ["+novos.getImpulsao()+"]";
+            menu[5] = menuAtributos[5]+" ["+novos.getJogoDeCabeca()+"]";
+            menu[6] = menuAtributos[6]+" ["+novos.getRemate()+"]";
+            menu[7] = menuAtributos[7]+" ["+novos.getControloDePasse()+"]";
+            if(novos instanceof AtributosGR) {
+                menu[8] = menuatributosGR[0] + " [" + ((AtributosGR) novos).getElasticidade() + "]";
+                menu[9] = menuatributosGR[1] + " [" + ((AtributosGR) novos).getReflexos() + "]";
+                novos = getAtributosGR(menu, novos, control, gravar);
+            }
+            else if(novos instanceof AtributosDefesa) {
+                menu[8] = menuatributosDF[0] + " [" + ((AtributosDefesa) novos).getPosicionamentoDefensivo() + "]";
+                menu[9] = menuatributosDF[1] + " [" + ((AtributosDefesa) novos).getCortes() + "]";
+                novos = getAtributosDF(menu, novos, control, gravar);
+            }
+            else if(novos instanceof AtributosMedio) {
+                menu[8] = menuatributosMD[0] + " [" + ((AtributosMedio) novos).getRecuperacaoDeBolas() + "]";
+                menu[9] = menuatributosMD[1] + " [" + ((AtributosMedio) novos).getVisaoDeJogo() + "]";
+                novos = getAtributosMD(menu, novos, control, gravar);
+            }
+            else if(novos instanceof AtributosAvancado) {
+                menu[8] = menuatributosAV[0] + " [" + ((AtributosAvancado) novos).getDesmarcacao() + "]";
+                menu[9] = menuatributosAV[1] + " [" + ((AtributosAvancado) novos).getPenaltis() + "]";
+                novos = getAtributosAV(menu, novos, control, gravar);
+            }
+            else if(novos instanceof AtributosLateral) {
+                menu[8] = menuatributosLT[0] + " [" + ((AtributosLateral) novos).getPrecisaoCruzamentos() + "]";
+                menu[9] = menuatributosLT[1] + " [" + ((AtributosLateral) novos).getDrible() + "]";
+                novos = getAtributosLT(menu, novos, control, gravar);
+            }
+            else return aot;
         }
+        if(gravar.get()) return novos;
+        else return aot;
     }
 }

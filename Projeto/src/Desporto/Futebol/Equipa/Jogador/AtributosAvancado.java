@@ -1,5 +1,6 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.io.Serializable;
 import java.text.DecimalFormat;
 
 /**
@@ -13,7 +14,7 @@ public class AtributosAvancado extends Atributos {
      *
      */
     public AtributosAvancado(){
-        this(0,0,0,0,0,0,0,0,0);
+        this(1,1,1,1,1,1,1,1,1);
     }
 
     /**
@@ -34,11 +35,23 @@ public class AtributosAvancado extends Atributos {
         this.setDesmarcacao(oAtrAv.getPenaltis());
     }
 
-        public AtributosAvancado(Atributos atributos, double x) {
+    public AtributosAvancado(Atributos atributos, double x) {
         super(atributos,x);
         int m = this.media();
         this.setDesmarcacao((int)((x+0.10)*m));
         this.setPenaltis((int)((x)*m));
+    }
+
+    public AtributosAvancado(Atributos atributos) {
+        super(atributos);
+        if(atributos instanceof AtributosAvancado){
+            this.setDesmarcacao(((AtributosAvancado) atributos).getDesmarcacao());
+            this.setPenaltis(((AtributosAvancado) atributos).getPenaltis());
+        }
+        else{
+            this.setDesmarcacao(1);
+            this.setPenaltis(1);
+        }
     }
 
     /**
@@ -96,7 +109,7 @@ public class AtributosAvancado extends Atributos {
     }
 
     public void desgaste(){
-        int r = (int) ((100 - getResistencia()) * 0.05) + 1;
+        int r = (int) ((100 - getResistencia()) * 0.025) + 1;
         this.setPenaltis(getPenaltis()-r);
         this.setDesmarcacao(getDesmarcacao()-r);
         this.setDestreza(getDestreza()-r);
