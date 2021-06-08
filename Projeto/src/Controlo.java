@@ -15,27 +15,28 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Controlo {
     private ControloDados cd;
-    private Scanner scan = new Scanner(System.in);
+    private final Scanner scan = new Scanner(System.in);
     private final String[] menuPrincipal = new String[]{
             "Menu Principal",
-            "Alterar Dados",
-            "Simular uma Partida"};
+            "Simular uma partida",
+            "Dados"};
 
-    private final String[] menuCarregarDados = new String[]{
+    private final String[] menuDados = new String[]{
             "Menu Dados",
             "Carregar dados",
             "Criar dados",
-            "Editar dados"};
+            "Ver/Editar dados",
+            "Gravar dados"};
 
-    private final String[] menuSimulação = new String[]{
-            "Simulação",
-            "Começar Simulação",
+    private final String[] menuSimulacao = new String[]{
+            "Simulacao",
+            "Começar Simulacao",
             "Editar Equipas"};
 
     private final String[] menuEditarEquipa = new String[]{
-            "Editar Equipa",
+            "Equipa",
             "Editar Nome",
-            "Editar Jogadores",
+            "Ver/Editar Jogadores",
             "Editar Tatica",
             "Escolher Titulares",
             "Ver Histórico",
@@ -43,7 +44,7 @@ public class Controlo {
     };
 
     private final String[] menuEditarJogador = new String[]{
-            "Editar Jogador",
+            "Jogador",
             "Editar Nome",
             "Editar Numero",
             "Editar Posicao",
@@ -162,12 +163,12 @@ public class Controlo {
     }
 
 
-    public void run() throws IOException, ClassNotFoundException {
+    public void run() {
         ViewJogo menu = new ViewJogo(menuPrincipal);
         menu.welcome();
         menu.setPreCondition(2,()->cd.simulacaoPossivel());
-        menu.setHandler(1, this::carregarDados);
-        menu.setHandler(2,()->simularJogo());
+        menu.setHandler(1, this::simularJogo);
+        menu.setHandler(2, this::carregarDados);
         menu.run();
     }
 
@@ -194,7 +195,7 @@ public class Controlo {
 
         System.out.println("Jogo entre "+equipaVisitada+" e "+equipaVisitante);
 
-        ViewJogo v = new ViewJogo(menuSimulação);
+        ViewJogo v = new ViewJogo(menuSimulacao);
         v.setHandler(1, ()->simulacao(equipaVisitada,equipaVisitante));
         v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,}, 3,true));
         v.run();
@@ -356,7 +357,7 @@ public class Controlo {
     }
 
     public void carregarDados(){
-        ViewJogo menu = new ViewJogo(menuCarregarDados);
+        ViewJogo menu = new ViewJogo(menuDados);
         String [] equipas = cd.nomesEquipas();
         int size = equipas.length+1, x = 0;
         String [] menuEquipas = new String[size];
@@ -377,6 +378,16 @@ public class Controlo {
         menu.setPreCondition(3,()->cd.existeEquipas());
         menu.setHandler(2, this::criarDados);
         menu.setHandler(3, ()->{editarDados(menuEquipas, size,false);menu.stop();});
+        menu.setHandler(4, ()->{
+            System.out.println("Nome do ficheiro: ");
+            String ficheiro = scan.nextLine();
+            try {
+                cd.escreverFicheiro(ficheiro);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+            menu.stop();
+        });
         menu.run();
     }
 
@@ -427,7 +438,7 @@ public class Controlo {
         v.setHandler(3,()->escolheTatica(e,control,v));
         v.setHandler(4,()->escolheTitulares(e,control,v));
         v.setHandler(5,()->mostrarHistorico(e.getNome()));
-        v.setHandler(6,()->eliminar(eliminacao,v));
+        v.setHandler(6,()->{eliminacao.set(true);v.stop();});
         v.run();
         return control.get();
     }
@@ -569,32 +580,36 @@ public class Controlo {
         ViewJogo editJ = new ViewJogo(ss);
         AtomicBoolean control = new AtomicBoolean(false);
         editJ.setHandler(1,()->j.setNome(auxScan(editJ,control)));
-        editJ.setHandler(2,()-> j.setNumero(auxScanInt(editJ,control)));
-        editJ.setHandler(3,()-> j.setPosicao(escolhePosicao(editJ,control)));
-        editJ.setHandler(4,()->j.setAtributos(getAtributos(j.getPosicao(),editJ,control)));
-        editJ.setHandler(5,()->transferencia(j,transferencia,editJ));
+        editJ.setHandler(2,()-> {
+            j.setNumero(auxScanInt());
+            editJ.stop();
+            control.set(true);
+        });
+        editJ.setHandler(3,()->{
+            j.setPosicao(escolhePosicao());
+            editJ.stop();
+            control.set(true);
+        });
+        editJ.setHandler(4,()->{
+            j.setAtributos(getAtributos(j.getPosicao()));
+            editJ.stop();
+            control.set(true);
+        });
+        editJ.setHandler(5,()-> {
+            transferencia.set(true);
+            editJ.lerEquipa();
+            String nomeEquipa = this.scan.nextLine();
+            cd.colocaJogador(j,nomeEquipa);
+            editJ.stop();
+        });
         editJ.setHandler(6,()->{
             System.out.println(j.toString());
             ViewJogo aux = new ViewJogo(new String[] {""});
             aux.run();
         });
-        editJ.setHandler(7,()->eliminar(transferencia,editJ));
+        editJ.setHandler(7,()->{transferencia.set(true);editJ.stop();});
         editJ.run();
         return control.get();
-    }
-
-    public void eliminar (AtomicBoolean transferencia, ViewJogo editJ){
-        transferencia.set(true);
-        editJ.stop();
-    }
-
-    public void transferencia (Jogador j, AtomicBoolean transferencia, ViewJogo editJ){
-        transferencia.set(true);
-        ViewJogo v = new ViewJogo();
-        v.lerequipa();
-        String nomeEquipa = this.scan.nextLine();
-        cd.colocaJogador(j,nomeEquipa);
-        editJ.stop();
     }
 
     public String auxScan(ViewJogo v, AtomicBoolean control){
@@ -604,15 +619,13 @@ public class Controlo {
         return this.scan.nextLine();
     }
 
-    public int auxScanInt(ViewJogo v, AtomicBoolean control){
+    public int auxScanInt(){
         System.out.print("@: ");
         int i = scan.nextInt();
         if(i > 0 && i <= 99){
-            v.stop();
-            control.set(true);
             return i;
         }
-        else return auxScanInt(v,control);
+        else return auxScanInt();
     }
 
     public void criarDados(){
@@ -650,38 +663,48 @@ public class Controlo {
         jogadormenu.setPreCondition(4,()->!j.getPosicao().equals(""));
         jogadormenu.setPreCondition(5,()->j.getNumero()!=0 && !j.getPosicao().equals("") && j.getAtributos().overall() != 0);
         jogadormenu.setHandler(1,()->j.setNome(auxScan(jogadormenu,control)));
-        jogadormenu.setHandler(2,()-> j.setNumero(auxScanInt(jogadormenu,control)));
-        jogadormenu.setHandler(3,()-> j.setPosicao(escolhePosicao(jogadormenu,control)));
-        jogadormenu.setHandler(4,()->j.setAtributos(getAtributos(j.getPosicao(),jogadormenu,control)));
-        jogadormenu.setHandler(5,()->colocaJogadarNaEquipa(j,jogadormenu));
+        jogadormenu.setHandler(2,()->{
+            j.setNumero(auxScanInt());
+            jogadormenu.stop();
+            control.set(true);
+        });
+        jogadormenu.setHandler(3,()->{
+            j.setPosicao(escolhePosicao());
+            jogadormenu.stop();
+            control.set(true);
+        });
+        jogadormenu.setHandler(4,()->{
+            j.setAtributos(getAtributos(j.getPosicao()));
+            jogadormenu.stop();
+            control.set(true);});
+        jogadormenu.setHandler(5,()->{
+            jogadormenu.lerEquipa();
+            String nome = scan.nextLine();
+            colocaJogadarNaEquipa(j,nome);
+            jogadormenu.stop();
+        });
         jogadormenu.run();
         return control.get();
     }
 
-    public void colocaJogadarNaEquipa (Jogador j, ViewJogo v){
-        ViewJogo aux = new ViewJogo();
-        v.lerequipa();
-        String nome = scan.nextLine();
+    public void colocaJogadarNaEquipa (Jogador j, String nome){
         while(nome.equals("")){
             nome = scan.nextLine();
         }
         cd.colocaJogador(j,nome);
-        v.stop();
     }
 
-    public String escolhePosicao(ViewJogo v, AtomicBoolean control){
+    public String escolhePosicao(){
         ViewJogo posicaomenu = new ViewJogo(menuPosicao);
         String [] posicoes = {"","Guarda-Redes", "Defesa", "Lateral", "Medio","Avancado"};
 
         AtomicInteger x = new AtomicInteger(0);
-        posicaomenu.setHandler(1, ()->x.set(auxEscolhe(1,posicaomenu)));
-        posicaomenu.setHandler(2, ()->x.set(auxEscolhe(2,posicaomenu)));
-        posicaomenu.setHandler(3, ()->x.set(auxEscolhe(3,posicaomenu)));
-        posicaomenu.setHandler(4, ()->x.set(auxEscolhe(4,posicaomenu)));
-        posicaomenu.setHandler(5, ()->x.set(auxEscolhe(5,posicaomenu)));
+        posicaomenu.setHandler(1, ()->{ x.set(1);posicaomenu.stop(); });
+        posicaomenu.setHandler(2, ()->{ x.set(2);posicaomenu.stop(); });
+        posicaomenu.setHandler(3, ()->{ x.set(3);posicaomenu.stop(); });
+        posicaomenu.setHandler(4, ()->{ x.set(4);posicaomenu.stop(); });
+        posicaomenu.setHandler(5, ()->{ x.set(5);posicaomenu.stop(); });
         posicaomenu.run();
-        v.stop();
-        control.set(true);
         return posicoes[x.intValue()];
     }
 
@@ -702,15 +725,10 @@ public class Controlo {
         for(i = 1; i <= 6; i++){
             int finalI = i;
             taticamenu.setPreCondition(i,()->e.podeUsarTatica(taticas[finalI -1]));
-            taticamenu.setHandler(i, ()->x.set(auxEscolhe(finalI-1,taticamenu)));
+            taticamenu.setHandler(i, ()->{x.set(finalI-1);taticamenu.stop();});
         }
         taticamenu.run();
         e.setTatica(taticas[x.intValue()]);
-    }
-
-    public int auxEscolhe (int i, ViewJogo v){
-        v.stop();
-        return i;
     }
 
     public void criarEquipa(){
@@ -771,7 +789,7 @@ public class Controlo {
         menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
         menu.setHandler(8,()->atr.setCortes(scanAtributo("Cortes")));
         menu.setHandler(9,()->atr.setPosicionamentoDefensivo(scanAtributo("Posicionamento Defensivo")));
-        menu.setHandler(10,()->menu.stop());
+        menu.setHandler(10, menu::stop);
         menu.run();
         return atr;
     }
@@ -788,7 +806,7 @@ public class Controlo {
         menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
         menu.setHandler(8,()->atr.setRecuperacaoDeBolas(scanAtributo("Recuperação de Bolas")));
         menu.setHandler(9,()->atr.setVisaoDeJogo(scanAtributo("Visão de Jogo")));
-        menu.setHandler(10,()->menu.stop());
+        menu.setHandler(10, menu::stop);
         menu.run();
         return atr;
     }
@@ -805,7 +823,7 @@ public class Controlo {
         menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
         menu.setHandler(8,()->atr.setDesmarcacao(scanAtributo("Desmarcação")));
         menu.setHandler(9,()->atr.setPenaltis(scanAtributo("Penáltis")));
-        menu.setHandler(10,()->menu.stop());
+        menu.setHandler(10, menu::stop);
         menu.run();
         return atr;
     }
@@ -822,36 +840,24 @@ public class Controlo {
         menu.setHandler(7,()->atr.setControloDePasse(scanAtributo("Controlo de Passe")));
         menu.setHandler(8,()->atr.setPrecisaoCruzamentos(scanAtributo("Precisão de Cruzamentos")));
         menu.setHandler(9,()->atr.setDrible(scanAtributo("Drible")));
-        menu.setHandler(10,()->menu.stop());
+        menu.setHandler(10, menu::stop);
         menu.run();
         return atr;
     }
 
 
-    public Atributos getAtributos(String posicao, ViewJogo v, AtomicBoolean control){
-        v.stop();
-        control.set(true);
-        if (posicao.equals("Guarda-Redes")){
-            return getAtributosGR();
+    public Atributos getAtributos(String posicao){
+        switch (posicao) {
+            case "Guarda-Redes":
+                return getAtributosGR();
+            case "Defesa":
+                return getAtributosDF();
+            case "Medio":
+                return getAtributosMD();
+            case "Avancado":
+                return getAtributosAV();
+            default:
+                return getAtributosLT();
         }
-        else if (posicao.equals("Defesa")){
-            return getAtributosDF();
-        }
-        else if (posicao.equals("Medio")){
-            return getAtributosMD();
-        }
-        else if (posicao.equals("Avancado")){
-            return getAtributosAV();
-        }
-        else {
-            return getAtributosLT();
-        }
-    }
-
-
-    public void terminar(){
-        ViewJogo viewJogo = new ViewJogo();
-        viewJogo.exitmessage();
-        System.exit(0);
     }
 }

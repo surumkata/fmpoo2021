@@ -73,11 +73,15 @@ public class Plantel {
     }
 
     public Jogador getTitular (int numero){
-        return this.titulares.get(numero).clone();
+        if(this.titulares.containsKey(numero))
+            return this.titulares.get(numero).clone();
+        else return null;
     }
 
     public Jogador getSuplente (int numero){
-        return this.suplentes.get(numero).clone();
+        if(this.suplentes.containsKey(numero))
+            return this.suplentes.get(numero).clone();
+        else return null;
     }
 
     public void limpaTitulares (){
@@ -155,6 +159,29 @@ public class Plantel {
         sb.append("*Tática* ").append(this.tatica.toString()).append("\n");
         sb.append("*Titulares* \n").append(titularesToString());
         sb.append("*Suplentes* \n").append(suplentesToString());
+        return sb.toString();
+    }
+
+    public String toFicheiro() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(titularesToFicheiro());
+        sb.append(suplentesToFicheiro());
+        return sb.toString();
+    }
+
+    private String suplentesToFicheiro() {
+        StringBuilder sb = new StringBuilder();
+        for(Jogador j : this.suplentes.values()){
+            sb.append(j.toFicheiro()).append("\n");
+        }
+        return sb.toString();
+    }
+
+    private String titularesToFicheiro() {
+        StringBuilder sb = new StringBuilder();
+        for(Jogador j : this.titulares.values()){
+            sb.append(j.toFicheiro()).append("\n");
+        }
         return sb.toString();
     }
 

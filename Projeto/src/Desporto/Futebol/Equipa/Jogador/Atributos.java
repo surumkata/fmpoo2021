@@ -46,8 +46,11 @@ public abstract class Atributos {
      *
      */
     public void setVelocidade(int velocidade) {
-        if(velocidade > 0)
+        if(velocidade >= 1 && velocidade <= 100)
             this.velocidade = velocidade;
+        else if(velocidade > 0){
+            this.velocidade = 100;
+        }
         else this.velocidade = 1;
     }
 
@@ -62,8 +65,11 @@ public abstract class Atributos {
      *
      */
     public void setResistencia(int resistencia) {
-        if(resistencia > 0)
+        if(resistencia >= 1 && resistencia <= 100)
             this.resistencia = resistencia;
+        else if(resistencia >= 1){
+            this.resistencia = 100;
+        }
         else this.resistencia = 1;
     }
 
@@ -78,8 +84,11 @@ public abstract class Atributos {
      *
      */
     public void setDestreza(int destreza) {
-        if (destreza > 0)
+        if(destreza >= 1 && destreza <= 100)
             this.destreza = destreza;
+        else if(destreza >= 1){
+            this.destreza = 100;
+        }
         else this.destreza = 1;
     }
 
@@ -94,8 +103,11 @@ public abstract class Atributos {
      *
      */
     public void setImpulsao(int impulsao) {
-        if(impulsao > 0)
+        if(impulsao >= 1 && impulsao <= 100)
             this.impulsao = impulsao;
+        else if(impulsao >= 1){
+            this.impulsao = 100;
+        }
         else this.impulsao = 1;
     }
 
@@ -110,8 +122,11 @@ public abstract class Atributos {
      *
      */
     public void setJogoDeCabeca(int jogoDeCabeca) {
-        if(jogoDeCabeca > 0)
+        if(jogoDeCabeca >= 1 && jogoDeCabeca <= 100)
             this.jogoDeCabeca = jogoDeCabeca;
+        else if(jogoDeCabeca >= 1){
+            this.jogoDeCabeca = 100;
+        }
         else this.jogoDeCabeca = 1;
     }
 
@@ -126,8 +141,11 @@ public abstract class Atributos {
      *
      */
     public void setRemate(int remate) {
-        if(remate > 0)
+        if(remate >= 1 && remate <= 100)
             this.remate = remate;
+        else if(remate >= 1){
+            this.remate = 100;
+        }
         else this.remate = 1;
     }
 
@@ -142,8 +160,11 @@ public abstract class Atributos {
      *
      */
     public void setControloDePasse(int controloDePasse) {
-        if(controloDePasse > 0)
+        if(controloDePasse >= 1 && controloDePasse <= 100)
             this.controloDePasse = controloDePasse;
+        else if(controloDePasse >= 1){
+            this.controloDePasse = 100;
+        }
         else this.controloDePasse = 1;
     }
 
@@ -162,7 +183,7 @@ public abstract class Atributos {
     /**
      *
      */
-    public abstract double overall();
+    public abstract int overall();
 
     public abstract void desgaste();
 
@@ -202,5 +223,17 @@ public abstract class Atributos {
 
     public int media (){
         return (getVelocidade()+getControloDePasse()+getDestreza()+getImpulsao()+getRemate()+getResistencia()+getJogoDeCabeca())/7;
+    }
+
+    public String toFicheiro() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(this.velocidade)     .append(",");
+        sb.append(this.resistencia)    .append(",");
+        sb.append(this.destreza)       .append(",");
+        sb.append(this.impulsao)       .append(",");
+        sb.append(this.jogoDeCabeca)   .append(",");
+        sb.append(this.remate)         .append(",");
+        sb.append(this.controloDePasse);
+        return sb.toString();
     }
 }

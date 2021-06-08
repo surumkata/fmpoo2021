@@ -6,9 +6,7 @@ import Desporto.Futebol.Equipa.Plantel;
 import Desporto.Futebol.Equipa.Tatica;
 import Desporto.Futebol.Partida.PartidaFutebol;
 
-import java.io.BufferedReader;
-import java.io.FileReader;
-import java.io.IOException;
+import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -168,16 +166,6 @@ public class ControloDados {
         this.partidas.put(equipa2,l2);
     }
 
-    public String historicoString2 (String equipa){
-        List<PartidaFutebol> l = historico(equipa);
-        StringBuilder sb = new StringBuilder();
-        sb.append("  **Partidas**\n");
-        for(PartidaFutebol p : l){
-            sb.append(p.toString()).append("\n");
-        }
-        return sb.toString();
-    }
-
     public String[] historicoString (String equipa){
         List<PartidaFutebol> l = historico(equipa);
         String[] s = new String[l.size()+1];
@@ -210,6 +198,20 @@ public class ControloDados {
         return l;
     }
 
+    public void escreverFicheiro(String ficheiro) throws IOException{
+        BufferedWriter writer = new BufferedWriter(new FileWriter("inputFiles\\"+ficheiro));
+        for(EquipaFutebol e : this.equipas.values()){
+            writer.append("Equipa:");
+            writer.append(e.toFicheiro());
+        }
+        List<PartidaFutebol> l = todasPartidas();
+        for(PartidaFutebol p : l){
+            writer.append("Jogo:");
+            writer.append(p.toFicheiro());
+        }
+        writer.close();
+    }
+
     public void lerFicheiro(String ficheiro) throws IOException, PosicaoInvalidaException {
         BufferedReader reader = new BufferedReader(new FileReader("inputFiles\\"+ficheiro));
         EquipaFutebol e = new EquipaFutebol();
@@ -227,12 +229,12 @@ public class ControloDados {
             else if (l.contains("Jogo:")){
                 if(!primeiraEquipa){
                     criarEquipa(e);
+                    primeiraEquipa = true;
                 }
-                else primeiraEquipa = true;
-                System.out.println(l);
+                boolean gravar = true;
                 // Jogo:<EquipaCasa>,<EquipaFora>,<ScoreCasa>,<ScoreFora>,<Data>,<JogadoresCasa>,<SubstituicoesCasa>,<JogadoresFora>,<SubstituicoesFora>
                 // Jogo:Sporting Club Shostakovich,Mendelssohn F. C.,0,0,2021-03-30,43,30,1,22,33,11,38,31,39,6,12,22->37,43->25,25->3,2,1,40,16,25,49,41,17,14,33,36,1->42,49->31,14->45
-                String[] parametros = l.split(",");
+                String[] parametros = l.split(",",-1);
                 String equipaA = parametros[0].split(":")[1];
                 String equipaB = parametros[1];
                 int golosVisitado = Integer.parseInt(parametros[2]);
@@ -242,45 +244,78 @@ public class ControloDados {
                 EquipaFutebol eB = getEquipaFutebol(equipaB);
                 Plantel pA = eA.getPlantel(); pA.limpaTitulares();
                 Plantel pB = eB.getPlantel(); pB.limpaTitulares();
-                System.out.println(eA.toString());
-                System.out.println(eB.toString());
 
-                for(int x = 5; x <= 15; x++){
+                for(int x = 5; x <= 15 && gravar; x++){
                     int numero = Integer.parseInt(parametros[x]);
-                    pA.removeSuplente(numero);
-                    pA.adicionaTitular(eA.getJogador(numero));
+                    if(eA.getJogador(numero)!=null) {
+                        pA.removeSuplente(numero);
+                        pA.adicionaTitular(eA.getJogador(numero));
+                    }
+                    else gravar = false;
                 }
-                for(int x = 19; x <= 29; x++){
+                for(int x = 19; x <= 29 && gravar; x++){
                     int numero = Integer.parseInt(parametros[x]);
-                    pB.removeSuplente(numero);
-                    pB.adicionaTitular(eB.getJogador(numero));
+                    if(eB.getJogador(numero)!=null) {
+                        pB.removeSuplente(numero);
+                        pB.adicionaTitular(eB.getJogador(numero));
+                    }
+                    else gravar = false;
                 }
                 eA.setPlantel(pA);
                 eB.setPlantel(pB);
                 PartidaFutebol partida = new PartidaFutebol(eA,eB,data,golosVisitado,golosVisitante);
-                for(int x = 16; x <= 18; x++){
-                    if(!parametros[x].equals("")){
+                int [][] subsC = new int[][] {new int[]{0,0,0},new int[]{0,0,0}};
+                int [][] subsF = new int[][] {new int[]{0,0,0},new int[]{0,0,0}};
+                for(int x = 16; x <= 18 && gravar; x++){
+                    if(parametros[x].contains("->")){
                         int n1 = Integer.parseInt(parametros[x].split("->")[0]);
                         int n2 = Integer.parseInt(parametros[x].split("->")[1]);
-                        partida.decSubstituicoes(true,n1,n2);
+                        boolean jaSub = false;
+                        for(int i = 0; i < (x-16); i++){
+                            if (n1 == subsC[0][i] || n2 == subsC[1][i]) {
+                                jaSub = true;
+                                break;
+                            }
+                        }
+                        if(!jaSub && pA.getTitular(n1) != null && pA.getSuplente(n2) != null) {
+                            partida.decSubstituicoes(true, n1, n2);
+                            subsC[0][x - 16] = n1;
+                            subsC[1][x - 16] = n2;
+                        }
+                        else
+                            gravar = false;
                     }
                 }
-                for(int x = 30; x <= 32; x++){
-                    if(!parametros[x].equals("")){
+                for(int x = 30; x <= 32 && gravar; x++){
+                    if(parametros[x].contains("->")){
                         int n1 = Integer.parseInt(parametros[x].split("->")[0]);
                         int n2 = Integer.parseInt(parametros[x].split("->")[1]);
-                        partida.decSubstituicoes(false,n1,n2);
+                        boolean jaSub = false;
+                        for(int i = 0; i < (x-30); i++){
+                            if (n1 == subsF[0][i] || n2 == subsF[1][i]) {
+                                jaSub = true;
+                                break;
+                            }
+                        }
+                        if(!jaSub && pB.getTitular(n1) != null && pB.getSuplente(n2) != null) {
+                            partida.decSubstituicoes(false, n1, n2);
+                            subsF[0][x - 30] = n1;
+                            subsF[1][x - 30] = n2;
+                        }
+                        else
+                            gravar = false;
                     }
                 }
-                adicionaPartida(partida);
+                if(gravar) adicionaPartida(partida);
 
 
             }
             else{
-                System.out.println(l);
                 Jogador j = new Jogador(l);
-                j.addEquipaHistorial(e.getNome());
-                e.adicionaPlantel(j);
+                if(j.getNumero() != 0 && !j.getNome().equals("") && !j.getPosicao().equals("")) {
+                    j.addEquipaHistorial(e.getNome());
+                    e.adicionaPlantel(j);
+                }
             }
         }
         if (!primeiraEquipa)

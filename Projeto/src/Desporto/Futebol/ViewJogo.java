@@ -9,12 +9,12 @@ public class ViewJogo {
 
     /** Functional interface para handlers. */
     public interface Handler {  // método de tratamento
-        public void execute();
+        void execute();
     }
 
     /** Functional interface para pré-condições. */
     public interface PreCondition {  // Predicate ?
-        public boolean validate();
+        boolean validate();
     }
 
     // Varíável de classe para suportar leitura
@@ -137,11 +137,7 @@ public class ViewJogo {
         System.out.println("Welcome!!!\n");
     }
 
-    public void exitmessage(){
-        System.out.println("ByeBye!!!\n");
-    }
-
-    public void lerequipa(){
+    public void lerEquipa(){
         System.out.print("Qual o nome da Equipa: ");
     }
 

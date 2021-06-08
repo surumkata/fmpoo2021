@@ -43,8 +43,11 @@ public class AtributosLateral extends Atributos {
      *
      */
     public void setPrecisaoCruzamentos(int precisaoCruzamentos) {
-        if(precisaoCruzamentos > 0)
+        if(precisaoCruzamentos >= 1 && precisaoCruzamentos <= 100)
             this.precisaoCruzamentos = precisaoCruzamentos;
+        else if(precisaoCruzamentos >= 1){
+            this.precisaoCruzamentos = 100;
+        }
         else this.precisaoCruzamentos = 1;
     }
 
@@ -59,8 +62,11 @@ public class AtributosLateral extends Atributos {
      *
      */
     public void setDrible(int drible) {
-        if(drible > 0)
+        if(drible >= 1 && drible <= 100)
             this.drible = drible;
+        else if(drible >= 1){
+            this.drible = 100;
+        }
         else this.drible = 1;
     }
 
@@ -81,10 +87,10 @@ public class AtributosLateral extends Atributos {
     /**
      *
      */
-    public double overall (){
-        return this.getDrible() * 0.1 + this.getResistencia() * 0.2 + this.getVelocidade() * 0.15 + this.getDestreza() * 0.1 +
+    public int overall (){
+        return (int) (this.getDrible() * 0.1 + this.getResistencia() * 0.2 + this.getVelocidade() * 0.15 + this.getDestreza() * 0.1 +
                 this.getImpulsao() * 0.05 + this.getJogoDeCabeca() * 0.05 + this.getRemate() * 0.05 +
-                this.getControloDePasse() * 0.1 + this.getPrecisaoCruzamentos() * 0.2;
+                this.getControloDePasse() * 0.1 + this.getPrecisaoCruzamentos() * 0.2);
     }
 
     public void desgaste(){
@@ -119,6 +125,12 @@ public class AtributosLateral extends Atributos {
     public String toString() {
         return super.toString() +
                 "Precisao de Cruzamentos: " + this.precisaoCruzamentos + "\n" +
-                "Reflexos: " + this.drible + "\n";
+                "Drible: " + this.drible + "\n";
+    }
+
+    public String toFicheiro() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toFicheiro()).append(",").append(this.precisaoCruzamentos);
+        return sb.toString();
     }
 }

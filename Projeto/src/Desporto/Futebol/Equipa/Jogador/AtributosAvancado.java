@@ -1,5 +1,7 @@
 package Desporto.Futebol.Equipa.Jogador;
 
+import java.text.DecimalFormat;
+
 /**
  *
  */
@@ -43,8 +45,11 @@ public class AtributosAvancado extends Atributos {
      *
      */
     public void setPenaltis(int penaltis) {
-        if(penaltis > 0)
+        if(penaltis >= 1 && penaltis <= 100)
             this.penaltis = penaltis;
+        else if(penaltis >= 1){
+            this.penaltis = 100;
+        }
         else this.penaltis = 1;
     }
 
@@ -59,8 +64,11 @@ public class AtributosAvancado extends Atributos {
      *
      */
     public void setDesmarcacao(int desmarcacao) {
-        if (desmarcacao>0)
+        if(desmarcacao >= 1 && desmarcacao <= 100)
             this.desmarcacao = desmarcacao;
+        else if(desmarcacao >= 1){
+            this.desmarcacao = 100;
+        }
         else this.desmarcacao = 1;
     }
 
@@ -81,10 +89,10 @@ public class AtributosAvancado extends Atributos {
     /**
      *
      */
-    public double overall (){
-        return this.getDesmarcacao() * 0.15 + this.getResistencia() * 0.1 + this.getVelocidade() * 0.1 + this.getDestreza() * 0.1 +
+    public int overall (){
+        return (int) (this.getDesmarcacao() * 0.15 + this.getResistencia() * 0.1 + this.getVelocidade() * 0.1 + this.getDestreza() * 0.1 +
                 this.getImpulsao() * 0.1 + this.getJogoDeCabeca() * 0.15 + this.getRemate() * 0.2 +
-                this.getControloDePasse() * 0.05 + this.getPenaltis() * 0.05;
+                this.getControloDePasse() * 0.05 + this.getPenaltis() * 0.05);
     }
 
     public void desgaste(){
@@ -119,8 +127,12 @@ public class AtributosAvancado extends Atributos {
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append(super.toString());
-        sb.append("Elasticidade: ").append(this.penaltis).append("\n");
-        sb.append("Reflexos: ")    .append(this.desmarcacao)    .append("\n");
+        sb.append("Penaltis: ").append(this.penaltis).append("\n");
+        sb.append("Desmarcacao: ")    .append(this.desmarcacao)    .append("\n");
         return sb.toString();
+    }
+
+    public String toFicheiro() {
+        return super.toFicheiro();
     }
 }

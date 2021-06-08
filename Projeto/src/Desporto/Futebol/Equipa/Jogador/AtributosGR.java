@@ -23,6 +23,12 @@ public class AtributosGR extends Atributos {
         this.setReflexos(ref);
     }
 
+    public AtributosGR(Atributos aot, int ela, int ref){
+        super(aot);
+        this.setElasticidade(ela);
+        this.setReflexos(ref);
+    }
+
     /**
      *
      */
@@ -42,8 +48,11 @@ public class AtributosGR extends Atributos {
      *
      */
     public void setElasticidade(int elasticidade) {
-        if(elasticidade > 0)
+        if(elasticidade >= 1 && elasticidade <= 100)
             this.elasticidade = elasticidade;
+        else if(elasticidade >= 1){
+            this.elasticidade = 100;
+        }
         else this.elasticidade = 1;
     }
 
@@ -58,8 +67,11 @@ public class AtributosGR extends Atributos {
      *
      */
     public void setReflexos(int reflexos) {
-        if (reflexos > 0)
+        if(reflexos >= 1 && reflexos <= 100)
             this.reflexos = reflexos;
+        else if(reflexos >= 1){
+            this.reflexos = 100;
+        }
         else this.reflexos = 1;
     }
 
@@ -80,10 +92,10 @@ public class AtributosGR extends Atributos {
     /**
      *
      */
-    public double overall (){
-        return this.getReflexos() * 0.3 + this.getResistencia() * 0.025 + this.getVelocidade() * 0.125 + this.getDestreza() * 0.025 +
+    public int overall (){
+        return (int) (this.getReflexos() * 0.3 + this.getResistencia() * 0.025 + this.getVelocidade() * 0.125 + this.getDestreza() * 0.025 +
                 this.getImpulsao() * 0.2 + this.getJogoDeCabeca() * 0.025 + this.getRemate() * 0.00 +
-                this.getControloDePasse() * 0.1 + this.getElasticidade() * 0.2;
+                this.getControloDePasse() * 0.1 + this.getElasticidade() * 0.2);
     }
 
     public void desgaste(){
@@ -120,6 +132,12 @@ public class AtributosGR extends Atributos {
         sb.append(super.toString());
         sb.append("Elasticidade: ").append(this.elasticidade).append("\n");
         sb.append("Reflexos: ")    .append(this.reflexos);
+        return sb.toString();
+    }
+
+    public String toFicheiro() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toFicheiro()).append(",").append(this.elasticidade);
         return sb.toString();
     }
 }

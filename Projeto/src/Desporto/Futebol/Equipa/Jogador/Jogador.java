@@ -210,119 +210,118 @@ public class Jogador {
         return sb.toString();
     }
 
-    public int habilidadeExtra () throws PosicaoInvalidaException{
-        int habExt = 0;
+    public int habilidadeExtra (int media){
         Random num = new Random();
-        switch(this.getPosicao()){
-            case "Guarda-Redes":
-            habExt = getAtributos().media() + ((AtributosGR) getAtributos()).getElasticidade()
-            + ((AtributosGR) getAtributos()).getReflexos();
-                break;
-            case "Defesa":
-            habExt = getAtributos().media() + ((AtributosDefesa) this.getAtributos()).getPosicionamentoDefensivo() + 
-                    ((AtributosDefesa) this.getAtributos()).getCortes() + 5 - num.nextInt(10);
-                break;
-            case "Medio":
-            habExt = getAtributos().media() + ((AtributosMedio) this.getAtributos()).getRecuperacaoDeBolas() + 
-                    ((AtributosMedio) this.getAtributos()).getVisaoDeJogo() + 5 - num.nextInt(10);
-                break;
-            case "Lateral":
-            habExt = getAtributos().media() + ((AtributosLateral) this.getAtributos()).getPrecisaoCruzamentos() + 
-                    ((AtributosLateral) this.getAtributos()).getDrible() + 5 - num.nextInt(10);
-                break;
-            case "Avancado":
-            habExt = getAtributos().media() + ((AtributosAvancado) this.getAtributos()).getPenaltis() + 
-                    ((AtributosAvancado) this.getAtributos()).getDesmarcacao() + 5 - num.nextInt(10);
-                break;
-            default:
-                throw new PosicaoInvalidaException();
-        }
-        return habExt;
+        return media + 5 - num.nextInt(10);
     }
 
     public Jogador (String linha) throws PosicaoInvalidaException {
         this();
         String[] parametros = linha.split(",");
+        if(!jogadorValido(parametros))
+            return;
         String[] aux = parametros[0].split(":");
+        int [] habilidades = new int[8];
+        for(int i = 0; i < parametros.length-2; i++){
+
+            try {
+                habilidades[i] = Integer.parseInt(parametros[i + 2]);
+            }
+            catch(NumberFormatException e){
+                habilidades[i] = 1;
+            }
+        }
+        int media = 0;
+        for(int i = 0; i < 7; i++){
+            media += habilidades[i];
+        }
+        media /= 7;
+        this.setNome(aux[1]);
+        try{
+            this.setNumero(Integer.parseInt(parametros[1]));
+        }
+        catch(NumberFormatException e){
+            this.setNumero(0);
+        }
+        this.setPosicao(aux[0]);
+        this.historial = new ArrayList<>();
         switch(aux[0]){
                 case "Guarda-Redes":
-                this.setNome(aux[1]);
-                this.setNumero(Integer.parseInt(parametros[1]));
-                this.setPosicao(aux[0]);
-                this.historial = new ArrayList<>();
-                this.setAtributos(new AtributosGR(Integer.parseInt(parametros[2]),
-                                               Integer.parseInt(parametros[3]),
-                                               Integer.parseInt(parametros[4]),
-                                               Integer.parseInt(parametros[5]),
-                                               Integer.parseInt(parametros[6]),
-                                               Integer.parseInt(parametros[7]),
-                                               Integer.parseInt(parametros[8]),
-                                               Integer.parseInt(parametros[9]),
-                                               this.habilidadeExtra()));
+                this.setAtributos(new AtributosGR(habilidades[0],
+                                                  habilidades[1],
+                                                  habilidades[2],
+                                                  habilidades[3],
+                                                  habilidades[4],
+                                                  habilidades[5],
+                                                  habilidades[6],
+                                                  habilidades[7],
+                                                  habilidadeExtra(media)));
                 break;
                 case "Defesa":
-                this.setNome(aux[1]);
-                this.setNumero(Integer.parseInt(parametros[1]));
-                this.setPosicao(aux[0]);
-                this.historial = new ArrayList<>();
-                this.setAtributos(new AtributosDefesa(Integer.parseInt(parametros[2]),
-                                                   Integer.parseInt(parametros[3]),
-                                                   Integer.parseInt(parametros[4]),
-                                                   Integer.parseInt(parametros[5]),
-                                                   Integer.parseInt(parametros[6]),
-                                                   Integer.parseInt(parametros[7]),
-                                                   Integer.parseInt(parametros[8]),
-                                                   this.habilidadeExtra(),
-                                                   this.habilidadeExtra()));
+                this.setAtributos(new AtributosDefesa(habilidades[0],
+                                                      habilidades[1],
+                                                      habilidades[2],
+                                                      habilidades[3],
+                                                      habilidades[4],
+                                                      habilidades[5],
+                                                      habilidades[6],
+                                                      this.habilidadeExtra(media),
+                                                      this.habilidadeExtra(media)));
                 break;
                 case "Medio":
-                this.setNome(aux[1]);
-                this.setNumero(Integer.parseInt(parametros[1]));
-                this.setPosicao(aux[0]);
-                this.historial = new ArrayList<>();
-                this.setAtributos(new AtributosMedio(Integer.parseInt(parametros[2]),
-                                                  Integer.parseInt(parametros[3]),
-                                                  Integer.parseInt(parametros[4]),
-                                                  Integer.parseInt(parametros[5]),
-                                                  Integer.parseInt(parametros[6]),
-                                                  Integer.parseInt(parametros[7]),
-                                                  Integer.parseInt(parametros[8]),
-                                                  Integer.parseInt(parametros[9]),
-                                                  this.habilidadeExtra()));
+                this.setAtributos(new AtributosMedio(habilidades[0],
+                                                     habilidades[1],
+                                                     habilidades[2],
+                                                     habilidades[3],
+                                                     habilidades[4],
+                                                     habilidades[5],
+                                                     habilidades[6],
+                                                     habilidades[7],
+                                                     this.habilidadeExtra(media)));
                     break;
                 case "Lateral":
-                this.setNome(aux[1]);
-                this.setNumero(Integer.parseInt(parametros[1]));
-                this.setPosicao(aux[0]);
-                this.historial = new ArrayList<>();
-                this.setAtributos(new AtributosLateral(Integer.parseInt(parametros[2]),
-                                                    Integer.parseInt(parametros[3]),
-                                                    Integer.parseInt(parametros[4]),
-                                                    Integer.parseInt(parametros[5]),
-                                                    Integer.parseInt(parametros[6]),
-                                                    Integer.parseInt(parametros[7]),
-                                                    Integer.parseInt(parametros[8]),
-                                                    Integer.parseInt(parametros[9]),
-                                                    this.habilidadeExtra()));
+                this.setAtributos(new AtributosLateral(habilidades[0],
+                                                       habilidades[1],
+                                                       habilidades[2],
+                                                       habilidades[3],
+                                                       habilidades[4],
+                                                       habilidades[5],
+                                                       habilidades[6],
+                                                       habilidades[7],
+                                                       this.habilidadeExtra(media)));
                     break;
                 case "Avancado":
-                this.setNome(aux[1]);
-                this.setNumero(Integer.parseInt(parametros[1]));
-                this.setPosicao(aux[0]);
-                this.historial = new ArrayList<>();
-                this.setAtributos(new AtributosAvancado(Integer.parseInt(parametros[2]),
-                                                     Integer.parseInt(parametros[3]),
-                                                     Integer.parseInt(parametros[4]),
-                                                     Integer.parseInt(parametros[5]),
-                                                     Integer.parseInt(parametros[6]),
-                                                     Integer.parseInt(parametros[7]),
-                                                     Integer.parseInt(parametros[8]),
-                                                     this.habilidadeExtra(),
-                                                     this.habilidadeExtra()));
+                this.setAtributos(new AtributosAvancado(habilidades[0],
+                                                        habilidades[1],
+                                                        habilidades[2],
+                                                        habilidades[3],
+                                                        habilidades[4],
+                                                        habilidades[5],
+                                                        habilidades[6],
+                                                        this.habilidadeExtra(media),
+                                                        this.habilidadeExtra(media)));
                     break;
                 default:
                     throw new PosicaoInvalidaException();
         }
     }
 
+    public boolean jogadorValido (String[] parametros){
+        String [] aux = parametros[0].split(":");
+        if (aux[0].equals("Guarda-Redes") || aux[0].equals("Lateral") || aux[0].equals("Medio"))
+            return parametros.length == 10 && aux.length == 2;
+        else if (aux[0].equals("Defesa") || aux[0].equals("Avancado"))
+            return parametros.length == 9 && aux.length == 2;
+        else
+            return false;
+    }
+
+    public String toFicheiro() {
+        final StringBuilder sb = new StringBuilder();
+        sb.append(this.getPosicao()).append(":");
+        sb.append(this.getNome()).append(",");
+        sb.append(this.getNumero()).append(",");
+        sb.append(this.getAtributos().toFicheiro());
+        return sb.toString();
+    }
 }

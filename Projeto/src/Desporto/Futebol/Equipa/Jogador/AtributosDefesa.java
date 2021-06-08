@@ -43,8 +43,11 @@ public class AtributosDefesa extends Atributos {
      *
      */
     public void setPosicionamentoDefensivo(int posicionamentoDefensivo) {
-        if (posicionamentoDefensivo > 0)
+        if(posicionamentoDefensivo >= 1 && posicionamentoDefensivo <= 100)
             this.posicionamentoDefensivo = posicionamentoDefensivo;
+        else if(posicionamentoDefensivo >= 1){
+            this.posicionamentoDefensivo = 100;
+        }
         else this.posicionamentoDefensivo = 1;
     }
 
@@ -59,8 +62,11 @@ public class AtributosDefesa extends Atributos {
      *
      */
     public void setCortes(int cortes) {
-        if(cortes > 0)
+        if(cortes >= 1 && cortes <= 100)
             this.cortes = cortes;
+        else if(cortes >= 1){
+            this.cortes = 100;
+        }
         else this.cortes = 1;
     }
 
@@ -81,10 +87,10 @@ public class AtributosDefesa extends Atributos {
     /**
      *
      */
-    public double overall (){
-        return this.getPosicionamentoDefensivo() * 0.2 + this.getResistencia() * 0.1 + this.getVelocidade() * 0.05 + this.getDestreza() * 0.05 +
+    public int overall (){
+        return (int) (this.getPosicionamentoDefensivo() * 0.2 + this.getResistencia() * 0.1 + this.getVelocidade() * 0.05 + this.getDestreza() * 0.05 +
                 this.getImpulsao() * 0.15 + this.getJogoDeCabeca() * 0.1 + this.getRemate() * 0.05 +
-                this.getControloDePasse() * 0.1 + this.getCortes() * 0.2;
+                this.getControloDePasse() * 0.1 + this.getCortes() * 0.2);
     }
 
     public void desgaste(){
@@ -119,6 +125,10 @@ public class AtributosDefesa extends Atributos {
     public String toString() {
         return super.toString() +
                 "Precisao de Cruzamentos: " + this.posicionamentoDefensivo + "\n" +
-                "Reflexos: " + this.cortes + "\n";
+                "Cortes: " + this.cortes + "\n";
+    }
+
+    public String toFicheiro() {
+        return super.toFicheiro();
     }
 }

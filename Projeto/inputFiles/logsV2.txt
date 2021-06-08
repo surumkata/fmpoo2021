@@ -221,7 +221,7 @@ Medio:Luis Francisco Ferreira Faria,43,97,95,18,89,74,65,80,67
 Avancado:Ana Miguel da Costa Peixoto Macedo,7,62,26,57,66,76,60,51
 Avancado:Antonio Maria De Araujo Serra Lobo Guerra,9,52,72,71,62,63,29,61
 Avancado:Diogo da Silva Rebelo,25,47,19,57,13,79,61,55
-Avancado:Simao Pedro Sa Cunha,45,9,51,86,23,74,52,24
+Avancado:Simao Pedro Sa Cunha,45,9,ola,86,23,74,52,24
 Guarda-Redes:Joao Silva Torres,16,50,55,12,90,68,63,60,82
 Lateral:Paulo Ricardo Dias da Costa,30,58,7,58,59,75,95,58,55
 Medio:Muhammad Ilham,20,34,73,66,38,36,39,73,58
@@ -314,20 +314,20 @@ Medio:Tiago Lucas Alves,46,58,60,60,60,66,24,52,12
 Lateral:Jeanete Alves do Couto,3,93,26,99,39,55,59,31,66
 Guarda-Redes:Tiago Passos Rodrigues,12,75,10,67,95,50,50,89,100
 Equipa:Debussy Athletic
-Guarda-Redes:Miguel Angelo Alves de Freitas,21,62,54,69,56,57,72,72,95
-Lateral:Joao Nuno Pereira Barbosa,32,40,63,94,71,81,96,62,54
-Defesa:Marco Antonio Dias Martins,5,17,94,24,92,68,69,80
-Defesa:Jorge Daniel Pereira Da Silva,6,61,59,57,44,54,71,66
-Lateral:Jose Luis Noval Fernandes Mendes,41,56,68,55,47,52,50,65,100
-Medio:Francisco Jose Martinho Toldy,45,96,29,72,55,70,69,52,1
-Medio:Jose Pedro Gomes Ferreira,12,69,58,91,63,52,41,50,33
-Medio:Maria Eugenia Bessa Cunha,22,11,72,55,91,57,65,81,64
-Medio:Ana Beatriz Ribeiro e Silva,48,54,85,80,79,44,89,67,55
-Avancado:Vasco Baptista Moreno,28,67,68,58,99,93,56,66
-Avancado:Joao Aniceto Rodrigues Rocha,3,54,69,77,58,64,54,9
-Defesa:Pedro Daniel Almeida Castro,42,44,64,80,69,71,71,99
-Guarda-Redes:Pedro Miguel Ribeiro Ferreira,18,52,67,70,52,56,58,72,21
-Lateral:Tiago Luis Dias da Silva,4,37,82,7,76,59,61,52,72
+Guarda-Redes:Miguel Angelo Alves de Freitas,21,999999,999999,99999,99999,9999,9999,99999,99999
+Lateral:Joao Nuno Pereira Barbosa,32,999999,999999,99999,99999,9999,9999,99999,99999
+Defesa:Marco Antonio Dias Martins,5,999999,999999,99999,99999,9999,9999,99999
+Defesa:Jorge Daniel Pereira Da Silva,6,999999,999999,99999,99999,9999,9999,99999
+Lateral:Jose Luis Noval Fernandes Mendes,41,999999,999999,99999,99999,9999,9999,99999,99999
+Medio:Francisco Jose Martinho Toldy,45,999999,999999,99999,99999,9999,9999,99999,99999
+Medio:Jose Pedro Gomes Ferreira,12,999999,999999,99999,99999,9999,9999,99999,99999
+Medio:Maria Eugenia Bessa Cunha,22,999999,999999,99999,99999,9999,9999,99999,99999
+Medio:Ana Beatriz Ribeiro e Silva,48,999999,999999,99999,99999,9999,9999,99999,99999
+Avancado:Vasco Baptista Moreno,28,999999,999999,99999,99999,9999,9999,99999
+Avancado:Joao Aniceto Rodrigues Rocha,3,999999,999999,99999,99999,9999,9999,99999
+Defesa:Pedro Daniel Almeida Castro,42,999999,999999,99999,99999,9999,9999,99999,99999
+Guarda-Redes:Pedro Miguel Ribeiro Ferreira,18,999999,999999,99999,99999,9999,9999,99999,99999
+Lateral:Tiago Luis Dias da Silva,7,999999,999999,99999,99999,9999,9999,99999,99999
 Medio:Augusto Cesar Oliveira Campos,36,85,58,64,50,93,66,4,67
 Avancado:Diogo Andre de Mata Rodrigues,16,66,86,74,73,75,89,30
 Medio:Andre Mateus Pires Presa,15,76,62,94,48,41,86,89,97

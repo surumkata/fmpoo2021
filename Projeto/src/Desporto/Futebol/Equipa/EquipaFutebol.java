@@ -63,15 +63,12 @@ public class EquipaFutebol{
 
     public Jogador getJogador (int numero){
         if(this.plantel.existeTitular(numero)){
-            System.out.println("encontrado "+numero);
             return this.plantel.getTitular(numero);
         }
         else if(this.plantel.existeSuplente(numero)) {
-            System.out.println("encontrado "+numero);
             return this.plantel.getSuplente(numero);
         }
         else {
-            System.out.println("null "+numero);
             return null;
         }
     }
@@ -135,7 +132,14 @@ public class EquipaFutebol{
     public String toString(){
         StringBuilder sb = new StringBuilder();
         sb.append("*Nome* ").append(this.nome).append("\n");
-        sb.append(this.plantel);
+        sb.append(this.plantel.toString());
+        return sb.toString();
+    }
+
+    public String toFicheiro(){
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.nome).append("\n");
+        sb.append(this.plantel.toFicheiro());
         return sb.toString();
     }
 

@@ -194,19 +194,49 @@ public class PartidaFutebol {
         return sb.toString();
     }
 
+    public String toFicheiro() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(equipaVisitada.getNome()).append(",");
+        sb.append(equipaVisitante.getNome()).append(",");
+        sb.append(golosVisitado).append(",").append(golosVisitante).append(",");
+        sb.append(data.toString());
+        sb.append(numerosEquipa(true));
+        sb.append(numerosEquipa(false));
+        sb.append("\n");
+        return sb.toString();
+    }
 
+    private String numerosEquipa(boolean visitado) {
+        StringBuilder sb = new StringBuilder();
+        EquipaFutebol e;
+        int [][]subs;
+        if(visitado) {
+            e = this.equipaVisitada;
+            subs = this.subsVisitada;
+        }
+        else {
+            e = this.equipaVisitante;
+            subs = this.subsVisitante;
+        }
+        for(int n : e.getPlantel().getTitulares().keySet()){
+            sb.append(",").append(n);
+        }
 
-    //                                  ******       *****     ***     
+        for(int i = 0; i < 3; i++){
+            sb.append(",");
+            if(!(subs[0][i] == 0)){
+                sb.append(subs[0][i]).append("->").append(subs[1][i]);
+            }
+        }
+        return sb.toString();
+    }
+
+    //                                  ******       *****     ***
     // Jogo:<EquipaCasa>,<EquipaFora>,<ScoreCasa>,<ScoreFora>,<Data>,<JogadoresCasa>,<SubstituicoesCasa>,<JogadoresFora>,<SubstituicoesFora>
     // Jogo:Sporting Club Shostakovich,Mendelssohn F. C.,0,0,2021-03-30,43,30,1,22,33,11,38,31,39,6,12,22->37,43->25,25->3,2,1,40,16,25,49,41,17,14,33,36,1->42,49->31,14->45
 
-    public PartidaFutebol (String l){
-        this();
-
-        //completar
 
 
-    }
 }
 
 

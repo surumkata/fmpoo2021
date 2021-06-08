@@ -44,8 +44,11 @@ public class AtributosMedio extends Atributos {
      *
      */
     public void setRecuperacaoDeBolas(int recuperacaoDeBolas) {
-        if(recuperacaoDeBolas > 0)
+        if(recuperacaoDeBolas >= 1 && recuperacaoDeBolas <= 100)
             this.recuperacaoDeBolas = recuperacaoDeBolas;
+        else if(recuperacaoDeBolas >= 1){
+            this.recuperacaoDeBolas = 100;
+        }
         else this.recuperacaoDeBolas = 1;
     }
 
@@ -60,8 +63,11 @@ public class AtributosMedio extends Atributos {
      *
      */
     public void setVisaoDeJogo(int visaoDeJogo) {
-        if(visaoDeJogo > 0)
+        if(visaoDeJogo >= 1 && visaoDeJogo <= 100)
             this.visaoDeJogo = visaoDeJogo;
+        else if(visaoDeJogo >= 1){
+            this.visaoDeJogo = 100;
+        }
         else this.visaoDeJogo = 1;
     }
 
@@ -82,10 +88,10 @@ public class AtributosMedio extends Atributos {
     /**
      *
      */
-    public double overall (){
-        return this.getVisaoDeJogo() * 0.2 + this.getResistencia() * 0.05 + this.getVelocidade() * 0.05 + this.getDestreza() * 0.1 +
+    public int overall (){
+        return (int) (this.getVisaoDeJogo() * 0.2 + this.getResistencia() * 0.05 + this.getVelocidade() * 0.05 + this.getDestreza() * 0.1 +
                 this.getImpulsao() * 0.05 + this.getJogoDeCabeca() * 0.1 + this.getRemate() * 0.1 +
-                this.getControloDePasse() * 0.2 + this.getRecuperacaoDeBolas() * 0.15;
+                this.getControloDePasse() * 0.2 + this.getRecuperacaoDeBolas() * 0.15);
     }
 
     public void desgaste(){
@@ -122,6 +128,12 @@ public class AtributosMedio extends Atributos {
         sb.append(super.toString());
         sb.append("Recuperação de Bolas: ").append(this.recuperacaoDeBolas).append("\n");
         sb.append("Visão de Jogo: ")               .append(this.visaoDeJogo)             .append("\n");
+        return sb.toString();
+    }
+
+    public String toFicheiro() {
+        StringBuilder sb = new StringBuilder();
+        sb.append(super.toFicheiro()).append(",").append(this.recuperacaoDeBolas);
         return sb.toString();
     }
 }
