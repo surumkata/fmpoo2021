@@ -151,14 +151,13 @@ public class Controlo {
      * Corre o programa começando pelo menu principal
      */
     public void run() {
-        System.out.print("\033[H\033[2J");
         ViewJogo menu = new ViewJogo(menuPrincipal);
+        menu.limpaTela();
         menu.welcome();
         menu.setPreCondition(2,()->cd.simulacaoPossivel());
         menu.setHandler(1, this::simularJogo);
         menu.setHandler(2, this::dados);
         menu.run();
-        System.out.print("\033[H\033[2J");
     }
 
     /**
@@ -175,8 +174,11 @@ public class Controlo {
         }
         AtomicBoolean control = new AtomicBoolean(false);
         String equipaVisitada = pickEquipa(equipasVisitadas,control);
-        if(!control.get())
+        if (!control.get()) {
+            ViewJogo w = new ViewJogo();
+            w.welcome();
             return;
+        }
         es.remove(equipaVisitada);
 
         String [] equipasVisitantes = new String[1+es.size()];
@@ -188,16 +190,20 @@ public class Controlo {
         }
         control.set(false);
         String equipaVisitante = pickEquipa(equipasVisitantes, control);
-        if(!control.get())
+        if(!control.get()){
+            ViewJogo w = new ViewJogo();
+            w.welcome();
             return;
+        }
         System.out.println("Jogo entre "+equipaVisitada+" e "+equipaVisitante);
 
         ViewJogo v = new ViewJogo(menuSimulacao);
-        v.welcome();
+        v.limpaTela();
         v.setHandler(1, ()->simulacao(equipaVisitada,equipaVisitante));
         v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,}, 3,true));
         v.run();
-
+        v.limpaTela();
+        v.welcome();
 
     }
 
@@ -384,7 +390,7 @@ public class Controlo {
      */
     public void dados(){
         ViewJogo menu = new ViewJogo(menuDados);
-        System.out.print("\033[H\033[2J");
+        menu.limpaTela();
         String [] equipas = cd.nomesEquipas();
         int size = equipas.length+1, x = 0;
         String [] menuEquipas = new String[size];
@@ -399,7 +405,8 @@ public class Controlo {
         menu.setHandler(4, ()->{gravarDados();menu.stop();});
         menu.setHandler(5,()->{resetDados();menu.stop();});
         menu.run();
-        System.out.print("\033[H\033[2J");
+        menu.limpaTela();
+        menu.welcome();
     }
 
     /**
@@ -429,6 +436,7 @@ public class Controlo {
             v.stop();
         });
         v.run();
+        v.limpaTela();
     }
 
     /**
@@ -458,6 +466,7 @@ public class Controlo {
             }
         });
         v.run();
+        v.limpaTela();
     }
 
     /**
@@ -484,6 +493,7 @@ public class Controlo {
             });
         }
         v.run();
+        v.limpaTela();
     }
     /**
      * Menu para a edição de uma equipa
@@ -491,7 +501,6 @@ public class Controlo {
      * @param simulacao Booleano que verifica se está a decorrer um jogo
      */
     public void editarEquipa(String nome, boolean simulacao){
-        System.out.print("\033[H\033[2J");
         EquipaFutebol e = cd.getEquipaFutebol(nome);
         cd.removeEquipa(nome);
 
@@ -514,7 +523,6 @@ public class Controlo {
             else es[3] = menuEditarEquipa[3];
         }
         if(!eliminacao.get()) cd.criarEquipa(e);
-        System.out.print("\033[H\033[2J");
     }
 
     /**
@@ -527,6 +535,7 @@ public class Controlo {
      */
     public boolean auxEditarEquipa(String [] ss, EquipaFutebol e, AtomicBoolean eliminacao, boolean simulacao){
         ViewJogo v = new ViewJogo(ss);
+        v.limpaTela();
         AtomicBoolean control = new AtomicBoolean(false);
         v.setPreCondition(2,()->!simulacao && e.getPlantel().getnJogadoresNoPlantel() > 0);
         v.setPreCondition(3,()->e.getPlantel().getTitulares().size() == 11);
@@ -563,10 +572,10 @@ public class Controlo {
      * @param equipa Equipa a saber o histórico
      */
     public void mostrarHistorico (String equipa){
-        System.out.print("\033[H\033[2J");
         String [] menu = this.cd.historicoString(equipa);
         List<PartidaFutebol> l = this.cd.historico(equipa);
         ViewJogo m = new ViewJogo(menu);
+        m.limpaTela();
         for(int i = 1; i < menu.length; i++){
             int finalI = i-1;
             m.setHandler(i,()->{
@@ -576,7 +585,7 @@ public class Controlo {
             });
         }
         m.run();
-        System.out.print("\033[H\033[2J");
+        m.limpaTela();
     }
 
     /**
@@ -584,7 +593,6 @@ public class Controlo {
      * @param e Equipa de futebol onde se encontram os jogadores
      */
     public void escolheTitulares(EquipaFutebol e){
-        System.out.print("\033[H\033[2J");
         Plantel p = e.getPlantel();
         p.limpaTitulares();
         Tatica t = p.getTatica();
@@ -598,7 +606,6 @@ public class Controlo {
         }
 
         e.setPlantel(p);
-        System.out.print("\033[H\033[2J");
     }
 
     /**
@@ -608,9 +615,9 @@ public class Controlo {
      * @return Equipa escolhida
      */
     public String pickEquipa (String[] equipasAEscolher, AtomicBoolean control){
-        System.out.print("\033[H\033[2J");
         AtomicInteger x = new AtomicInteger(1);
         ViewJogo v = new ViewJogo(equipasAEscolher);
+        v.limpaTela();
         for(int i = 1; i < equipasAEscolher.length; i++){
             int finalI = i;
             v.setHandler(i,()->{
@@ -620,8 +627,8 @@ public class Controlo {
             });
         }
         v.run();
+        v.limpaTela();
 
-        System.out.print("\033[H\033[2J");
         return equipasAEscolher[x.get()];
     }
 
@@ -632,7 +639,6 @@ public class Controlo {
      * @param np Número de posições por escolher
      */
     public void pickTitulares (Plantel p, String posicao, int np){
-        System.out.print("\033[H\033[2J");
         int x;
         while (np > 0){
             String [][] jogadores = p.nomesSuplentes(posicao);
@@ -650,18 +656,18 @@ public class Controlo {
             p.adicionaTitular(j);
             np--;
         }
-        System.out.print("\033[H\033[2J");
     }
 
     /**
      * Controlador para o menu da escolha dos titulares
      * @param menu Array de strings com os parâmetros do menu
      * @param numeros Array de strings com os números dos jogadores (em forma de string) a serem escolhidos para titulares
-     * @return Novo número do jogador
+     * @return Número do jogador
      */
     public int auxPickTitulares(String[] menu, String[] numeros){
         AtomicInteger x = new AtomicInteger(Integer.parseInt(numeros[0]));
         ViewJogo v = new ViewJogo(menu);
+        v.limpaTela();
         for(int i = 1; i < menu.length; i++){
             int finalI = i-1;
             v.setHandler(i,()->{
@@ -670,6 +676,7 @@ public class Controlo {
             });
         }
         v.run();
+        v.limpaTela();
         return x.get();
     }
 
@@ -678,7 +685,6 @@ public class Controlo {
      * @param e Equipa de futebol com os jogadores a serem alterados
      */
     public void editarJogadores (EquipaFutebol e){
-        System.out.print("\033[H\033[2J");
         int x;
         String [][] jogadores = e.nomesJogadores();
         int tam = jogadores[0].length;
@@ -690,6 +696,7 @@ public class Controlo {
             menu[x] = jogadores[0][x-1]+"["+jogadores[1][x-1]+"]";
         }
         ViewJogo v = new ViewJogo(menu);
+        v.limpaTela();
         for(int i = 1; i < tam; i++){
             int finalI = i-1;
             v.setHandler(i,()->{
@@ -698,7 +705,7 @@ public class Controlo {
             });
         }
         v.run();
-        System.out.print("\033[H\033[2J");
+        v.limpaTela();
     }
 
     /**
@@ -707,7 +714,6 @@ public class Controlo {
      * @param numero Número do jogador a encontrar
      */
     public void editarJogador(EquipaFutebol e, int numero){
-        System.out.print("\033[H\033[2J");
         Jogador j = e.getJogador(numero);
         e.removePlantel(numero);
 
@@ -732,7 +738,6 @@ public class Controlo {
             }
         }
         if(!transferencia.get()) e.adicionaPlantel(j);
-        System.out.print("\033[H\033[2J");
     }
 
     /**
@@ -744,6 +749,7 @@ public class Controlo {
      */
     public boolean auxEditarJogador(String[] ss, Jogador j, AtomicBoolean transferencia){
         ViewJogo editJ = new ViewJogo(ss);
+        editJ.limpaTela();
         AtomicBoolean control = new AtomicBoolean(false);
         editJ.setHandler(1,()->{
             j.setNome(auxScan());
@@ -782,6 +788,7 @@ public class Controlo {
             editJ.stop();
         });
         editJ.run();
+        editJ.limpaTela();
         return control.get();
     }
 
@@ -849,6 +856,7 @@ public class Controlo {
      */
     public boolean auxCriarJogador (String[] ss, Jogador j){
         ViewJogo jogadormenu = new ViewJogo(ss);
+        jogadormenu.limpaTela();
         AtomicBoolean control = new AtomicBoolean(true);
         jogadormenu.setPreCondition(new int []{2,3,4},()->!j.getNome().equals(""));
         jogadormenu.setPreCondition(4,()->!j.getPosicao().equals(""));
@@ -876,6 +884,7 @@ public class Controlo {
             control.set(false);
         });
         jogadormenu.run();
+        jogadormenu.limpaTela();
         return control.get();
     }
 
