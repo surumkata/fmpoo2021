@@ -13,6 +13,12 @@ import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * Classe responsável por adicionar um menu a um evento da aplicação, onde se incluem um controlador de execução de partidas, um scanner,
+ * array de strings para o menu principal, para o menu dos dados, para o menu das gravações os dados, para o menu das leituras dos dados,
+ * para o menu da simulação de uma partida, para o menu da edição de equipas, para o menu de edição de jogadores, para o menu de criação de dados,
+ * para o menu da criação de jogadores, para o menu das posições dos jogadores, para o menu da escolha do esquema tático e dos atributos dos jogadores
+ */
 public class Controlo {
     private ControloDados cd;
     private final Scanner scan = new Scanner(System.in);
@@ -134,21 +140,30 @@ public class Controlo {
             "Substituicoes ",
             "Substituicoes "};
 
-
+    /**
+     * Construtor vazio de controlo
+     */
     public Controlo() {
         this.cd = new ControloDados();
     }
 
-
+    /**
+     * Corre o programa começando pelo menu principal
+     */
     public void run() {
+        System.out.print("\033[H\033[2J");
         ViewJogo menu = new ViewJogo(menuPrincipal);
         menu.welcome();
         menu.setPreCondition(2,()->cd.simulacaoPossivel());
         menu.setHandler(1, this::simularJogo);
         menu.setHandler(2, this::dados);
         menu.run();
+        System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Menu das escolhas das equipas para jogar
+     */
     public void simularJogo(){
         List<String> es = this.cd.nomesEquipasProntas();
         String [] equipasVisitadas = new String[1+es.size()];
@@ -159,7 +174,7 @@ public class Controlo {
             x++;
         }
         AtomicBoolean control = new AtomicBoolean(false);
-        String equipaVisitada = picaEquipa(equipasVisitadas,control);
+        String equipaVisitada = pickEquipa(equipasVisitadas,control);
         if(!control.get())
             return;
         es.remove(equipaVisitada);
@@ -172,12 +187,13 @@ public class Controlo {
             x++;
         }
         control.set(false);
-        String equipaVisitante = picaEquipa(equipasVisitantes, control);
+        String equipaVisitante = pickEquipa(equipasVisitantes, control);
         if(!control.get())
             return;
         System.out.println("Jogo entre "+equipaVisitada+" e "+equipaVisitante);
 
         ViewJogo v = new ViewJogo(menuSimulacao);
+        v.welcome();
         v.setHandler(1, ()->simulacao(equipaVisitada,equipaVisitante));
         v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,}, 3,true));
         v.run();
@@ -185,6 +201,11 @@ public class Controlo {
 
     }
 
+    /**
+     * Simula uma partida de futebol com as várias mensagens para os vários eventos de um jogo de futebol
+     * @param equipaVisitada Nome da equipa da casa
+     * @param equipaVisitante Nome da equipa visitante
+     */
     public void simulacao(String equipaVisitada, String equipaVisitante){
         EquipaFutebol visitadaO = this.cd.getEquipaFutebol(equipaVisitada);
         EquipaFutebol visitanteO = this.cd.getEquipaFutebol(equipaVisitante);
@@ -204,14 +225,8 @@ public class Controlo {
                 posIntervalo = true;
                 simulacao[0] = "Intervalo " + resultado;
             }
-            else{
+            else
                 simulacao[0] = "Simulacao " + resultado;
-            }
-            //if(!substituicoes.get()){
-            //    visitada.desgasteJogo();
-            //    visitante.desgasteJogo();
-            //}
-            //else substituicoes.set(false);
             substituicoes.set(false);
 
             AtomicInteger s1 = new AtomicInteger(exp.getSubsRestantes(true));
@@ -255,13 +270,19 @@ public class Controlo {
         this.cd.adicionaPartida(p);
     }
 
-
-
+    /**
+     * Efetua uma substituição, mostrando uma mensagem a anunciar esse evento
+     * @param e Equipa de futebol que vai efetuar uma substituição
+     * @param substituicao Booleano verifica se foi feita a substituição
+     * @param numeroTitular Número da camisola do jogador em campo
+     * @param numeroATrocar Número da camisola do substituto
+     * @return Mensagem a anunciar a substituição
+     */
     public String substituicoes(EquipaFutebol e, AtomicBoolean substituicao, AtomicInteger numeroTitular, AtomicInteger numeroATrocar){
         Plantel p = e.getPlantel();
         int x;
         String [][] titulares = p.nomesTitulares();
-        String [][] suplentes = p.nomesSupelentes();
+        String [][] suplentes = p.nomesSuplentes();
         int tamT = titulares[0].length;
         int tamS = suplentes[0].length;
         String [] menu = new String[tamT+1];
@@ -358,8 +379,12 @@ public class Controlo {
         return "";
     }
 
+    /**
+     * Menu para ler, criar, editar, gravar e fazer reset de dados
+     */
     public void dados(){
         ViewJogo menu = new ViewJogo(menuDados);
+        System.out.print("\033[H\033[2J");
         String [] equipas = cd.nomesEquipas();
         int size = equipas.length+1, x = 0;
         String [] menuEquipas = new String[size];
@@ -374,10 +399,15 @@ public class Controlo {
         menu.setHandler(4, ()->{gravarDados();menu.stop();});
         menu.setHandler(5,()->{resetDados();menu.stop();});
         menu.run();
+        System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Menu da gravação de dados
+     */
     public void gravarDados(){
         ViewJogo v = new ViewJogo(gravarDados);
+        
         v.setHandler(1,()->{
             System.out.println("Nome do ficheiro: ");
             String ficheiro = scan.nextLine();
@@ -401,8 +431,12 @@ public class Controlo {
         v.run();
     }
 
+    /**
+     * Menu da leitura de dados
+     */
     public void lerDados(){
         ViewJogo v = new ViewJogo(lerDados);
+        
         v.setHandler(1,()->{
             try {
                 System.out.println("Nome do ficheiro: ");
@@ -426,10 +460,19 @@ public class Controlo {
         v.run();
     }
 
+    /**
+     * Reset dos dados
+     */
     public void resetDados(){
         this.cd = new ControloDados();
     }
 
+    /**
+     * Menu para a edição de dados
+     * @param menu Menu inicial que vai ser alterado
+     * @param size 
+     * @param simulacao
+     */
     public void editarDados(String[] menu, int size, boolean simulacao){
         menu[0] = "Editar Equipas";
         ViewJogo v = new ViewJogo(menu);
@@ -442,7 +485,13 @@ public class Controlo {
         }
         v.run();
     }
+    /**
+     * Menu para a edição de uma equipa
+     * @param nome Nome da equipa a editar
+     * @param simulacao Booleano que verifica se está a decorrer um jogo
+     */
     public void editarEquipa(String nome, boolean simulacao){
+        System.out.print("\033[H\033[2J");
         EquipaFutebol e = cd.getEquipaFutebol(nome);
         cd.removeEquipa(nome);
 
@@ -465,8 +514,17 @@ public class Controlo {
             else es[3] = menuEditarEquipa[3];
         }
         if(!eliminacao.get()) cd.criarEquipa(e);
+        System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Controlador para o menu da edição de equipa
+     * @param ss Array de strings com os parâmetros do menu
+     * @param e Equipa de futebol a alterar
+     * @param eliminacao Booleano que verifica se é para eliminar a equipa
+     * @param simulacao Booleano que verifica se está a jogar
+     * @return true se bem sucedido, false caso contrário
+     */
     public boolean auxEditarEquipa(String [] ss, EquipaFutebol e, AtomicBoolean eliminacao, boolean simulacao){
         ViewJogo v = new ViewJogo(ss);
         AtomicBoolean control = new AtomicBoolean(false);
@@ -500,7 +558,12 @@ public class Controlo {
         return control.get();
     }
 
+    /**
+     * Menu para o histórico das partidas efetuadas por uma dada equipa
+     * @param equipa Equipa a saber o histórico
+     */
     public void mostrarHistorico (String equipa){
+        System.out.print("\033[H\033[2J");
         String [] menu = this.cd.historicoString(equipa);
         List<PartidaFutebol> l = this.cd.historico(equipa);
         ViewJogo m = new ViewJogo(menu);
@@ -513,9 +576,15 @@ public class Controlo {
             });
         }
         m.run();
+        System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Escolhe os titulares de uma equipa de futebol
+     * @param e Equipa de futebol onde se encontram os jogadores
+     */
     public void escolheTitulares(EquipaFutebol e){
+        System.out.print("\033[H\033[2J");
         Plantel p = e.getPlantel();
         p.limpaTitulares();
         Tatica t = p.getTatica();
@@ -525,13 +594,21 @@ public class Controlo {
 
         int x;
         for(x = 0; x < 5; x++){
-            picaTitulares(p,posicoes[x],nposicoes[x]);
+            pickTitulares(p,posicoes[x],nposicoes[x]);
         }
 
         e.setPlantel(p);
+        System.out.print("\033[H\033[2J");
     }
 
-    public String picaEquipa (String[] equipasAEscolher, AtomicBoolean control){
+    /**
+     * Escolhe a equipa desejada pelo utilizador
+     * @param equipasAEscolher Array de strings com as equipas por escolher
+     * @param control Controlador
+     * @return Equipa escolhida
+     */
+    public String pickEquipa (String[] equipasAEscolher, AtomicBoolean control){
+        System.out.print("\033[H\033[2J");
         AtomicInteger x = new AtomicInteger(1);
         ViewJogo v = new ViewJogo(equipasAEscolher);
         for(int i = 1; i < equipasAEscolher.length; i++){
@@ -544,12 +621,18 @@ public class Controlo {
         }
         v.run();
 
-
+        System.out.print("\033[H\033[2J");
         return equipasAEscolher[x.get()];
     }
 
-
-    public void picaTitulares (Plantel p, String posicao, int np){
+    /**
+     * Menu para a escolha dos titulares para o onze inicial
+     * @param p Plantel para onde se vai escolher os vários jogadores
+     * @param posicao Posição para onde se vai escolher jogadores
+     * @param np Número de posições por escolher
+     */
+    public void pickTitulares (Plantel p, String posicao, int np){
+        System.out.print("\033[H\033[2J");
         int x;
         while (np > 0){
             String [][] jogadores = p.nomesSuplentes(posicao);
@@ -561,15 +644,22 @@ public class Controlo {
                 x++;
                 menu[x] = jogadores[0][x-1]+"["+jogadores[1][x-1]+"]";
             }
-            int n = auxPicaTitulares(menu, jogadores[1]);
+            int n = auxPickTitulares(menu, jogadores[1]);
             Jogador j = p.getSuplente(n);
             p.removeSuplente(n);
             p.adicionaTitular(j);
             np--;
         }
+        System.out.print("\033[H\033[2J");
     }
 
-    public int auxPicaTitulares(String[] menu, String[] numeros){
+    /**
+     * Controlador para o menu da escolha dos titulares
+     * @param menu Array de strings com os parâmetros do menu
+     * @param numeros Array de strings com os números dos jogadores (em forma de string) a serem escolhidos para titulares
+     * @return Novo número do jogador
+     */
+    public int auxPickTitulares(String[] menu, String[] numeros){
         AtomicInteger x = new AtomicInteger(Integer.parseInt(numeros[0]));
         ViewJogo v = new ViewJogo(menu);
         for(int i = 1; i < menu.length; i++){
@@ -583,7 +673,12 @@ public class Controlo {
         return x.get();
     }
 
+    /**
+     * Edita vários jogadores de uma equipa de futebol
+     * @param e Equipa de futebol com os jogadores a serem alterados
+     */
     public void editarJogadores (EquipaFutebol e){
+        System.out.print("\033[H\033[2J");
         int x;
         String [][] jogadores = e.nomesJogadores();
         int tam = jogadores[0].length;
@@ -603,9 +698,16 @@ public class Controlo {
             });
         }
         v.run();
+        System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Menu para a edição de um jogador
+     * @param e Equipa de futebol onde o jogador se encontra
+     * @param numero Número do jogador a encontrar
+     */
     public void editarJogador(EquipaFutebol e, int numero){
+        System.out.print("\033[H\033[2J");
         Jogador j = e.getJogador(numero);
         e.removePlantel(numero);
 
@@ -630,8 +732,16 @@ public class Controlo {
             }
         }
         if(!transferencia.get()) e.adicionaPlantel(j);
+        System.out.print("\033[H\033[2J");
     }
 
+    /**
+     * Controlador para o menu da edição de jogadores
+     * @param ss Array de strings com os parâmetros do menu
+     * @param j Jogador a ser alterado
+     * @param transferencia Booleano que verifica que um jogador vai ser transferido
+     * @return true se bem sucedido, false caso contrário
+     */
     public boolean auxEditarJogador(String[] ss, Jogador j, AtomicBoolean transferencia){
         ViewJogo editJ = new ViewJogo(ss);
         AtomicBoolean control = new AtomicBoolean(false);
@@ -675,11 +785,19 @@ public class Controlo {
         return control.get();
     }
 
+    /**
+     * Menu para detetar uma string introduzida pelo utilizador
+     * @return String introduzida pelo utilizador
+     */
     public String auxScan(){
         System.out.print("@: ");
         return this.scan.nextLine();
     }
 
+    /**
+     * Controlador para o menu de introdução de strings
+     * @return Valor entre 0 e 100
+     */
     public int auxScanInt(){
         System.out.print("@: ");
         int i = scan.nextInt();
@@ -689,6 +807,9 @@ public class Controlo {
         else return auxScanInt();
     }
 
+    /**
+     * Menu para a criação de dados
+     */
     public void criarDados(){
         ViewJogo menu = new ViewJogo(menuCriarDados);
         menu.setHandler(1, this::criarJogador);
@@ -696,6 +817,9 @@ public class Controlo {
         menu.run();
     }
 
+    /**
+     * Menu para a criação de um jogador
+     */
     public void criarJogador(){
         Jogador j = new Jogador();
         String [] js = new String[6];
@@ -717,6 +841,12 @@ public class Controlo {
         }
     }
 
+    /**
+     * Controlador para o menu da ciração de um jogador
+     * @param ss Array de strings com os parâmetros de um menu
+     * @param j Jogador a criar
+     * @return true se foi bem sucedido, false caso contrário
+     */
     public boolean auxCriarJogador (String[] ss, Jogador j){
         ViewJogo jogadormenu = new ViewJogo(ss);
         AtomicBoolean control = new AtomicBoolean(true);
@@ -749,6 +879,11 @@ public class Controlo {
         return control.get();
     }
 
+    /**
+     * Coloca um jogador numa equipa
+     * @param j Jogador
+     * @param nome Nome do jogador à escolha
+     */
     public void colocaJogadarNaEquipa (Jogador j, String nome){
         while(nome.equals("")){
             nome = scan.nextLine();
@@ -756,6 +891,10 @@ public class Controlo {
         cd.colocaJogador(j,nome);
     }
 
+    /**
+     * Escolhe a posição de um jogador
+     * @return String com a posição escolhida
+     */
     public String escolhePosicao(){
         ViewJogo menu = new ViewJogo(menuPosicao);
         String [] posicoes = {"","Guarda-Redes", "Defesa", "Lateral", "Medio","Avancado"};
@@ -770,7 +909,10 @@ public class Controlo {
         return posicoes[x.intValue()];
     }
 
-
+    /**
+     * Altera a tática de uma equipa de futebol
+     * @param e Equipa de futebol 
+     */
     public void escolheTatica(EquipaFutebol e){
         ViewJogo menu = new ViewJogo(menuEscolheTatica);
         Tatica[] taticas = {new Tatica(1,2,2,4,2),
@@ -791,6 +933,9 @@ public class Controlo {
         e.setTatica(taticas[x.intValue()]);
     }
 
+    /**
+     * Cria uma equipa com um dado nome
+     */
     public void criarEquipa(){
         System.out.println("Escolhe um nome para a tua equipa.");
         String nome = nomeEquipa();
@@ -798,6 +943,10 @@ public class Controlo {
         System.out.println("Equipa criada com sucesso.");
     }
 
+    /**
+     * Devolve o nome de uma equipa à escolha
+     * @return Nome da equipa
+     */
     public String nomeEquipa(){
         String nome = scan.nextLine();
         if(!cd.existeEquipa(nome))
@@ -808,6 +957,11 @@ public class Controlo {
         }
     }
 
+    /**
+     * Devolve o valor de um atributo à escolha
+     * @param atributo Atributo para o qual se quer atribuir um valor
+     * @return Valor para o atributo
+     */
     public int scanAtributo(String atributo){
         ViewJogo v = new ViewJogo();
         v.atributosMessage(atributo);
@@ -820,6 +974,14 @@ public class Controlo {
         }
     }
 
+    /**
+     * Devolve os atributos de um guarda-redes em forma de menu
+     * @param menu Menu a ser alterado
+     * @param aot Atributos de um guarda-redes
+     * @param control Booleano para alterar o estado
+     * @param gravar Booleano para gravar o objeto
+     * @return Atributos de um guarda-redes em forma de um menu
+     */
     public Atributos getAtributosGR(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
         ViewJogo v = new ViewJogo(menu);
         AtributosGR atr = new AtributosGR(aot);
@@ -837,6 +999,14 @@ public class Controlo {
         return atr;
     }
 
+    /**
+     * Devolve os atributos de um defesa em forma de menu
+     * @param menu Menu a ser alterado
+     * @param aot Atributos de um defesa
+     * @param control Booleano para alterar o estado
+     * @param gravar Booleano para gravar o objeto
+     * @return Atributos de um defesa em forma de um menu
+     */
     public Atributos getAtributosDF(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
         ViewJogo v = new ViewJogo(menu);
         AtributosDefesa atr = new AtributosDefesa(aot);
@@ -854,6 +1024,14 @@ public class Controlo {
         return atr;
     }
 
+    /**
+     * Devolve os atributos de um médio em forma de menu
+     * @param menu Menu a ser alterado
+     * @param aot Atributos de um médio
+     * @param control Booleano para alterar o estado
+     * @param gravar Booleano para gravar o objeto
+     * @return Atributos de um médio em forma de um menu
+     */
     public Atributos getAtributosMD(String[] menu,Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
         ViewJogo v = new ViewJogo(menu);
         AtributosMedio atr = new AtributosMedio(aot);
@@ -871,6 +1049,14 @@ public class Controlo {
         return atr;
     }
 
+    /**
+     * Devolve os atributos de um avançado em forma de menu
+     * @param menu Menu a ser alterado
+     * @param aot Atributos de um avançado
+     * @param control Booleano para alterar o estado
+     * @param gravar Booleano para gravar o objeto
+     * @return Atributos de um avançado em forma de um menu
+     */
     public Atributos getAtributosAV(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
         ViewJogo v = new ViewJogo(menu);
         AtributosAvancado atr = new AtributosAvancado(aot);
@@ -888,6 +1074,14 @@ public class Controlo {
         return atr;
     }
 
+    /**
+     * Devolve os atributos de um lateral em forma de menu
+     * @param menu Menu a ser alterado
+     * @param aot Atributos de um lateral
+     * @param control Booleano para alterar o estado
+     * @param gravar Booleano para gravar o objeto
+     * @return Atributos de um lateral em forma de um menu
+     */
     public Atributos getAtributosLT(String[] menu, Atributos aot, AtomicBoolean control, AtomicBoolean gravar){
         ViewJogo v = new ViewJogo(menu);
         AtributosLateral atr = new AtributosLateral(aot);
@@ -905,7 +1099,11 @@ public class Controlo {
         return atr;
     }
 
-
+    /**
+     * Devolve os atributos de um jogador em forma de menu
+     * @param aot Atributos de um jogador
+     * @return Atributos em forma de menu
+     */
     public Atributos getAtributos(Atributos aot){
         String [] menu = new String[11];
         menu[0] = menuAtributos[0];

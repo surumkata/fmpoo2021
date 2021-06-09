@@ -2,6 +2,9 @@ package Desporto.Futebol;
 
 import java.util.*;
 
+/**
+ * Classe para o menu do jogo
+ */
 public class ViewJogo {
 
 
@@ -55,7 +58,6 @@ public class ViewJogo {
 
     /**
      * Correr o NewMenu.
-     *
      * Termina com a opção 0 (zero).
      */
     public void run() {
@@ -133,30 +135,64 @@ public class ViewJogo {
         return op;
     }
 
+    /**
+     * Mensagem de boas vindas
+     */
     public void welcome(){
-        System.out.println("Welcome!!!\n");
+        System.out.println("███████╗███╗░░░███╗  ██████╗░░█████╗░░█████╗░  ██████╗░░█████╗░██████╗░░░███╗░░");
+        System.out.println("██╔════╝████╗░████║  ██╔══██╗██╔══██╗██╔══██╗  ╚════██╗██╔══██╗╚════██╗░████║░░");
+        System.out.println("█████╗░░██╔████╔██║  ██████╔╝██║░░██║██║░░██║  ░░███╔═╝██║░░██║░░███╔═╝██╔██║░░");
+        System.out.println("██╔══╝░░██║╚██╔╝██║  ██╔═══╝░██║░░██║██║░░██║  ██╔══╝░░██║░░██║██╔══╝░░╚═╝██║░░");
+        System.out.println("██║░░░░░██║░╚═╝░██║  ██║░░░░░╚█████╔╝╚█████╔╝  ███████╗╚█████╔╝███████╗███████╗");
+        System.out.println("\u001B[32m                          ___________________________                         ");
+        System.out.println("                         |             |             |                        ");
+        System.out.println("                         |___          |          ___|                        ");
+        System.out.println("                         |_  |         |         |  _|                        ");
+        System.out.println("                        .| | |.       ,|.       .| | |.                       ");
+        System.out.println("                        || | | )     ( | )     ( | | ||                       ");
+        System.out.println("                        '|_| |'       `|'       `| |_|'                       ");
+        System.out.println("                         |___|         |         |___|                        ");
+        System.out.println("                         |             |             |                        ");
+        System.out.println("                         |_____________|_____________|               \u001B[0m");
     }
 
+    /**
+     * Mensagem de leitura do nome da equipa
+     */
     public void lerEquipa(){
         System.out.print("Qual o nome da Equipa: ");
     }
 
 
+    /**
+     * Mensagem de erro de atribuição de valor para os atributos
+     */
     public void atributosMessageError(){
         System.out.println("O valor inserido não está de [1-100]\n");
     }
 
+    /**
+     * Mensagem de classificação de um atributo
+     * @param atributo
+     */
     public void atributosMessage(String atributo){
         System.out.print("Classifique o "+atributo+" do Jogador de [1-100]: ");
     }
 
+    /**
+     * Parar menu
+     */
     public void stop(){
         this.continuacao = false;
     }
 
+    /**
+     * Apresenta os comentários de um jogo num menu
+     * @param tempo Tempo de jogo
+     * @param comentario Comentário a aparecer
+     */
     public void comentariosJogo (double tempo, String comentario){
         if(tempo < 10) System.out.println("0"+tempo+"': "+comentario);
         else System.out.println(tempo+"': "+comentario);
     }
-
 }

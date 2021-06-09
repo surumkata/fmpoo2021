@@ -15,10 +15,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+/**
+ * Classe de controlo para a execução de partidas de futebol, que incluem map de equipas de futebol que são identificadas pelo seu nome e
+ * um map de partidas de futebol onde cada é possivel associar o nome de uma equipa à lista de todos os seus jogos efetuados
+ */
 public class ControloDados implements Serializable{
     private Map<String, EquipaFutebol> equipas;
     private Map<String, List<PartidaFutebol>> partidas;
 
+    /**
+     * Construtor vazio para a execução de partidas, onde existem 2 equipas criadas por defeito
+     */
     public ControloDados() {
         this.equipas = new HashMap<>();
         this.partidas = new HashMap<>();
@@ -83,29 +90,48 @@ public class ControloDados implements Serializable{
 
     }
 
+    /**
+     * Verifica se é possível simular um jogo (tem de existir pelo menos 2 equipas prontas a jogar)
+     * @return true se for possível, false caso contrário
+     */
     public boolean simulacaoPossivel (){
         return equipasProntas() >= 2;
     }
 
+    /**
+     * Devolve o número de equipas prontas a jogar 
+     * @return Número de equipas
+     */
     public int equipasProntas(){
         int x = 0;
-        for(EquipaFutebol ef : equipas.values()){
-            if(ef.equipaPronta()) {
-                //System.out.println(ef.getNome()+" Pronta!");
+        for(EquipaFutebol ef : equipas.values())
+            if(ef.equipaPronta()) 
                 x++;
-            }
-        }
         return x;
     }
 
+    /**
+     * Verifica se existem equipas no map de equipas
+     * @return true se existem, false caso contrário
+     */
     public boolean existeEquipas (){
         return (this.equipas.size()>0);
     }
 
+    /**
+     * Verifica se existe uma dada equipa no map de equipas
+     * @param equipa Nome da equipa a verificar
+     * @return true se existe, false caso contrário
+     */
     public boolean existeEquipa(String equipa){
         return this.equipas.containsKey(equipa);
     }
 
+    /**
+     * Devolve a equipa de futebol com um dado nome
+     * @param equipa Nome da equipa de futebol a obter
+     * @return Equipa de futebol pretendida
+     */
     public EquipaFutebol getEquipaFutebol (String equipa){
         if(!existeEquipa(equipa)){
             System.out.println("Não está criada o "+equipa);
@@ -114,20 +140,37 @@ public class ControloDados implements Serializable{
         return this.equipas.get(equipa).clone();
     }
 
+    /**
+     * Adiciona uma equipa de futebol ao map de equipas
+     * @param e Equipa de futebol
+     */
     public void criarEquipa(EquipaFutebol e){
         this.equipas.put(e.getNome(),e);
     }
 
+    /**
+     * Cria uma equipa de futebol com um dado nome
+     * @param nome Nome da equipa a criar
+     */
     public void criarEquipa(String nome){
         this.equipas.put(nome,new EquipaFutebol(nome));
     }
 
+    /**
+     * Remove uma equipa de futebol
+     * @param nome Nome da equipa a remover
+     */
     public void removeEquipa (String nome){
         if(existeEquipa(nome)){
             this.equipas.remove(nome);
         }
     }
 
+    /**
+     * Coloca um jogador numa dada equipa, criando uma nova equipa caso não exista
+     * @param j Jogador a mover
+     * @param equipa Nome da equipa para onde se quer tranferir o jogador
+     */
     public void colocaJogador (Jogador j, String equipa) {
         if(!existeEquipa(equipa)){
             criarEquipa(equipa);
@@ -136,10 +179,18 @@ public class ControloDados implements Serializable{
         this.equipas.get(equipa).adicionaPlantel(j);
     }
 
+    /**
+     * Devolve um array de strings com o nome de todas as equipas prontas a jogar
+     * @return Array de strings
+     */
     public String[] nomesEquipas (){
         return this.equipas.keySet().toArray(new String[0]);
     }
 
+    /**
+     * Lista com todas as equipas prontas a jogar
+     * @return Lista com as equipas
+     */
     public List<String> nomesEquipasProntas (){
         return this.equipas.values().stream()
                 .filter(EquipaFutebol::equipaPronta)
@@ -147,6 +198,10 @@ public class ControloDados implements Serializable{
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Adiciona uma partida de futebol ao map de partidas de futebol
+     * @param p Partida a adicionar
+     */
     public void adicionaPartida (PartidaFutebol p){
         String equipa1 = p.getNomeEquipa(true);
         String equipa2 = p.getNomeEquipa(false);
@@ -166,6 +221,11 @@ public class ControloDados implements Serializable{
         this.partidas.put(equipa2,l2);
     }
 
+    /**
+     * Transforma uma lista de todos os jogos de uma equipa num array de strings
+     * @param equipa Nome da equipa
+     * @return Array de strings
+     */
     public String[] historicoString (String equipa){
         List<PartidaFutebol> l = historico(equipa);
         String[] s = new String[l.size()+1];
@@ -178,6 +238,11 @@ public class ControloDados implements Serializable{
         return s;
     }
 
+    /**
+     * Devolve uma lista de todos os jogos de uma equipa
+     * @param equipa Nome da equipa
+     * @return Lista de partidas de uma equipa
+     */
     public List<PartidaFutebol> historico(String equipa){
         List<PartidaFutebol> l = new ArrayList<>();
         if(this.partidas.containsKey(equipa)){
@@ -186,6 +251,10 @@ public class ControloDados implements Serializable{
         return l;
     }
 
+    /**
+     * Devolve uma lista de todas as partidas de futebol
+     * @return Lista de partidas
+     */
     public List<PartidaFutebol> todasPartidas(){
         List<PartidaFutebol> l = new ArrayList<>();
         for(List<PartidaFutebol> laux : this.partidas.values()){
@@ -198,6 +267,11 @@ public class ControloDados implements Serializable{
         return l;
     }
 
+    /**
+     * Escreve uma partida de futebol num ficheiro de texto
+     * @param ficheiro Nome do ficheiro
+     * @throws IOException Exceção que é atirada caso não encontre o ficheiro
+     */
     public void escreverFicheiro(String ficheiro) throws IOException{
         BufferedWriter writer = new BufferedWriter(new FileWriter("inputFiles/"+ficheiro));
         for(EquipaFutebol e : this.equipas.values()){
@@ -212,6 +286,12 @@ public class ControloDados implements Serializable{
         writer.close();
     }
 
+    /**
+     * Lê um ficheiro de texto e faz os respetivos parses nas estruturas de dados
+     * @param ficheiro Nome do ficheiro de texto
+     * @throws IOException Exceção que é atirada caso não encontre o ficheiro
+     * @throws PosicaoInvalidaException Exceção que é atirada caso encontre uma posição inválida
+     */
     public void lerFicheiro(String ficheiro) throws IOException, PosicaoInvalidaException {
         BufferedReader reader = new BufferedReader(new FileReader("inputFiles/"+ficheiro));
         EquipaFutebol e = new EquipaFutebol();
@@ -232,8 +312,6 @@ public class ControloDados implements Serializable{
                     primeiraEquipa = true;
                 }
                 boolean gravar = true;
-                // Jogo:<EquipaCasa>,<EquipaFora>,<ScoreCasa>,<ScoreFora>,<Data>,<JogadoresCasa>,<SubstituicoesCasa>,<JogadoresFora>,<SubstituicoesFora>
-                // Jogo:Sporting Club Shostakovich,Mendelssohn F. C.,0,0,2021-03-30,43,30,1,22,33,11,38,31,39,6,12,22->37,43->25,25->3,2,1,40,16,25,49,41,17,14,33,36,1->42,49->31,14->45
                 String[] parametros = l.split(",",-1);
                 String equipaA = parametros[0].split(":")[1];
                 String equipaB = parametros[1];
@@ -323,20 +401,41 @@ public class ControloDados implements Serializable{
         reader.close();
     }
 
+    /**
+     * Tranforma uma string com uma data para um LocalDate
+     * @param s Linha com a string data
+     * @return LocalDate
+     */
     public LocalDate stringToLocalDateTime(String s) {
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
         return LocalDate.parse(s, formatter);
     }
 
-    public ControloDados lerFicheiroObjeto(String filename) throws IOException, ClassNotFoundException,FileNotFoundException {
+    /**
+     * Lê o ficheiro objeto com um jogo de futebol
+     * @param filename Nome do ficheiro
+     * @return Execução de um jogo
+     * @throws IOException Exceção que é atirada caso não encontre o ficheiro
+     * @throws ClassNotFoundException Exceção que é atirada caso não encontre a classe pretendida
+     */
+    public ControloDados lerFicheiroObjeto(String filename) throws IOException, ClassNotFoundException {
         File f = new File("inputFiles/"+filename);
         FileInputStream fis = new FileInputStream(f);
         ObjectInputStream ois = new ObjectInputStream(fis);
         ControloDados cd;
-        if((cd = (ControloDados) ois.readObject())!=null) return cd;
+        if((cd = (ControloDados) ois.readObject())!=null){
+            ois.close();
+            return cd;
+        }
+        ois.close();
         return null;
     }
 
+    /**
+     * Grava num ficheiro objeto uma partida de futebol
+     * @param filename Nome do ficheiro objeto
+     * @throws IOException Exceção que é atirada caso não encontre o ficheiro
+     */
     public void gravarFicheiroObjeto (String filename) throws IOException {
         File f = new File("inputFiles/"+filename);
         FileOutputStream fos = new FileOutputStream(f);

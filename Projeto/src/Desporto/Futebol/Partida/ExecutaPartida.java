@@ -7,6 +7,11 @@ import Desporto.Futebol.ViewJogo;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
+/**
+ * Classe responsável pela execução de uma partida, que é constituída por uma partida de futebol, pelo jogador que possui a bola, 
+ * um booleano a representar se é um jogador visitante ou visitado, um booleano que representa se a partida começou ou não e uma 
+ * variável de instância que gera algo aleatório
+ */
 public class ExecutaPartida {
     private PartidaFutebol partida;
     private Jogador jogadorAtual;
@@ -20,26 +25,39 @@ public class ExecutaPartida {
     public static final String ANSI_YELLOW = "\u001B[33m";
     public static final String ANSI_CYAN = "\u001B[36m";
 
-    private static final double acaoRapida = 0.5, acaoMedia = 1.0;
+    private static final double acaoRapida = 0.5, acaoMedia = 1.0; 
 
+    /**
+     * Construtor de uma execução de uma partida, recebendo uma partida de futebol
+     * @param partida Partida de futebol a ser executada
+     */
     public ExecutaPartida(PartidaFutebol partida) {
         this.partida = partida.clone();
         this.random = new Random();
         this.casa = random.nextBoolean();
         this.comecou = this.casa;
-
         this.jogadorAtual = partida.getJogador(this.casa, "Medio");
     }
 
+    /**
+     * Construtor de uma execução de uma partida, recebendo duas equipas de futebol
+     * @param visitado Equipa da casa
+     * @param visitante Equipa visitante
+     */
     public ExecutaPartida(EquipaFutebol visitado, EquipaFutebol visitante) {
         this.partida = new PartidaFutebol(visitado,visitante);
         this.random = new Random();
         this.casa = random.nextBoolean();
         this.comecou = this.casa;
-
         this.jogadorAtual = partida.getJogador(this.casa, "Medio");
     }
 
+    /**
+     * Mostra no ecrã os vários momentos de um jogo de futebol: mensagem de inicio de jogo, de intevalo, de final de jogo,etc.
+     * @param intervalo Booleano que verifica se estamos no intervalo ou não
+     * @param substituicoes Boolean que verifica se ja foram efetuadas substituições ou não
+     * @return true se não não foram efetuadas substituições e se a partida já terminou, false caso contrário
+     */
     public boolean run (AtomicBoolean intervalo, AtomicBoolean substituicoes){
         if(!substituicoes.get()) {
             ViewJogo v = new ViewJogo();
@@ -79,9 +97,13 @@ public class ExecutaPartida {
         return false;
     }
 
+    /**
+     * Provoca uma ação a um defesa comparando com o overall de um avançado adversário
+     * @param v Menu
+     */
     public void runDefesa (ViewJogo v){
         Jogador adversario = partida.getJogador(!this.casa, "Avancado");
-        double overalldif = jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
+        double overalldif = (double) jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" tenta passar a bola.");
@@ -102,11 +124,14 @@ public class ExecutaPartida {
         }
     }
 
+    /**
+     * Provoca uma ação a um médio comparando com o overall de um médio adversário
+     * @param v Menu
+     */
     public void runMedio (ViewJogo v){
         Jogador adversario = partida.getJogador(!this.casa, "Medio");
-        double overalldif = jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
+        double overalldif = (double) jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
 
-        Random random = new Random();
         boolean lateral = random.nextBoolean();
 
         if(overalldif > 15){
@@ -134,9 +159,13 @@ public class ExecutaPartida {
         }
     }
 
+    /**
+     * Provoca uma ação a um lateral comparando com o overall de um lateral adversário
+     * @param v Menu
+     */
     public void runLateral(ViewJogo v){
         Jogador adversario = partida.getJogador(!this.casa, "Lateral");
-        double overalldif = jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
+        double overalldif = (double) jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
 
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
@@ -158,10 +187,14 @@ public class ExecutaPartida {
         }
     }
 
+    /**
+     * Provoca uma ação a um avançado comparando com o overall do guarda-redes ou de um defesa adversário 
+     * @param v Menu
+     */
     public void runAvancado(ViewJogo v){
         Jogador adversarioGR = partida.getJogador(!this.casa, "Guarda-Redes");
         Jogador adversarioDF = partida.getJogador(!this.casa, "Defesa");
-        double overalldif = jogadorAtual.getAtributos().overall() - adversarioDF.getAtributos().overall();
+        double overalldif = (double) jogadorAtual.getAtributos().overall() - adversarioDF.getAtributos().overall();
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversarioGR.getNumero());
@@ -171,7 +204,6 @@ public class ExecutaPartida {
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversarioDF.getNumero());
             if(tentaRoubarAvancado(adversarioDF,v)){
-                Random random = new Random();
                 this.casa = !this.casa;
                 this.jogadorAtual = adversarioDF;
             }
@@ -182,6 +214,10 @@ public class ExecutaPartida {
         }
     }
 
+    /**
+     * Provoca uma ação a um guarda-redes conforme o seu desgaste ao longo da partida
+     * @param v Menu
+     */
     public void runGuardaRedes(ViewJogo v){
         int irandom = random.nextInt(101);
         this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
@@ -200,6 +236,11 @@ public class ExecutaPartida {
         }
     }
 
+    /**
+     * Mostra se um jogador conseguiu rematar para a baliza através de diferentes mensagens no menu.
+     * @param adversario Jogador adversário
+     * @param v Menu
+     */
     public void tentaChutar(Jogador adversario, ViewJogo v){
         int irandom = random.nextInt(400);
         boolean comentario = random.nextBoolean();
@@ -211,12 +252,11 @@ public class ExecutaPartida {
         AtributosGR atrGR = (AtributosGR) adversario.getAtributos();
 
         int dif = 100 + this.jogadorAtual.getAtributos().getRemate() - ((atrGR.getElasticidade()+atrGR.getReflexos())/2);
-
         v.comentariosJogo(tempo, "Rematouu!");
         if(dif >= irandom){
             comentario = random.nextBoolean();
             if(comentario)
-                v.comentariosJogo(tempo,ANSI_GREEN+"Golo!!! É do "+this.partida.getNomeEquipa(this.casa)+", o "+adversario.getNome()+" até voou, mas não alcançou a bola."+ANSI_RESET);
+                v.comentariosJogo(tempo,ANSI_GREEN+"Golo!!! É do "+this.partida.getNomeEquipa(this.casa)+", o "+adversario.getNome()+" esticou-se todo, mas não alcançou a bola."+ANSI_RESET);
             else
                 v.comentariosJogo(tempo,ANSI_GREEN+"Marcou, está lá dentro, mais um para a conta do "+this.jogadorAtual.getNome()+"."+ANSI_RESET);
             partida.incGolos(this.casa);
@@ -227,14 +267,20 @@ public class ExecutaPartida {
         else {
             this.casa = !this.casa;
             if(comentario)
-                v.comentariosJogo(tempo,ANSI_RED+"Errou feio a baliza do "+this.partida.getNomeEquipa(this.casa)+"."+ANSI_RESET);
+                v.comentariosJogo(tempo,ANSI_RED+"Que falhanço de "+this.jogadorAtual.getNome()+ "! Não acertou na baliza do "+this.partida.getNomeEquipa(this.casa)+"."+ANSI_RESET);
             else
-                v.comentariosJogo(tempo,ANSI_RED+"Que grande defesa do "+adversario.getNome()+" que evita o golo ao "+this.jogadorAtual.getNome()+"."+ANSI_RESET);
+                v.comentariosJogo(tempo,ANSI_RED+"Grande defesa do "+adversario.getNome()+" que evita o golo quase certo ao "+this.jogadorAtual.getNome()+"."+ANSI_RESET);
             this.jogadorAtual = adversario;
             partida.incTimer(acaoRapida);
         }
     }
 
+    /**
+     * Mostra se um jogador consegue passar a bola
+     * @param posicaoComp Posição do jogador que possui a bola
+     * @param posicaoAdv Posição do adversário que pode intersetar a bola
+     * @param v Menu
+     */
     public void tentaPassar(String posicaoComp, String posicaoAdv, ViewJogo v){
         int controloDePasse = this.jogadorAtual.getAtributos().getControloDePasse();
         partida.incTimer(acaoRapida);
@@ -253,19 +299,30 @@ public class ExecutaPartida {
         }
     }
 
+    /**
+     * Verifica se um defesa consegue roubar a bola a um avançado
+     * @param adversario Jogador adversário que quer roubar a bola
+     * @param v Menu
+     * @return true se conseguiu roubar a bola, false caso contrário
+     */
     public boolean tentaRoubarAvancado(Jogador adversario, ViewJogo v){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
-        AtributosDefesa AtrD = (AtributosDefesa) adversario.getAtributos();
+        AtributosDefesa atrD = (AtributosDefesa) adversario.getAtributos();
 
-        int dif = 100 + this.jogadorAtual.getAtributos().getVelocidade() - AtrD.getCortes();
+        int dif = 100 + this.jogadorAtual.getAtributos().getVelocidade() - atrD.getCortes();
         v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não quer deixá-lo chutar.");
 
         return (dif >= irandom);
     }
 
-
+    /**
+     * Verifica se um jogador adversário consegue roubar a bola a um jogador com a bola
+     * @param adversario Jogador que quer roubar a bola
+     * @param v Menu
+     * @return true se conseguiu roubar a bola, false caso contrário
+     */
     public boolean tentaRoubarDefesa(Jogador adversario, ViewJogo v){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
@@ -275,6 +332,12 @@ public class ExecutaPartida {
         return (dif >= irandom);
     }
 
+    /**
+     * Verifica se um lateral consegue roubar a bola a um jogador com a bola
+     * @param adversario Jogador que quer roubar a bola
+     * @param v Menu
+     * @return true se consegue roubar a bola, false caso contrário
+     */
     public boolean tentaRoubarLateral(Jogador adversario, ViewJogo v){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
@@ -282,10 +345,16 @@ public class ExecutaPartida {
         AtributosLateral advAtrL = (AtributosLateral) this.jogadorAtual.getAtributos();
 
         int dif = 100 + advAtrL.getDrible() - adversario.getAtributos().getVelocidade();
-        v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não vai fazer a vida fácil a "+jogadorAtual.getNome()+".");
+        v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não vai facilitar a vida a "+jogadorAtual.getNome()+".");
         return (dif >= irandom);
     }
 
+    /**
+     * Verifica se um médio consegue roubar a bola a um jogador com a bola
+     * @param adversario Jogador que quer roubar a bola
+     * @param v Menu
+     * @return true se consegue roubar a bola, false caso contrário
+     */
     public boolean tentaRoubarMedio(Jogador adversario, ViewJogo v){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
@@ -298,20 +367,41 @@ public class ExecutaPartida {
         return (dif >= irandom);
     }
 
+    /**
+     * Devolve uma cópia da partida da execução de uma partida de futebol
+     * @return Cópia da partida de futebol
+     */
     public PartidaFutebol getPartida() {
         return partida.clone();
     }
 
+    /**
+     * Devolve o número de substituições que a equipa adversária ainda pode fazer
+     * @param visitado Booleano a indicar se é a equipa visitante
+     * @return Número de substituições que ainda podem ser feitas
+     */
     public int getSubsRestantes (boolean visitado){
         return this.partida.getSubstituicoesRestantes(visitado);
     }
 
+    /**
+     * Apresenta o comentário de uma substituição, indicando quem entra em campo e quem sai
+     * @param visitado Booleano a indicar se é a equipa visitante 
+     * @param com Comentário a aparecer no menu
+     * @param n1 Jogador que sai da partida
+     * @param n2 Jogador que entra na partida
+     */
     public void decSubs (boolean visitado, String com, int n1, int n2){
         this.partida.decSubstituicoes(visitado, n1, n2);
         ViewJogo v = new ViewJogo();
         v.comentariosJogo(this.partida.getTempo(), com);
     }
 
+    /**
+     * Devolve uma cópia de uma equipa de futebol atualizada
+     * @param visitado Booleano a verificar se é equipa visitada
+     * @param e Equipa de futebol original
+     */
     public void atualizaEquipa(boolean visitado, EquipaFutebol e){
         if(visitado) this.partida.atualizaVisitado(e);
         else this.partida.atualizaVisitante(e);

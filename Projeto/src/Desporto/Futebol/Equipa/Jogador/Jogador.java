@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
 
-
+/**
+ * Classe que representa um jogador, que possui um número de camisola, um nome, uma posição, um historial dos clubes por onde passou e atributos
+ */
 public class Jogador implements Serializable {
     private int numero;
     private String nome;
@@ -13,6 +15,9 @@ public class Jogador implements Serializable {
     private List <String> historial;
     private Atributos atributos;
 
+    /**
+     * Construtor vazio de um jogador
+     */
     public Jogador(){
         this.numero = 0;
         this.nome ="";
@@ -20,17 +25,29 @@ public class Jogador implements Serializable {
         this.historial = new ArrayList<>();
     }
 
+    /**
+     * Construtor parametrizado de um jogador
+     * @param numero Numero da camisola 
+     * @param nome Nome
+     * @param posicao Posição
+     * @param historial Historial
+     * @param atributos Atributos
+     */
     public Jogador(int numero, String nome, String posicao, List<String> historial, Atributos atributos){
-        if (!posicaoValida(posicao)){
+        if (!posicaoValida(posicao))
             this.posicao = "Guarda-Redes";
-        }
-        else this.posicao = posicao;
+        else 
+            this.posicao = posicao;
         this.numero = numero;
         this.nome = nome;
         this.historial = new ArrayList<>(historial);
         this.atributos = atributos.clone();
     }
 
+    /**
+     * Construtor cópia de um jogador
+     * @param oJ Objeto original
+     */
     public Jogador (Jogador oJ){
         this.numero = oJ.getNumero();
         this.nome = oJ.getNome();
@@ -39,6 +56,11 @@ public class Jogador implements Serializable {
         this.atributos = oJ.getAtributos();
     }
 
+    /**
+     * Construtor cópia de um jogador, mas com a posição alterada pelo argumento deste método e respetivos atributos
+     * @param oJ Objeto original
+     * @param posicao Posição do novo jogador
+     */
     public Jogador (Jogador oJ, String posicao){
         this(oJ);
         this.posicao = posicao;
@@ -96,6 +118,7 @@ public class Jogador implements Serializable {
                     default:
                         break;
                 }
+                break;
             case "Lateral":
                 switch (posicaoJ) {
                     case "Avancado":
@@ -119,6 +142,11 @@ public class Jogador implements Serializable {
         }
     }
 
+    /**
+     * Testa se uma posição é válida
+     * @param posicao Posição a validar
+     * @return true se válido, false caso contrário
+     */
     private boolean posicaoValida (String posicao){
         return posicao.equals("Guarda-Redes") ||
                posicao.equals("Defesa") ||
@@ -127,18 +155,34 @@ public class Jogador implements Serializable {
                posicao.equals("Avancado");
     }
 
+    /**
+     * Devolve o nome do jogador
+     * @return Nome
+     */
     public String getNome() {
         return nome;
     }
     
+    /**
+     * Devolve o número da camisola do jogador
+     * @return Número da camisola
+     */
     public int getNumero() {
         return numero;
     }
 
+    /**
+     * Devolve os atributos de um jogador
+     * @return Atributos
+     */
     public Atributos getAtributos() {
         return atributos.clone();
     }
 
+    /**
+     * Devolve o historial de um jogador
+     * @return Historial
+     */
     public List<String> getHistorial() {
         if (this.historial != null && !this.historial.isEmpty())
             return new ArrayList<>(this.historial);
@@ -146,26 +190,50 @@ public class Jogador implements Serializable {
             return new ArrayList<>();
     }
 
+    /**
+     * Devolve a posição de um jogador
+     * @return
+     */
     public String getPosicao() {
         return posicao;
     }
 
+    /**
+     * Altera o nome de um jogador
+     * @param nome Novo nome
+     */
     public void setNome(String nome) {
         this.nome = nome;
     }
 
+    /**
+     * Altera o número da camisola de um jogador
+     * @param numero Novo número
+     */
     public void setNumero(int numero) {
         this.numero = numero;
     }
 
+    /**
+     * Adiciona uma equipa ao historial de um jogador
+     * @param equipa Equipa a adicionar
+     */
     public void addEquipaHistorial (String equipa){
         this.historial.add(equipa);
-    }
+    }   
 
+    /**
+     * Altera os atributos de um jogador
+     * @param atributos Novos atributos
+     */
     public void setAtributos(Atributos atributos) {
         this.atributos = atributos.clone();
     }
 
+    /**
+     * Altera a posição de um jogador, alterando por sua vez os seus atributos
+     * @param posicao Nova posição
+     */
     public void setPosicao(String posicao) {
         this.posicao = posicao;
         switch (this.posicao) {
@@ -202,14 +270,23 @@ public class Jogador implements Serializable {
         }
     }
 
+    /**
+     * Método de cópia de um jogador
+     */
     public Jogador clone() {
         return new Jogador(this);
     }
 
+    /**
+     * Provoca desgaste a um jogador
+     */
     public void desgastaJogador (){
         this.atributos.desgaste();
     }
 
+    /**
+     * Verifica se 2 objetos Jogador são iguais
+     */
     public boolean equals(Object o) {
         if (this == o)
             return true;
@@ -219,6 +296,10 @@ public class Jogador implements Serializable {
         return this.nome.equals(j.nome) && this.numero == j.numero && this.posicao.equals(j.posicao)
                 && this.historial.equals(j.historial) && this.atributos.equals(j.atributos);
     }
+
+    /**
+     * Transforma o objeto Jogador numa string
+     */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
         sb.append("Nome: ").append(this.getNome()).append("\n");
@@ -229,11 +310,22 @@ public class Jogador implements Serializable {
         return sb.toString();
     }
 
+    /**
+     * Cálculo de uma habilidade extra de um jogador (necessário para preencher os campos em falta vindos do ficheiro logs.txt)
+     * @param media Média dos parâmetros gerais de um jogador
+     * @return Habilidade extra
+     */
     public int habilidadeExtra (int media){
         Random num = new Random();
         return media + 5 - num.nextInt(10);
     }
 
+    /**
+     * Construtor de um jogador proveniente de uma linha de um ficheiro. 
+     * Efetua os devidos parses.
+     * @param linha Linha de um ficheiro
+     * @throws PosicaoInvalidaException Exceção caso se detete uma posição inválida
+     */
     public Jogador (String linha) throws PosicaoInvalidaException {
         this();
         String[] parametros = linha.split(",");
@@ -325,6 +417,11 @@ public class Jogador implements Serializable {
         }
     }
 
+    /**
+     * Dado um array de strings oriundos de um split de uma linha do ficheiro, testa correspondem a parâmetros válidos de um jogador
+     * @param parametros Array de strings
+     * @return true se corresponde a um jogador, false caso contrário
+     */
     public boolean jogadorValido (String[] parametros){
         String [] aux = parametros[0].split(":");
         if (aux[0].equals("Guarda-Redes") || aux[0].equals("Lateral") || aux[0].equals("Medio"))
@@ -335,6 +432,10 @@ public class Jogador implements Serializable {
             return false;
     }
 
+    /**
+     * Transforma o objeto jogador numa linha de um ficheiro
+     * @return String de um ficheiro
+     */
     public String toFicheiro() {
         final StringBuilder sb = new StringBuilder();
         sb.append(this.getPosicao()).append(":");

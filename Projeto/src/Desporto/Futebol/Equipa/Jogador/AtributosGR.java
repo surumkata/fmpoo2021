@@ -1,23 +1,31 @@
 package Desporto.Futebol.Equipa.Jogador;
 
-import java.io.Serializable;
 
 /**
- *
+ * Classe para os atributos de um guarda-redes, onde se incluem a elasticidade e os reflexos
  */
 public class AtributosGR extends Atributos {
     private int elasticidade;
     private int reflexos;
 
     /**
-     *
+     * Construtor vazio dos atributos de um guarda-redes
      */
     public AtributosGR(){
         this(0,0,0,0,0,0,0,0,0);
     }
 
     /**
-     *
+     * Construtor parametrizado dos atributos de um guarda-redes
+     * @param vel Velocidade 
+     * @param res Resistencia
+     * @param des Destreza
+     * @param imp Impulsão
+     * @param jdc Jogo de cabeça
+     * @param rem Remate
+     * @param cdp Controlo de passe
+     * @param ela Elasticidade
+     * @param ref Reflexos
      */
     public AtributosGR(int vel, int res, int des, int imp, int jdc, int rem, int cdp, int ela, int ref){
         super(vel,res,des,imp,jdc,rem,cdp);
@@ -25,6 +33,12 @@ public class AtributosGR extends Atributos {
         this.setReflexos(ref);
     }
 
+    /**
+     * Construtor dos atributos de um guarda-redes, recebendo os atributos gerais e os valores para os penaltys e para a desmarcação
+     * @param aot Atributos gerais
+     * @param ela Elasticidade
+     * @param ref Reflexos
+     */
     public AtributosGR(Atributos aot, int ela, int ref){
         super(aot);
         this.setElasticidade(ela);
@@ -32,7 +46,8 @@ public class AtributosGR extends Atributos {
     }
 
     /**
-     *
+     * Construtor cópia dos atributos de um guarda-redes
+     * @param oAtrGR Objeto original
      */
     public AtributosGR(AtributosGR oAtrGR){
         super(oAtrGR);
@@ -40,6 +55,10 @@ public class AtributosGR extends Atributos {
         this.setReflexos(oAtrGR.getReflexos());
     }
 
+    /**
+     * Construtor dos atributos de um guarda-redes, recebendo quaisquer atributos
+     * @param atributos Atributos comuns a todos os jogadores
+     */
     public AtributosGR(Atributos atributos) {
         super(atributos);
         if(atributos instanceof AtributosGR){
@@ -53,7 +72,8 @@ public class AtributosGR extends Atributos {
     }
 
     /**
-     *
+     * Altera o valor da elasticidade, verificando se o valor inserido está entre 1 e 100 (inclusive)
+     * @param elasticidade Novo valor
      */
     public void setElasticidade(int elasticidade) {
         if(elasticidade >= 1 && elasticidade <= 100)
@@ -65,14 +85,16 @@ public class AtributosGR extends Atributos {
     }
 
     /**
-     *
+     * Devolve a elasticidade de um jogador
+     * @return Elasticidade
      */
     public int getElasticidade() {
         return elasticidade;
     }
 
     /**
-     *
+     * Altera o valor dos reflexos, verificando se o valor inserido está entre 1 e 100 (inclusive)
+     * @param reflexos Reflexos
      */
     public void setReflexos(int reflexos) {
         if(reflexos >= 1 && reflexos <= 100)
@@ -84,21 +106,22 @@ public class AtributosGR extends Atributos {
     }
 
     /**
-     *
+     * Devolve os reflexos de um jogador
+     * @return
      */
     public int getReflexos() {
         return reflexos;
     }
 
     /**
-     *
+     * Método que faz uma cópia dos atributos de um guarda-redes.
      */
     public AtributosGR clone() {
         return new AtributosGR(this);
     }
 
     /**
-     *
+     * Calcula a habilidade global de um guarda-redes, arredondado às unidades
      */
     public int overall (){
         return (int) (this.getReflexos() * 0.3 + this.getResistencia() * 0.025 + this.getVelocidade() * 0.125 + this.getDestreza() * 0.025 +
@@ -106,6 +129,9 @@ public class AtributosGR extends Atributos {
                 this.getControloDePasse() * 0.1 + this.getElasticidade() * 0.2);
     }
 
+    /**
+     * Calcula o desgaste de um guarda-redes ao longo de uma partida de futebol
+     */
     public void desgaste(){
         int r = (int) ((100 - getResistencia()) * 0.015) + 1;
         this.setElasticidade(getElasticidade()-r);
@@ -119,7 +145,7 @@ public class AtributosGR extends Atributos {
     }
 
     /**
-     *
+     * Verifica se 2 objetos AtributosGR são iguais
      */
     public boolean equals(Object o) {
         if (this == o)
@@ -133,7 +159,7 @@ public class AtributosGR extends Atributos {
     }
 
     /**
-     *
+     * Representa os atributos de um guarda-redes numa string
      */
     public String toString() {
         final StringBuilder sb = new StringBuilder();
@@ -143,6 +169,9 @@ public class AtributosGR extends Atributos {
         return sb.toString();
     }
 
+    /**
+     * Representa os atributos de um guarda-redes numa linha
+     */
     public String toFicheiro() {
         StringBuilder sb = new StringBuilder();
         sb.append(super.toFicheiro()).append(",").append(this.elasticidade);
