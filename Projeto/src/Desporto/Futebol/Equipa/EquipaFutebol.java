@@ -172,7 +172,6 @@ public class EquipaFutebol implements Serializable {
         if(this.plantel.getnJogadoresNoPlantel() < 22) {
             while (this.plantel.numeroOcupado(numero)) {
                 if (!x) {
-                    System.out.println("O número do jogador já está ocupado, a gerar um novo\n");
                     x = true;
                 }
                 numero++;

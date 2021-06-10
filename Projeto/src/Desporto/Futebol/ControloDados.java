@@ -27,64 +27,21 @@ public class ControloDados implements Serializable{
         this.equipas = new HashMap<>();
         this.partidas = new HashMap<>();
 
-        EquipaFutebol eA = new EquipaFutebol("Braga");
-        EquipaFutebol eB = new EquipaFutebol("Benfica");
+        EquipaFutebol eA = new EquipaFutebol("TeamA");
+        EquipaFutebol eB = new EquipaFutebol("TeamB");
 
-        Tatica t = new Tatica(1,3,2,3,2);
+        Tatica t422 = new Tatica(1,2,2,4,2);
 
-        eA.setTatica(t);
-
-        List<String> historialA = new ArrayList<>();
-        historialA.add("Tondela");
-        historialA.add("Benfica");
-        historialA.add("Braga");
-        List<String> historialB = new ArrayList<>();
-        historialB.add("Benfica");
-
-        Atributos atrGRa = new AtributosGR(99,99,99,99,99,99,99,99,99);
-        Atributos atrDFa = new AtributosDefesa(99,99,99,99,99,99,99,99,99);
-        Atributos atrLTa = new AtributosLateral(99,99,99,99,99,99,99,99,99);
-        Atributos atrMDa = new AtributosMedio(99,99,99,99,99,99,99,99,99);
-        Atributos atrAVa = new AtributosAvancado(99,99,99,99,99,99,99,99,99);
-
-        Atributos atrGRb =  new AtributosGR(50,50,50,50,50,50,50,50,50);
-        Atributos atrDFb =  new AtributosDefesa(50,50,50,50,50,50,50,50,50);
-        Atributos atrLTb =  new AtributosLateral(50,50,50,50,50,50,50,50,50);
-        Atributos atrMDb =  new AtributosMedio(50,50,50,50,50,50,50,50,50);
-        Atributos atrAVb =  new AtributosAvancado(50,50,50,50,50,50,50,50,50);
-
-        Jogador j1 = new Jogador(1,"Matheus","Guarda-Redes",historialA,atrGRa);eA.adicionaPlantel(j1);
-        Jogador j2 = new Jogador(2,"David Carmo","Defesa",historialA,atrDFa);eA.adicionaPlantel(j2);
-        Jogador j3 = new Jogador(3,"Raúl Silva","Defesa",historialA,atrDFa);eA.adicionaPlantel(j3);
-        Jogador j4 = new Jogador(4,"Bruno Viana","Defesa",historialA,atrDFa);eA.adicionaPlantel(j4);
-        Jogador j5 = new Jogador(5,"Esgaio","Lateral",historialA,atrLTa);eA.adicionaPlantel(j5);
-        Jogador j6 = new Jogador(6,"Sequeira","Lateral",historialA,atrLTa);eA.adicionaPlantel(j6);
-        Jogador j7 = new Jogador(7,"Castro","Medio",historialA,atrMDa);eA.adicionaPlantel(j7);
-        Jogador j8 = new Jogador(8,"Musrati","Medio",historialA,atrMDa);eA.adicionaPlantel(j8);
-        Jogador j9 = new Jogador(9,"Fransérgio","Medio",historialA,atrMDa);eA.adicionaPlantel(j9);
-        Jogador j10 = new Jogador(10,"Abél Ruiz","Avancado",historialA,atrAVa);eA.adicionaPlantel(j10);
-        Jogador j11 = new Jogador(11,"Paulinho","Avancado",historialA,atrAVa);eA.adicionaPlantel(j11);
-        Jogador j12 = new Jogador(1,"Hugo Leite","Guarda-Redes",historialB,atrGRb);eB.adicionaPlantel(j12);
-        Jogador j13 = new Jogador(2,"Otamendi","Defesa",historialB,atrDFb);eB.adicionaPlantel(j13);
-        Jogador j14 = new Jogador(3,"Vertoghen","Defesa",historialB,atrDFb);eB.adicionaPlantel(j14);
-        Jogador j15 = new Jogador(4,"Diogo Gonçalves","Lateral",historialB,atrLTb);eB.adicionaPlantel(j15);
-        Jogador j16 = new Jogador(5,"Grimaldo","Lateral",historialB,atrLTb);eB.adicionaPlantel(j16);
-        Jogador j17 = new Jogador(6,"Taraabt","Medio",historialB,atrMDb);eB.adicionaPlantel(j17);
-        Jogador j18 = new Jogador(7,"Weigl","Medio",historialB,atrMDb);eB.adicionaPlantel(j18);
-        Jogador j19 = new Jogador(8,"Everton","Medio",historialB,atrMDb);eB.adicionaPlantel(j19);
-        Jogador j20 = new Jogador(9,"Pizzi","Medio",historialB,atrMDb);eB.adicionaPlantel(j20);
-        Jogador j21 = new Jogador(10,"Rafa Silva","Avancado",historialB,atrAVb);eB.adicionaPlantel(j21);
-        Jogador j22 = new Jogador(11,"Seferovic","Avancado",historialB,atrAVb);eB.adicionaPlantel(j22);
-
-        Jogador j23 = new Jogador(12,"Tiago Sá","Guarda-Redes",historialA,atrGRa);eA.adicionaPlantel(j23);
-        Jogador j24 = new Jogador(13,"Rolando","Defesa",historialA,atrDFa);eA.adicionaPlantel(j24);
-        Jogador j25 = new Jogador(14,"João Novais","Medio",historialA,atrMDa);eA.adicionaPlantel(j25);
-        Jogador j26 = new Jogador(15,"André Horta","Medio",historialA,atrMDa);eA.adicionaPlantel(j26);
-        Jogador j27 = new Jogador(16,"Galeno","Avancado",historialA,atrAVa);eA.adicionaPlantel(j27);
-
-        this.equipas.put("Braga",eA);
-        this.equipas.put("Benfica",eB);
-
+        this.fillEquipa(eA);
+        this.fillEquipa(eB);
+        eA.setTatica(t422); eB.setTatica(t422);
+        while(equipasProntas()<2){
+            removeEquipa(eA.getNome());
+            removeEquipa(eB.getNome());
+            this.fillEquipa(eA);
+            this.fillEquipa(eB);
+            eA.setTatica(t422); eB.setTatica(t422);
+        }
     }
 
     /**

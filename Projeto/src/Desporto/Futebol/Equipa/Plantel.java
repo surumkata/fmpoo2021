@@ -177,29 +177,44 @@ public class Plantel implements Serializable {
         this.tatica = tatica.clone();
         this.limpaTitulares();
         for(int i = 0; i < tatica.getnGR(); i++){
-            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Guarda-Redes")).findAny().get();
-            removeSuplente(jgd.getNumero());
-            adicionaTitular(jgd);
+            Optional <Jogador> jgdOp = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Guarda-Redes")).findAny();
+            if(jgdOp.isPresent()){
+                Jogador jgd = jgdOp.get();
+                removeSuplente(jgd.getNumero());
+                adicionaTitular(jgd);
+            }
         }
         for(int i = 0; i < tatica.getnDF(); i++){
-            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Defesa")).findAny().get();
-            removeSuplente(jgd.getNumero());
-            adicionaTitular(jgd);
+            Optional <Jogador> jgdOp = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Defesa")).findAny();
+            if(jgdOp.isPresent()){
+                Jogador jgd = jgdOp.get();
+                removeSuplente(jgd.getNumero());
+                adicionaTitular(jgd);
+            }
         }
         for(int i = 0; i < tatica.getnLT(); i++){
-            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Lateral")).findAny().get();
-            removeSuplente(jgd.getNumero());
-            adicionaTitular(jgd);
+            Optional <Jogador> jgdOp = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Lateral")).findAny();
+            if(jgdOp.isPresent()){
+                Jogador jgd = jgdOp.get();
+                removeSuplente(jgd.getNumero());
+                adicionaTitular(jgd);
+            }
         }
         for(int i = 0; i < tatica.getnMD(); i++){
-            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Medio")).findAny().get();
-            removeSuplente(jgd.getNumero());
-            adicionaTitular(jgd);
+            Optional <Jogador> jgdOp = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Medio")).findAny();
+            if(jgdOp.isPresent()){
+                Jogador jgd = jgdOp.get();
+                removeSuplente(jgd.getNumero());
+                adicionaTitular(jgd);
+            }
         }
         for(int i = 0; i < tatica.getnPL(); i++){
-            Jogador jgd = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Avancado")).findAny().get();
-            removeSuplente(jgd.getNumero());
-            adicionaTitular(jgd);
+            Optional <Jogador> jgdOp = this.suplentes.values().stream().filter(j -> j.getPosicao().equals("Avancado")).findAny();
+            if(jgdOp.isPresent()){
+                Jogador jgd = jgdOp.get();
+                removeSuplente(jgd.getNumero());
+                adicionaTitular(jgd);
+            }
         }
     }
 
@@ -471,7 +486,6 @@ public class Plantel implements Serializable {
      */
     public String[][] nomesSuplentes(String posicao){
         List<Jogador> js =  this.suplentes.values().stream().map(Jogador::clone).filter(j -> j.getPosicao().equals(posicao)).collect(Collectors.toList());
-        System.out.println(js.stream().map(j -> j.getNome()).collect(Collectors.toList()));
         int tam = js.size();
         String [] nomes = new String[tam];
         String [] numeros = new String[tam];
@@ -483,7 +497,6 @@ public class Plantel implements Serializable {
                 i++;
             }
         }
-        System.out.println(Arrays.toString(nomes));
         return new String[][]{nomes, numeros};
     }
 

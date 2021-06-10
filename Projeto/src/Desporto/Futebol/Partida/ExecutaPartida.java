@@ -18,6 +18,8 @@ public class ExecutaPartida {
     private Boolean casa; //0 -> Jogador é visitante //1 -> Jogador é visitado
     private Boolean comecou;
     private Random random;
+    private final ViewJogo v;
+    private boolean comentariosON;
 
     public static final String ANSI_RESET = "\u001B[0m";
     public static final String ANSI_RED = "\u001B[31m";
@@ -37,6 +39,8 @@ public class ExecutaPartida {
         this.casa = random.nextBoolean();
         this.comecou = this.casa;
         this.jogadorAtual = partida.getJogador(this.casa, "Medio");
+        this.comentariosON = true;
+        this.v = new ViewJogo();
     }
 
     /**
@@ -50,6 +54,17 @@ public class ExecutaPartida {
         this.casa = random.nextBoolean();
         this.comecou = this.casa;
         this.jogadorAtual = partida.getJogador(this.casa, "Medio");
+        this.comentariosON = true;
+        this.v = new ViewJogo();
+    }
+
+
+    /**
+     * Habilita ou desabilida os comentarios durante a simulacao.
+     * @param comentariosON Booleano (true para habiliar comentarios, false para desabilitar)
+     */
+    public void setComentariosON(boolean comentariosON) {
+        this.comentariosON = comentariosON;
     }
 
     /**
@@ -61,7 +76,7 @@ public class ExecutaPartida {
     public boolean run (AtomicBoolean intervalo, AtomicBoolean substituicoes){
         if(!substituicoes.get()) {
             ViewJogo v = new ViewJogo();
-            if (this.partida.getTempo() == 0) {
+            if (this.partida.getTempo() == 0 && comentariosON) {
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "Faltam poucos momentos para começar o encontro." + ANSI_RESET);
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "Já rola a bola." + ANSI_RESET);
                 v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " com a bola.");
@@ -69,28 +84,31 @@ public class ExecutaPartida {
             if (this.partida.getTempo() == 45) {
                 this.casa = !this.comecou;
                 this.jogadorAtual = partida.getJogador(this.casa, "Medio");
-                v.comentariosJogo(45.0, ANSI_CYAN + "Os jogadores voltaram do intervalo prontos para retomar a partida" + ANSI_RESET);
-                v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " com a bola.");
+                if(comentariosON) {
+                    v.comentariosJogo(45.0, ANSI_CYAN + "Os jogadores voltaram do intervalo prontos para retomar a partida" + ANSI_RESET);
+                    v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " com a bola.");
+                }
             }
             double controlTime = this.partida.getTempo();
             while (this.partida.getTempo() - controlTime < 5 && (this.partida.getTempo() < 45 || intervalo.get()) && (this.partida.getTempo() < 90)) {
                 if (this.jogadorAtual.getPosicao().equals("Defesa")) {
-                    runDefesa(v);
+                    runDefesa();
                 } else if (this.jogadorAtual.getPosicao().equals("Medio")) {
-                    runMedio(v);
+                    runMedio();
                 } else if (this.jogadorAtual.getPosicao().equals("Guarda-Redes")) {
-                    runGuardaRedes(v);
+                    runGuardaRedes();
                 } else if (this.jogadorAtual.getPosicao().equals("Avancado")) {
-                    runAvancado(v);
+                    runAvancado();
                 } else if (this.jogadorAtual.getPosicao().equals("Lateral")) {
-                    runLateral(v);
+                    runLateral();
                 }
             }
             if (this.partida.getTempo() >= 45 && !intervalo.get()) {
                 intervalo.set(true);
                 this.partida.setTempo(45.0);
-                v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "O árbitro apita, ambas as equipas saem para o intervalo." + ANSI_RESET);
-            } else if (this.partida.getTempo() >= 90)
+                if(comentariosON)
+                    v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "O árbitro apita, ambas as equipas saem para o intervalo." + ANSI_RESET);
+            } else if (this.partida.getTempo() >= 90 && comentariosON)
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "O árbitro apita, é o final do encontro." + ANSI_RESET);
             return (this.partida.getTempo() >= 90);
         }
@@ -99,36 +117,34 @@ public class ExecutaPartida {
 
     /**
      * Provoca uma ação a um defesa comparando com o overall de um avançado adversário
-     * @param v Menu
      */
-    public void runDefesa (ViewJogo v){
+    private void runDefesa (){
         Jogador adversario = partida.getJogador(!this.casa, "Avancado");
         double overalldif = (double) jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
-            v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" tenta passar a bola.");
-            tentaPassar("Medio","Medio",v);
+            if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" tenta passar a bola.");
+            tentaPassar("Medio","Medio");
         }
         else{
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversario.getNumero());
-            if(tentaRoubarDefesa(adversario,v)){
-                v.comentariosJogo(partida.getTempo(),"A pressão alta resultou.");
+            if(tentaRoubarDefesa(adversario)){
+                if(comentariosON) v.comentariosJogo(partida.getTempo(),"A pressão alta resultou.");
                 this.casa = !this.casa;
                 this.jogadorAtual = adversario;
             }
             else {
-                v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " deixa o avançado para trás e tenta passar a bola");
-                tentaPassar("Medio", "Medio", v);
+                if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " deixa o avançado para trás e tenta passar a bola");
+                tentaPassar("Medio", "Medio");
             }
         }
     }
 
     /**
      * Provoca uma ação a um médio comparando com o overall de um médio adversário
-     * @param v Menu
      */
-    public void runMedio (ViewJogo v){
+    private void runMedio (){
         Jogador adversario = partida.getJogador(!this.casa, "Medio");
         double overalldif = (double) jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
 
@@ -136,128 +152,124 @@ public class ExecutaPartida {
 
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
-            v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" pode passar a bola.");
+            if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" pode passar a bola.");
             if(lateral) {
-                tentaPassar("Lateral","Lateral",v);
+                tentaPassar("Lateral","Lateral");
             }
-            else tentaPassar("Avancado","Defesa",v);
+            else tentaPassar("Avancado","Defesa");
         }
         else{
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversario.getNumero());
-            if(tentaRoubarMedio(adversario,v)) {
+            if(tentaRoubarMedio(adversario)) {
                 this.casa = !this.casa;
                 this.jogadorAtual = adversario;
-                v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" levou a melhor sobre o seu adversário.");
+                if(comentariosON) v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" levou a melhor sobre o seu adversário.");
             }
             else {
-                v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" levou a melhor sobre o seu adversário e pode passar a bola.");
+                if(comentariosON) v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" levou a melhor sobre o seu adversário e pode passar a bola.");
                 if (lateral) {
-                    tentaPassar("Lateral", "Lateral", v);
-                } else tentaPassar("Avancado", "Defesa", v);
+                    tentaPassar("Lateral", "Lateral");
+                } else tentaPassar("Avancado", "Defesa");
             }
         }
     }
 
     /**
      * Provoca uma ação a um lateral comparando com o overall de um lateral adversário
-     * @param v Menu
      */
-    public void runLateral(ViewJogo v){
+    private void runLateral(){
         Jogador adversario = partida.getJogador(!this.casa, "Lateral");
         double overalldif = (double) jogadorAtual.getAtributos().overall() - adversario.getAtributos().overall();
 
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
-            v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" pode cruzar para a área.");
-            tentaPassar("Avancado","Defesa",v);
+            if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" pode cruzar para a área.");
+            tentaPassar("Avancado","Defesa");
         }
         else{
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversario.getNumero());
-            if(tentaRoubarLateral(adversario,v)){
+            if(tentaRoubarLateral(adversario)){
                 this.casa = !this.casa;
-                v.comentariosJogo(partida.getTempo(),adversario.getNome()+" ganha o duelo com "+jogadorAtual.getNome()+".");
+                if(comentariosON) v.comentariosJogo(partida.getTempo(),adversario.getNome()+" ganha o duelo com "+jogadorAtual.getNome()+".");
                 this.jogadorAtual = adversario;
             }
             else {
-                v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" finta o "+adversario.getNome()+" e pode cruzar.");
-                tentaPassar("Avancado","Defesa",v);
+                if(comentariosON) v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" finta o "+adversario.getNome()+" e pode cruzar.");
+                tentaPassar("Avancado","Defesa");
             }
         }
     }
 
     /**
-     * Provoca uma ação a um avançado comparando com o overall do guarda-redes ou de um defesa adversário 
-     * @param v Menu
+     * Provoca uma ação a um avançado comparando com o overall do guarda-redes ou de um defesa adversário
      */
-    public void runAvancado(ViewJogo v){
+    private void runAvancado(){
         Jogador adversarioGR = partida.getJogador(!this.casa, "Guarda-Redes");
         Jogador adversarioDF = partida.getJogador(!this.casa, "Defesa");
         double overalldif = (double) jogadorAtual.getAtributos().overall() - adversarioDF.getAtributos().overall();
         if(overalldif > 15){
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversarioGR.getNumero());
-            tentaChutar(adversarioGR,v);
+            tentaChutar(adversarioGR);
         }
         else{
             this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
             this.partida.desgastaDurantePartida(!this.casa,adversarioDF.getNumero());
-            if(tentaRoubarAvancado(adversarioDF,v)){
+            if(tentaRoubarAvancado(adversarioDF)){
                 this.casa = !this.casa;
                 this.jogadorAtual = adversarioDF;
             }
             else {
-                v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " deixou o defesa para trás.");
-                tentaChutar(adversarioGR, v);
+                if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome() + " deixou o defesa para trás.");
+                tentaChutar(adversarioGR);
             }
         }
     }
 
     /**
      * Provoca uma ação a um guarda-redes conforme o seu desgaste ao longo da partida
-     * @param v Menu
      */
-    public void runGuardaRedes(ViewJogo v){
+    private void runGuardaRedes(){
         int irandom = random.nextInt(101);
         this.partida.desgastaDurantePartida(this.casa,this.jogadorAtual.getNumero());
 
         if(irandom <= 70){
-            v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" chuta a bola para o meio campo.");
-            tentaPassar("Medio","Medio",v);
+            if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" chuta a bola para o meio campo.");
+            tentaPassar("Medio","Medio");
         }
         else if (irandom <= 85){
-            v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" joga uma bola alta na linha.");
-            tentaPassar("Lateral","Lateral",v);
+            if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" joga uma bola alta na linha.");
+            tentaPassar("Lateral","Lateral");
         }
         else{
-            v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" opta por jogar curto.");
-            tentaPassar("Defesa","Avancado",v);
+            if(comentariosON) v.comentariosJogo(partida.getTempo(), jogadorAtual.getNome()+" opta por jogar curto.");
+            tentaPassar("Defesa","Avancado");
         }
     }
 
     /**
      * Mostra se um jogador conseguiu rematar para a baliza através de diferentes mensagens no menu.
      * @param adversario Jogador adversário
-     * @param v Menu
      */
-    public void tentaChutar(Jogador adversario, ViewJogo v){
+    private void tentaChutar(Jogador adversario){
         int irandom = random.nextInt(400);
         boolean comentario = random.nextBoolean();
         double tempo = this.partida.getTempo();
-        if(comentario)
+        if(comentario && comentariosON)
             v.comentariosJogo(tempo, ANSI_YELLOW+"O "+this.jogadorAtual.getNome()+" encontra-se enquadrado com a baliza."+ANSI_RESET);
-        else
+        else if(comentariosON)
             v.comentariosJogo(tempo, ANSI_YELLOW+"O "+this.jogadorAtual.getNome()+" pode rematar à baliza."+ANSI_RESET);
         AtributosGR atrGR = (AtributosGR) adversario.getAtributos();
 
         int dif = 100 + this.jogadorAtual.getAtributos().getRemate() - ((atrGR.getElasticidade()+atrGR.getReflexos())/2);
-        v.comentariosJogo(tempo, "Rematouu!");
+        if(comentariosON) v.comentariosJogo(tempo, "Rematouu!");
         if(dif >= irandom){
             comentario = random.nextBoolean();
-            if(comentario)
+            if(comentario && comentariosON)
                 v.comentariosJogo(tempo,ANSI_GREEN+"Golo!!! É do "+this.partida.getNomeEquipa(this.casa)+", o "+adversario.getNome()+" esticou-se todo, mas não alcançou a bola."+ANSI_RESET);
-            else
+            else if(comentariosON)
                 v.comentariosJogo(tempo,ANSI_GREEN+"Marcou, está lá dentro, mais um para a conta do "+this.jogadorAtual.getNome()+"."+ANSI_RESET);
             partida.incGolos(this.casa);
             this.casa = !this.casa;
@@ -266,9 +278,9 @@ public class ExecutaPartida {
         }
         else {
             this.casa = !this.casa;
-            if(comentario)
+            if(comentario && comentariosON)
                 v.comentariosJogo(tempo,ANSI_RED+"Que falhanço de "+this.jogadorAtual.getNome()+ "! Não acertou na baliza do "+this.partida.getNomeEquipa(this.casa)+"."+ANSI_RESET);
-            else
+            else if(comentariosON)
                 v.comentariosJogo(tempo,ANSI_RED+"Grande defesa do "+adversario.getNome()+" que evita o golo quase certo ao "+this.jogadorAtual.getNome()+"."+ANSI_RESET);
             this.jogadorAtual = adversario;
             partida.incTimer(acaoRapida);
@@ -279,40 +291,43 @@ public class ExecutaPartida {
      * Mostra se um jogador consegue passar a bola
      * @param posicaoComp Posição do jogador que possui a bola
      * @param posicaoAdv Posição do adversário que pode intersetar a bola
-     * @param v Menu
      */
-    public void tentaPassar(String posicaoComp, String posicaoAdv, ViewJogo v){
+    private void tentaPassar(String posicaoComp, String posicaoAdv){
         int controloDePasse = this.jogadorAtual.getAtributos().getControloDePasse();
         partida.incTimer(acaoRapida);
 
         boolean comentario = random.nextBoolean();
         if(random.nextInt(101) <= controloDePasse){
             this.jogadorAtual = partida.getJogador(this.casa, posicaoComp);
-            if(comentario) v.comentariosJogo(partida.getTempo(),"A bola chega até aos pés de "+jogadorAtual.getNome()+".");
-            else v.comentariosJogo(partida.getTempo(),"Que grande passe para "+jogadorAtual.getNome()+".");
+            if(comentario && comentariosON)
+                v.comentariosJogo(partida.getTempo(),"A bola chega até aos pés de "+jogadorAtual.getNome()+".");
+            else if(comentariosON)
+                v.comentariosJogo(partida.getTempo(),"Que grande passe para "+jogadorAtual.getNome()+".");
         }
         else {
             this.casa = !this.casa;
             this.jogadorAtual = partida.getJogador(this.casa, posicaoAdv);
-            if(comentario) v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" interceta a bola.");
-            else v.comentariosJogo(partida.getTempo(), "Que passe feio!");
+            if(comentario && comentariosON)
+                v.comentariosJogo(partida.getTempo(),jogadorAtual.getNome()+" interceta a bola.");
+            else if(comentariosON)
+                v.comentariosJogo(partida.getTempo(), "Que passe feio!");
         }
     }
 
     /**
      * Verifica se um defesa consegue roubar a bola a um avançado
      * @param adversario Jogador adversário que quer roubar a bola
-     * @param v Menu
      * @return true se conseguiu roubar a bola, false caso contrário
      */
-    public boolean tentaRoubarAvancado(Jogador adversario, ViewJogo v){
+    private boolean tentaRoubarAvancado(Jogador adversario){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         AtributosDefesa atrD = (AtributosDefesa) adversario.getAtributos();
 
         int dif = 100 + this.jogadorAtual.getAtributos().getVelocidade() - atrD.getCortes();
-        v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não quer deixá-lo chutar.");
+        if(comentariosON)
+            v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não quer deixá-lo chutar.");
 
         return (dif >= irandom);
     }
@@ -320,49 +335,49 @@ public class ExecutaPartida {
     /**
      * Verifica se um jogador adversário consegue roubar a bola a um jogador com a bola
      * @param adversario Jogador que quer roubar a bola
-     * @param v Menu
      * @return true se conseguiu roubar a bola, false caso contrário
      */
-    public boolean tentaRoubarDefesa(Jogador adversario, ViewJogo v){
+    private boolean tentaRoubarDefesa(Jogador adversario){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         int dif = 100 + this.jogadorAtual.getAtributos().getVelocidade() - adversario.getAtributos().getVelocidade();
-        v.comentariosJogo(partida.getTempo(),adversario.getNome()+" está a fazer pressão alta.");
+        if(comentariosON)
+            v.comentariosJogo(partida.getTempo(),adversario.getNome()+" está a fazer pressão alta.");
         return (dif >= irandom);
     }
 
     /**
      * Verifica se um lateral consegue roubar a bola a um jogador com a bola
      * @param adversario Jogador que quer roubar a bola
-     * @param v Menu
      * @return true se consegue roubar a bola, false caso contrário
      */
-    public boolean tentaRoubarLateral(Jogador adversario, ViewJogo v){
+    private boolean tentaRoubarLateral(Jogador adversario){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         AtributosLateral advAtrL = (AtributosLateral) this.jogadorAtual.getAtributos();
 
         int dif = 100 + advAtrL.getDrible() - adversario.getAtributos().getVelocidade();
-        v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não vai facilitar a vida a "+jogadorAtual.getNome()+".");
+        if(comentariosON)
+            v.comentariosJogo(partida.getTempo(),adversario.getNome()+" não vai facilitar a vida a "+jogadorAtual.getNome()+".");
         return (dif >= irandom);
     }
 
     /**
      * Verifica se um médio consegue roubar a bola a um jogador com a bola
      * @param adversario Jogador que quer roubar a bola
-     * @param v Menu
      * @return true se consegue roubar a bola, false caso contrário
      */
-    public boolean tentaRoubarMedio(Jogador adversario, ViewJogo v){
+    private boolean tentaRoubarMedio(Jogador adversario){
         int irandom = random.nextInt(201);
         partida.incTimer(acaoRapida);
 
         AtributosMedio advAtrM = (AtributosMedio) adversario.getAtributos();
 
         int dif = 100 + this.jogadorAtual.getAtributos().getControloDePasse() - advAtrM.getRecuperacaoDeBolas();
-        v.comentariosJogo(partida.getTempo(),adversario.getNome()+" encontra-se no caminho.");
+        if(comentariosON)
+            v.comentariosJogo(partida.getTempo(),adversario.getNome()+" encontra-se no caminho.");
 
         return (dif >= irandom);
     }
@@ -394,7 +409,7 @@ public class ExecutaPartida {
     public void decSubs (boolean visitado, String com, int n1, int n2){
         this.partida.decSubstituicoes(visitado, n1, n2);
         ViewJogo v = new ViewJogo();
-        v.comentariosJogo(this.partida.getTempo(), com);
+        if(comentariosON) v.comentariosJogo(this.partida.getTempo(), com);
     }
 
     /**

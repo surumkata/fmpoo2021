@@ -33,8 +33,8 @@ public class PartidaFutebol implements Serializable {
         this.tempo = 0.0;
         this.golosVisitante = 0;
         this.golosVisitado = 0;
-        this.substituicoesVisitante = 0;
-        this.substituicoesVisitados = 0;
+        this.substituicoesVisitante = 3;
+        this.substituicoesVisitados = 3;
         this.data = LocalDate.now();
         this.equipaVisitante = new EquipaFutebol();
         this.equipaVisitante = new EquipaFutebol();
@@ -113,6 +113,14 @@ public class PartidaFutebol implements Serializable {
     public int getSubstituicoesRestantes(boolean visitado) {
         if(visitado) return substituicoesVisitados;
         else return substituicoesVisitante;
+    }
+
+    public int getGolosVisitado() {
+        return golosVisitado;
+    }
+
+    public int getGolosVisitante() {
+        return golosVisitante;
     }
 
     /**

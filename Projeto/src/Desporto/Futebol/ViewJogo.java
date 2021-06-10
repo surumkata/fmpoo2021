@@ -7,7 +7,6 @@ import java.util.*;
  */
 public class ViewJogo {
 
-
     // Interfaces auxiliares
 
     /** Functional interface para handlers. */
@@ -174,6 +173,10 @@ public class ViewJogo {
         System.out.println(s);
     }
 
+    public void historico(String s) {
+        System.out.println(s);
+    }
+
 
     /**
      * Mensagem de erro de atribuição de valor para os atributos
@@ -205,5 +208,27 @@ public class ViewJogo {
     public void comentariosJogo (double tempo, String comentario){
         if(tempo < 10) System.out.println("0"+tempo+"': "+comentario);
         else System.out.println(tempo+"': "+comentario);
+    }
+
+    public void resultado(String equipaVisitada, String equipaVisitante, int golosVisitado, int golosVisitante){
+        System.out.println("**Resultado** ("+equipaVisitada+") "+golosVisitado+" - "+golosVisitante+" ("+equipaVisitante+")");
+    }
+
+    public void scanFicheiro(boolean objeto){
+        if(objeto) System.out.print("Nome do ficheiro objeto: ");
+        else System.out.print("Nome do ficheiro: ");
+    }
+
+    public void scanEquipa(){
+        System.out.print("Nome da equipa: ");
+    }
+
+    public void sucessoEquipa(boolean sucesso){
+        if(sucesso) System.out.println("Equipa criada com sucesso.");
+        else System.out.println("Esse nome já pertence a uma equipa, escolhe outro.");
+    }
+
+    public void scan(){
+        System.out.print("@: ");
     }
 }

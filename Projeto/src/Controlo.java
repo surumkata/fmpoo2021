@@ -50,6 +50,17 @@ public class Controlo {
             "Começar Simulacao",
             "Editar Equipas"};
 
+    private final String[] menuSimulacoes = new String[]{
+            "Simulacao",
+            "Fazer Simulacao Rapida",
+            "Fazer Simulacao Normal"};
+
+    private final String[] menuSimulacaoRapida = new String[]{
+            "Simulacao Rapida",
+            "Começar",
+            "Programar substituições",
+            "Programar substituições"};
+
     private final String[] menuEditarEquipa = new String[]{
             "Equipa",
             "Editar Nome",
@@ -155,7 +166,7 @@ public class Controlo {
         ViewJogo menu = new ViewJogo(menuPrincipal);
         menu.limpaTela();
         menu.welcome();
-        menu.setPreCondition(2,()->cd.simulacaoPossivel());
+        menu.setPreCondition(1,()->cd.simulacaoPossivel());
         menu.setHandler(1, this::simularJogo);
         menu.setHandler(2, this::dados);
         menu.run();
@@ -199,13 +210,109 @@ public class Controlo {
 
         ViewJogo v = new ViewJogo(menuSimulacao);
         v.limpaTela();
-        v.setHandler(1,()->{simulacao(equipaVisitada,equipaVisitante);v.stop();});
+        v.setHandler(1,()->{escolheSimulacao(equipaVisitada,equipaVisitante);v.stop();});
         v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,}, 3,true));
         v.run();
         v.limpaTela();
         v.welcome();
 
     }
+
+    private void escolheSimulacao (String equipaVisitada, String equipaVisitante){
+        ViewJogo v = new ViewJogo(menuSimulacoes);
+        v.setHandler(1,()->{simulacaoRapida(equipaVisitada,equipaVisitante);});
+        v.setHandler(2,()->{simulacao(equipaVisitada,equipaVisitante);});
+        v.run();
+    }
+
+
+    private void simulacaoRapida(String equipaVisitada, String equipaVisitante) {
+        String[] menu = new String[4];
+        menu[0] = menuSimulacaoRapida[0];
+        menu[1] = menuSimulacaoRapida[1];
+        EquipaFutebol visitadaO = this.cd.getEquipaFutebol(equipaVisitada);
+        EquipaFutebol visitanteO = this.cd.getEquipaFutebol(equipaVisitante);
+        AtomicBoolean comecar = new AtomicBoolean(false);
+        AtomicBoolean sair = new AtomicBoolean(false);
+        AtomicInteger s1 = new AtomicInteger(3);
+        AtomicInteger s2 = new AtomicInteger(3);
+        int subs1[][] = new int[][]{new int[]{0, 0, 0}, new int[]{0, 0, 0}};
+        int subs2[][] = new int[][]{new int[]{0, 0, 0}, new int[]{0, 0, 0}};
+        EquipaFutebol equipa1 = visitadaO.clone();
+        EquipaFutebol equipa2 = visitanteO.clone();
+        while (!comecar.get() && !sair.get()) {
+            sair.set(true);
+            menu[2] = menuSimulacaoRapida[2] + " " + equipaVisitada + " [" + s1.get() + " substituições restantes]";
+            menu[3] = menuSimulacaoRapida[3] + " " + equipaVisitante + " [" + s2.get() + " substituições restantes]";
+            ViewJogo v = new ViewJogo(menu);
+            v.setPreCondition(2, () -> (s1.get() > 0));
+            v.setPreCondition(3, () -> (s2.get() > 0));
+            AtomicInteger n1 = new AtomicInteger(0);
+            AtomicInteger n2 = new AtomicInteger(0);
+            AtomicBoolean substituicao = new AtomicBoolean(false);
+            v.setHandler(1, () -> {
+                comecar.set(true);
+                v.stop();
+                sair.set(false);
+            });
+            EquipaFutebol finalEquipa = equipa1;
+            EquipaFutebol finalEquipa2 = equipa2;
+            v.setHandler(2, () -> {
+                substituicoes(finalEquipa, substituicao, n1, n2);
+                if (substituicao.get()) {
+                    subs1[0][3 - s1.get()] = n1.get();
+                    subs1[1][3 - s1.get()] = n2.get();
+                    s1.set(s1.get() - 1);
+                }
+                v.stop();
+                sair.set(false);
+            });
+            v.setHandler(3, () -> {
+                substituicoes(finalEquipa2, substituicao, n1, n2);
+                if (substituicao.get()) {
+                    subs2[0][3 - s2.get()] = n1.get();
+                    subs2[1][3 - s2.get()] = n2.get();
+                    s2.set(s2.get() - 1);
+                }
+                v.stop();
+                sair.set(false);
+            });
+            v.run();
+        }
+        if(!sair.get()){
+            ExecutaPartida exp = new ExecutaPartida(visitadaO, visitanteO);
+            exp.setComentariosON(false);
+            AtomicBoolean intervalo = new AtomicBoolean(false);
+            AtomicBoolean ignorar = new AtomicBoolean(false);
+            boolean posIntervalo = false;
+            while (!exp.run(intervalo, ignorar)) {
+                if (!posIntervalo && intervalo.get()) {
+                    posIntervalo = true;
+                    equipa1 = visitadaO.clone();
+                    equipa2 = visitanteO.clone();
+                    for (int i = 0; i < 3; i++) {
+                        if (subs1[0][i] != 0) {
+                            equipa1.substiuicaoJogo(subs1[0][i], subs1[1][i]);
+                            exp.decSubs(true, "", subs1[0][i], subs1[1][i]);
+                        }
+                        if (subs2[0][i] != 0) {
+                            equipa2.substiuicaoJogo(subs2[0][i], subs2[1][i]);
+                            exp.decSubs(false, "", subs2[0][i], subs2[1][i]);
+                        }
+                    }
+                    exp.atualizaEquipa(true, equipa1);
+                    exp.atualizaEquipa(true, equipa2);
+                }
+            }
+            exp.atualizaEquipa(true, visitadaO);
+            exp.atualizaEquipa(false, visitanteO);
+            PartidaFutebol p = exp.getPartida();
+            ViewJogo v = new ViewJogo();
+            v.resultado(equipaVisitada, equipaVisitante, p.getGolosVisitado(), p.getGolosVisitante());
+            this.cd.adicionaPartida(p);
+        }
+    }
+
 
     /**
      * Simula uma partida de futebol com as várias mensagens para os vários eventos de um jogo de futebol
@@ -251,7 +358,7 @@ public class Controlo {
             AtomicInteger n1 = new AtomicInteger(0);
             AtomicInteger n2 = new AtomicInteger(0);
             menuS.setHandler(1,()->{menuS.stop();continuar.set(true);});
-            menuS.setHandler(2, ()->{
+            menuS.setHandler(2,()->{
                 String comentario = substituicoes(finalVisitada,substituicao,n1,n2);
                 if(substituicao.get()) {
                     s1.set(s1.get() - 1);
@@ -281,8 +388,9 @@ public class Controlo {
         if(continuar.get()) {
             exp.atualizaEquipa(false, visitanteO);
             exp.atualizaEquipa(true, visitadaO);
-            System.out.println(resultado);
+            ViewJogo v = new ViewJogo();
             PartidaFutebol p = exp.getPartida();
+            v.resultado(equipaVisitada,equipaVisitante,p.getGolosVisitado(),p.getGolosVisitante());
             this.cd.adicionaPartida(p);
         }
     }
@@ -427,7 +535,7 @@ public class Controlo {
         ViewJogo v = new ViewJogo(gravarDados);
         
         v.setHandler(1,()->{
-            System.out.println("Nome do ficheiro: ");
+            v.scanFicheiro(false);
             String ficheiro = scan.nextLine();
             try {
                 cd.escreverFicheiro(ficheiro);
@@ -437,7 +545,7 @@ public class Controlo {
             v.stop();
         });
         v.setHandler(2,()->{
-            System.out.println("Nome do ficheiro objeto: ");
+            v.scanFicheiro(true);
             String ficheiro = scan.nextLine();
             try {
                 cd.gravarFicheiroObjeto(ficheiro);
@@ -458,7 +566,7 @@ public class Controlo {
         
         v.setHandler(1,()->{
             try {
-                System.out.println("Nome do ficheiro: ");
+                v.scanFicheiro(false);
                 String ficheiro = scan.nextLine();
                 cd.lerFicheiro(ficheiro);
                 v.stop();
@@ -468,7 +576,7 @@ public class Controlo {
         });
         v.setHandler(2,()->{
             try {
-                System.out.println("Nome do ficheiro objeto: ");
+                v.scanFicheiro(true);
                 String ficheiro = scan.nextLine();
                 cd = cd.lerFicheiroObjeto(ficheiro);
                 v.stop();
@@ -592,8 +700,8 @@ public class Controlo {
         for(int i = 1; i < menu.length; i++){
             int finalI = i-1;
             m.setHandler(i,()->{
-                System.out.println(l.get(finalI).toString());
                 ViewJogo aux = new ViewJogo(new String[] {""});
+                aux.historico(l.get(finalI).toString());
                 aux.run();
             });
         }
@@ -792,7 +900,6 @@ public class Controlo {
             editJ.stop();
         });
         editJ.setHandler(6,()->{
-            System.out.println(j.toString());
             ViewJogo aux = new ViewJogo(new String[] {""});
             aux.run();
         });
@@ -810,7 +917,8 @@ public class Controlo {
      * @return String introduzida pelo utilizador
      */
     private String auxScan(){
-        System.out.print("@: ");
+        ViewJogo v = new ViewJogo();
+        v.scan();
         return this.scan.nextLine();
     }
 
@@ -819,8 +927,15 @@ public class Controlo {
      * @return Valor entre 0 e 100
      */
     private int auxScanInt(){
-        System.out.print("@: ");
-        int i = scan.nextInt();
+        ViewJogo v = new ViewJogo();
+        v.scan();
+        int i;
+        try{
+            i = scan.nextInt();
+        }
+        catch(NumberFormatException e){
+            return auxScanInt();
+        }
         if(i > 0 && i <= 99){
             return i;
         }
@@ -959,10 +1074,11 @@ public class Controlo {
      * Cria uma equipa com um dado nome
      */
     private void criarEquipa(){
-        System.out.println("Escolhe um nome para a tua equipa.");
+        ViewJogo v = new ViewJogo();
+        v.scanEquipa();
         String nome = nomeEquipa();
         cd.criarEquipa(nome);
-        System.out.println("Equipa criada com sucesso.");
+        v.sucessoEquipa(true);
     }
 
     /**
@@ -970,11 +1086,13 @@ public class Controlo {
      * @return Nome da equipa
      */
     private String nomeEquipa(){
+        ViewJogo v = new ViewJogo();
+        v.scanEquipa();
         String nome = scan.nextLine();
         if(!cd.existeEquipa(nome))
             return nome;
         else {
-            System.out.println("Esse nome já pertence a uma equipa, escolhe outro.");
+            v.sucessoEquipa(false);
             return nomeEquipa();
         }
     }
