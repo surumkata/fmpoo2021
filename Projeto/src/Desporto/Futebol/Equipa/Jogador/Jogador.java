@@ -15,17 +15,21 @@ public class Jogador implements Serializable {
     private List <String> historial;
     private Atributos atributos;
 
-    //21
+    //30
     private final String[] nomesProprios = {
             "Simao","Tiago","Joao","Nuno","Luis","Geremias","Paulo","Goncalo",
             "Pedro","Nelson","Fabio","Gil","Antonio","Miguel","Rogério",
-            "Guilherme","Jose","Chico","Rafael","Eduardo","Jonas","Rodrigo"};
+            "Guilherme","Jose","Chico","Rafael","Eduardo","Jonas","Rodrigo","Rui",
+            "Diogo","Tomas","Tobias","Raul","Jorge","Hugo","Andre"
+    };
 
-    //27
+    //30
     private final String[] nomesApelidos = {
             "Sa","Silva","Barbosa","Geremias","Barroso","Cunha","Carvalho","Sousa","Carneiro",
             "Braz","Alvim","Saraiva","Dias","Fernandes","Rocha","Cardozo","Rodrigues","Ribeiro",
-            "Dinis","Tina","Guimaraes","Alves","Pereira","Freitas","Queiros","Costa","Pato"};
+            "Dinis","Tina","Guimaraes","Alves","Pereira","Freitas","Queiros","Costa","Pato","Daniel",
+            "Oliveira","Santos"
+    };
 
     /**
      * Construtor vazio de um jogador
@@ -479,8 +483,8 @@ public class Jogador implements Serializable {
 
     public void random(){
         Random r = new Random();
-        int n1 = r.nextInt(22);
-        int n2 = r.nextInt(27);
+        int n1 = r.nextInt(30);
+        int n2 = r.nextInt(30);
         this.nome = nomesProprios[n1]+" "+nomesApelidos[n2];
         String [] posicoes = {"Guarda-Redes","Defesa","Lateral","Medio","Avancado"};
         int pos = r.nextInt(5);

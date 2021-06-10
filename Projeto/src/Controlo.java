@@ -196,11 +196,10 @@ public class Controlo {
             w.welcome();
             return;
         }
-        System.out.println("Jogo entre "+equipaVisitada+" e "+equipaVisitante);
 
         ViewJogo v = new ViewJogo(menuSimulacao);
         v.limpaTela();
-        v.setHandler(1, ()->simulacao(equipaVisitada,equipaVisitante));
+        v.setHandler(1,()->{simulacao(equipaVisitada,equipaVisitante);v.stop();});
         v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,}, 3,true));
         v.run();
         v.limpaTela();
@@ -223,8 +222,10 @@ public class Controlo {
 
         String resultado = exp.getPartida().resultado();
         AtomicBoolean substituicoes = new AtomicBoolean(false);
+        AtomicBoolean continuar = new AtomicBoolean(true);
 
         while(!exp.run(intervalo,substituicoes)){
+            continuar.set(false);
             PartidaFutebol p = exp.getPartida();
             EquipaFutebol finalVisitada = p.getEquipaVisitada();
             EquipaFutebol finalVisitante = p.getEquipaVisitante();
@@ -249,7 +250,7 @@ public class Controlo {
             menuS.setPreCondition(3,()->(s2.get() > 0));
             AtomicInteger n1 = new AtomicInteger(0);
             AtomicInteger n2 = new AtomicInteger(0);
-            menuS.setHandler(1, menuS::stop);
+            menuS.setHandler(1,()->{menuS.stop();continuar.set(true);});
             menuS.setHandler(2, ()->{
                 String comentario = substituicoes(finalVisitada,substituicao,n1,n2);
                 if(substituicao.get()) {
@@ -258,6 +259,7 @@ public class Controlo {
                     exp.decSubs(true,comentario,n1.get(),n2.get());
                     menuS.stop();
                 }
+                continuar.set(true);
             });
             menuS.setHandler(3, ()->{
                 String comentario = substituicoes(finalVisitante,substituicao,n1,n2);
@@ -266,18 +268,23 @@ public class Controlo {
                     substituicoes.set(true);
                     exp.decSubs(false,comentario,n1.get(),n2.get());
                     menuS.stop();
+                    continuar.set(true);
                 }
             });
             menuS.run();
             exp.atualizaEquipa(true,finalVisitada);
             exp.atualizaEquipa(false,finalVisitante);
+            if(!continuar.get())
+                break;
         }
 
-        exp.atualizaEquipa(false,visitanteO);
-        exp.atualizaEquipa(true,visitadaO);
-        System.out.println(resultado);
-        PartidaFutebol p = exp.getPartida();
-        this.cd.adicionaPartida(p);
+        if(continuar.get()) {
+            exp.atualizaEquipa(false, visitanteO);
+            exp.atualizaEquipa(true, visitadaO);
+            System.out.println(resultado);
+            PartidaFutebol p = exp.getPartida();
+            this.cd.adicionaPartida(p);
+        }
     }
 
     /**
