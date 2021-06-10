@@ -139,21 +139,21 @@ public class ViewJogo {
      * Mensagem de boas vindas
      */
     public void welcome(){
-        System.out.println("███████╗███╗░░░███╗  ██████╗░░█████╗░░█████╗░  ██████╗░░█████╗░██████╗░░░███╗░░");
-        System.out.println("██╔════╝████╗░████║  ██╔══██╗██╔══██╗██╔══██╗  ╚════██╗██╔══██╗╚════██╗░████║░░");
-        System.out.println("█████╗░░██╔████╔██║  ██████╔╝██║░░██║██║░░██║  ░░███╔═╝██║░░██║░░███╔═╝██╔██║░░");
-        System.out.println("██╔══╝░░██║╚██╔╝██║  ██╔═══╝░██║░░██║██║░░██║  ██╔══╝░░██║░░██║██╔══╝░░╚═╝██║░░");
-        System.out.println("██║░░░░░██║░╚═╝░██║  ██║░░░░░╚█████╔╝╚█████╔╝  ███████╗╚█████╔╝███████╗███████╗");
-        System.out.println("\u001B[32m                          ___________________________                         ");
-        System.out.println("                         |             |             |                        ");
-        System.out.println("                         |___          |          ___|                        ");
-        System.out.println("                         |_  |         |         |  _|                        ");
-        System.out.println("                        .| | |.       ,|.       .| | |.                       ");
-        System.out.println("                        || | | )     ( | )     ( | | ||                       ");
-        System.out.println("                        '|_| |'       `|'       `| |_|'                       ");
-        System.out.println("                         |___|         |         |___|                        ");
-        System.out.println("                         |             |             |                        ");
-        System.out.println("                         |_____________|_____________|               \u001B[0m");
+        System.out.println("███████╗███╗░░░███╗    ██████╗░░█████╗░░█████╗░    ██████╗░░█████╗░██████╗░░░███╗░░");
+        System.out.println("██╔════╝████╗░████║    ██╔══██╗██╔══██╗██╔══██╗    ╚════██╗██╔══██╗╚════██╗░████║░░");
+        System.out.println("█████╗░░██╔████╔██║    ██████╔╝██║░░██║██║░░██║    ░░███╔═╝██║░░██║░░███╔═╝██╔██║░░");
+        System.out.println("██╔══╝░░██║╚██╔╝██║    ██╔═══╝░██║░░██║██║░░██║    ██╔══╝░░██║░░██║██╔══╝░░╚═╝██║░░");
+        System.out.println("██║░░░░░██║░╚═╝░██║    ██║░░░░░╚█████╔╝╚█████╔╝    ███████╗╚█████╔╝███████╗███████╗");
+        System.out.println("\u001B[32m                          _________________________________                         ");
+        System.out.println("                         |                |                |                        ");
+        System.out.println("                         |___             |             ___|                        ");
+        System.out.println("                         |_  |            |            |  _|                        ");
+        System.out.println("                        .| | |.          ,|.          .| | |.                       ");
+        System.out.println("                        || | | )        ( | )        ( | | ||                       ");
+        System.out.println("                        '|_| |'          `|'          `| |_|'                       ");
+        System.out.println("                         |___|            |            |___|                        ");
+        System.out.println("                         |                |                |                        ");
+        System.out.println("                         |________________|________________|               \u001B[0m");
     }
 
     /**
@@ -168,6 +168,10 @@ public class ViewJogo {
      */
     public void lerEquipa(){
         System.out.print("Qual o nome da Equipa: ");
+    }
+
+    public void mostraCampo(String s){
+        System.out.println(s);
     }
 
 

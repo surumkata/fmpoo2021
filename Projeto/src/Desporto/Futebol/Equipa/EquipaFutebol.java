@@ -169,19 +169,21 @@ public class EquipaFutebol implements Serializable {
     public void adicionaPlantel(Jogador j){
         boolean x = false;
         int numero = j.getNumero();
-        while(this.plantel.numeroOcupado(numero)) {
-            if(!x){
-                System.out.println("O número do jogador já está ocupado, a gerar um novo\n");
-                x = true;
+        if(this.plantel.getnJogadoresNoPlantel() < 22) {
+            while (this.plantel.numeroOcupado(numero)) {
+                if (!x) {
+                    System.out.println("O número do jogador já está ocupado, a gerar um novo\n");
+                    x = true;
+                }
+                numero++;
             }
-            numero++;
+            j.setNumero(numero);
+            int sizeDisponivel = 11 - this.plantel.getTitulares().size() - this.plantel.quantasPosicoesFaltam();
+            if (!this.plantel.temPosicao(j.getPosicao()) || sizeDisponivel > 0)
+                this.plantel.adicionaTitular(j);
+            else
+                this.plantel.adicionaSuplente(j);
         }
-        j.setNumero(numero);
-        int sizeDisponivel = 11 - this.plantel.getTitulares().size() - this.plantel.quantasPosicoesFaltam();
-        if(!this.plantel.temPosicao(j.getPosicao()) || sizeDisponivel > 0) 
-            this.plantel.adicionaTitular(j);
-        else
-            this.plantel.adicionaSuplente(j);
     }
 
     /**
@@ -250,23 +252,22 @@ public class EquipaFutebol implements Serializable {
     public String[][] nomesJogadores (){
         String[][] titulares = this.plantel.nomesTitulares();
         String[][] suplentes = this.plantel.nomesSuplentes();
-        String[][] jogadores = new String [2][titulares[0].length+ suplentes[0].length];
-        int i = 0, j = 0;
-        for(String s : titulares[0]){
-            jogadores[0][i] = "(T) "+s;
-            i++;
+        String[][] jogadores = new String [3][titulares[0].length+ suplentes[0].length];
+        int i, j;
+
+        for(i = 0; i < titulares[0].length;i++){
+            jogadores[0][i] = "*"+titulares[0][i]+"*";
+            if(Integer.parseInt(titulares[1][i]) < 10)
+                jogadores[1][i] = "0"+titulares[1][i];
+            else jogadores[1][i] = titulares[1][i];
+            jogadores[2][i] = titulares[2][i];
         }
-        for(String s : titulares[1]){
-            jogadores[1][j] = s;
-            j++;
-        }
-        for(String s : suplentes[0]){
-            jogadores[0][i] = "(S) "+s;
-            i++;
-        }
-        for(String s : suplentes[1]){
-            jogadores[1][j] = s;
-            j++;
+        for(j = 0; j < suplentes[0].length;j++,i++){
+            jogadores[0][i] = suplentes[0][j];
+            if(Integer.parseInt(suplentes[1][j]) < 10)
+                jogadores[1][i] = "0"+suplentes[1][j];
+            else jogadores[1][i] = suplentes[1][j];
+            jogadores[2][i] = suplentes[2][j];
         }
         return jogadores;
     }

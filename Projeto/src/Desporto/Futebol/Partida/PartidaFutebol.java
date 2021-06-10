@@ -1,13 +1,16 @@
 package Desporto.Futebol.Partida;
 
 import Desporto.Futebol.Equipa.EquipaFutebol;
+import Desporto.Futebol.Equipa.Jogador.CompPosicao;
 import Desporto.Futebol.Equipa.Jogador.Jogador;
+import Desporto.Futebol.Equipa.Tatica;
 
 import java.io.Serializable;
 import java.time.LocalDate;
 import java.util.List;
 import java.util.Map;
 import java.util.Random;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 /**
@@ -198,7 +201,10 @@ public class PartidaFutebol implements Serializable {
                     filter(e -> e.getPosicao().equals(posicao)).collect(Collectors.toList());
         }
         Random i = new Random();
-        return js.get(i.nextInt(js.size()));
+        if(js.size()>0)
+            return js.get(i.nextInt(js.size()));
+        else
+            return null;
     }
 
     /**
@@ -261,8 +267,21 @@ public class PartidaFutebol implements Serializable {
         else this.golosVisitante++;
     }
 
+
     /**
-     * Devolve uma cópia da equipa da casa atualizada
+     * Atualiza uma equipa (casa ou fora de acordo com o booleano)
+     * @param e Equipa de futebol da casa
+     * @param visitada Booleano que verifica se é a equipa da casa
+     */
+    public void atualizaEquipa (EquipaFutebol e, boolean visitada){
+        if(visitada)
+            atualizaVisitado(e);
+        else
+            atualizaVisitante(e);
+    }
+
+    /**
+     * Atualiza a equipa da casa
      * @param e Equipa de futebol da casa
      */
     public void atualizaVisitado (EquipaFutebol e){
@@ -270,7 +289,7 @@ public class PartidaFutebol implements Serializable {
     }
 
     /**
-     * Devolve uma cópia da equipa visitante atualizada
+     * Atualiza a equipa visitante
      * @param e Equipa de futebol visitante
      */
     public void atualizaVisitante (EquipaFutebol e){
@@ -285,6 +304,7 @@ public class PartidaFutebol implements Serializable {
         sb.append("***Partida***\n");
         sb.append("**Resultado** ").append(resultado()).append("\n");
         sb.append("**Data** ").append(this.data.toString()).append("\n");
+        sb.append(campo(tatica(true),tatica(false)));
         sb.append("**Equipa Visitada**\n");
         sb.append(equipaVisitada.toString());
         sb.append("*Substituições*\n");
@@ -303,6 +323,93 @@ public class PartidaFutebol implements Serializable {
         }
         return sb.toString();
     }
+
+    public String campo(String[] e1, String[] e2){
+        StringBuilder sb = new StringBuilder();
+        sb.append("      _______________________________________  \n");
+        sb.append("     |                   |                   |  \n");
+        sb.append("     |____ ").append(e1[4]).append(e1[6]).append("          |          ").append(e2[6]).append(e2[4]).append(" ____|  \n");
+        sb.append("     |__  |").append(e1[1]).append("  ").append(e1[8]).append("    ").append(e1[14]).append("  |  ").append(e2[14]).append("    ").append(e2[8]).append("  ").append(e2[1]).append("|  __|  \n");
+        sb.append("    .|  | |.   ").append(e1[9]).append("       .|.       ").append(e2[9]).append("   .| |  |. \n");
+        sb.append("    ||").append(e1[0]).append("| |").append(e1[2]).append("  ").append(e1[10]).append(" ").append(e1[13]).append(" ").append(e1[15]).append("( | )").append(e2[15]).append(" ").append(e2[13]).append(" ").append(e2[10]).append("  ").append(e2[2]).append("| |").append(e2[0]).append("|| \n");
+        sb.append("    '|__| |'   ").append(e1[11]).append("       '|'       ").append(e2[11]).append("   '| |__|' \n");
+        sb.append("     |__  |").append(e1[3]).append("  ").append(e1[12]).append("    ").append(e1[16]).append("  |  ").append(e2[16]).append("    ").append(e2[12]).append("  ").append(e2[3]).append("|  __|  \n");
+        sb.append("     |____ ").append(e1[5]).append(e1[7]).append("          |          ").append(e2[7]).append(e2[5]).append(" ____|  \n");
+        sb.append("     |___________________|___________________|  \n");
+        return sb.toString();
+    }
+
+    public String[] tatica(boolean visitado){
+        Tatica t;
+        if (visitado)
+            t = this.equipaVisitada.getPlantel().getTatica();
+        else t = this.equipaVisitante.getPlantel().getTatica();
+
+        Tatica[] taticas = {new Tatica(1,2,2,4,2), //4-4-2
+                new Tatica(1,2,2,3,3), //4-3-3
+                new Tatica(1,3,2,3,2), //3-5-2
+                new Tatica(1,3,2,4,1), //3-6-1
+                new Tatica(1,3,4,2,1), //5-4-1
+                new Tatica(1,3,2,3,2)}; //5-3-2
+
+        String [] s = new String[17];
+        for(int i = 0; i < 17; i++){
+            s[i] = "";
+        }
+        if(t.equals(taticas[0])){ //4-4-2 || 2 - 6 - 7 - 8 - 12 - 15
+            s[2] = s[6] = s[7] = s[8] = s[12] = s[15] = "  ";
+        }
+        else if(t.equals(taticas[1])){ //4-3-3 || 2 - 6 - 7 - 9 - 11 - 13
+            s[2] = s[6] = s[7] = s[9] = s[11] = s[13] = "  ";
+        }
+        else if(t.equals(taticas[2])){ //3-5-2 || 4 - 5 - 9 - 11 - 13 - 15
+            s[4] = s[5] = s[9] = s[11] = s[13] = s[15] = "  ";
+        }
+        else if(t.equals(taticas[3])){ //3-6-1 || 4 - 5 - 9 - 11 - 14 - 16
+            s[4] = s[5] = s[9] = s[11] = s[14] = s[16] = "  ";
+        }
+        else if(t.equals(taticas[4])){ //5-4-1 || 6 - 7 - 9 - 11 - 14 - 16
+            s[6] = s[7] = s[9] = s[11] = s[14] = s[16] = "  ";
+
+        }
+        else if(t.equals(taticas[5])){ //5-3-2 || 6 - 7 - 9 - 11 - 13 - 15
+            s[6] = s[7] = s[9] = s[11] = s[13] = s[15] = "  ";
+        }
+        String[] n = numerosTitulares(visitado);
+        int x, y = 0;
+        for(x = 0; y <= 10; x++){
+            if(!s[x].equals("  ")) {
+                s[x] = n[y];
+                y++;
+            }
+        }
+        return s;
+    }
+
+
+
+/*
+//4-4-2 || 2 - 6 - 7 - 8 - 12 - 15
+//4-3-3 || 2 - 6 - 7 - 9 - 11 - 13
+//3-5-2 || 4 - 5 - 9 - 11 - 13 - 15
+//3-6-1 || 4 - 5 - 9 - 11 - 14 - 16
+//5-4-1 || 6 - 7 - 9 - 11 - 14 - 16
+//5-3-2 || 6 - 7 - 9 - 11 - 13 - 15
+    public String campo(String[] numeros){
+        StringBuilder sb = new StringBuilder();
+        sb.append("      _______________________________________  \n");
+        sb.append("     |                   |                   |  \n");
+        sb.append("     |____ 0406          |          LTLT ____|  \n");
+        sb.append("     |__  |01  08    14  |  AV    MD  DF|  __|  \n");
+        sb.append("    .|  | |.   09       .|.       MD   .| |  |. \n");
+        sb.append("    ||00| |02  10 13 15( | )15 13 10  02| |00|| \n");
+        sb.append("    '|__| |'   11       '|'       MD   '| |__|' \n");
+        sb.append("     |____|03  12    16  |  AV    MD  DF|____|  \n");
+        sb.append("     |     0507          |          LTLT     |  \n");
+        sb.append("     |___________________|___________________|  \n");
+        return sb.toString();
+    }
+ */
 
     /**
      * Transforma uma partida de futebol numa linha
@@ -348,6 +455,24 @@ public class PartidaFutebol implements Serializable {
             }
         }
         return sb.toString();
+    }
+
+    public String[] numerosTitulares(boolean visitado){
+        String[] numeros = new String [11];
+        Map <Integer,Jogador> titulares = this.getEquipaTitulares(visitado);
+        TreeSet<Jogador> tm = new TreeSet<>(new CompPosicao());
+
+        tm.addAll(titulares.values());
+        int x = 0;
+        for(Jogador j : tm){
+            int n = j.getNumero();
+            if(n > 9){
+                numeros[x] = Integer.toString(n);
+            }
+            else numeros[x] = "0"+n;
+            x++;
+        }
+        return numeros;
     }
 }
 

@@ -9,10 +9,7 @@ import Desporto.Futebol.Partida.PartidaFutebol;
 import java.io.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /**
@@ -81,7 +78,7 @@ public class ControloDados implements Serializable{
 
         Jogador j23 = new Jogador(12,"Tiago Sá","Guarda-Redes",historialA,atrGRa);eA.adicionaPlantel(j23);
         Jogador j24 = new Jogador(13,"Rolando","Defesa",historialA,atrDFa);eA.adicionaPlantel(j24);
-        Jogador j25 = new Jogador(14,"João Novais","Medio",historialA,atrLTa);eA.adicionaPlantel(j25);
+        Jogador j25 = new Jogador(14,"João Novais","Medio",historialA,atrMDa);eA.adicionaPlantel(j25);
         Jogador j26 = new Jogador(15,"André Horta","Medio",historialA,atrMDa);eA.adicionaPlantel(j26);
         Jogador j27 = new Jogador(16,"Galeno","Avancado",historialA,atrAVa);eA.adicionaPlantel(j27);
 
@@ -445,4 +442,15 @@ public class ControloDados implements Serializable{
         oos.close();
     }
 
+    public void fillEquipa(EquipaFutebol e){
+//
+        while(e.getPlantel().getnJogadoresNoPlantel() < 22){
+            Jogador j = new Jogador();
+            j.random();
+            e.adicionaPlantel(j);
+        }
+
+        removeEquipa(e.getNome());
+        criarEquipa(e);
+    }
 }

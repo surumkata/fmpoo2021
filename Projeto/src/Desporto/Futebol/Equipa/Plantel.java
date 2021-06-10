@@ -1,5 +1,6 @@
 package Desporto.Futebol.Equipa;
 
+import Desporto.Futebol.Equipa.Jogador.CompPosicao;
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
 import java.io.Serializable;
@@ -248,7 +249,7 @@ public class Plantel implements Serializable {
         sb.append("*Titulares* \n").append(titularesToString());
         sb.append("*Suplentes* \n").append(suplentesToString());
         return sb.toString();
-    }   
+    }
 
     /**
      * Transforma um plantel numa linha
@@ -335,6 +336,7 @@ public class Plantel implements Serializable {
      */
     public void removeSuplente(int id){
         this.suplentes.remove(id);
+        this.nJogadoresNoPlantel--;
     }
 
     /**
@@ -343,6 +345,7 @@ public class Plantel implements Serializable {
      */
     public void removeTitular(int id){
         this.titulares.remove(id);
+        this.nJogadoresNoPlantel--;
     }
 
     /**
@@ -382,21 +385,17 @@ public class Plantel implements Serializable {
     }
 
     /**
-     * Verifica se a substituição foi bem sucedida
+     * Realiza uma substituicao (o titular desaparece pois não pode voltar a entrar)
      * @param titular Número do titular a ser substituído
      * @param suplente Número do suplente a entrar
-     * @return true se a substituição foi bem sucedida, false caso contrário
      */
-    public boolean substituicao(int titular, int suplente) {
+    public void substituicao(int titular, int suplente) {
         if (existeTitular(titular) && existeSuplente(suplente)){
             Jogador s = getSuplente(suplente);
             this.titulares.remove(titular);
             this.suplentes.remove(suplente);
             this.titulares.put(suplente,s);
-            return true;
         }
-        else
-            return false;
     }
 
     /**
@@ -404,12 +403,16 @@ public class Plantel implements Serializable {
      * @return Array de strings
      */
     public String[][] nomesSuplentes (){
+        TreeSet<Jogador> tm = new TreeSet<>(new CompPosicao());
         String [] nomes = new String[this.suplentes.size()];
         String [] numeros = new String[this.suplentes.size()];
-        String [] posicoes = new String[this.titulares.size()];
-        String [] overall = new String[this.titulares.size()];
+        String [] posicoes = new String[this.suplentes.size()];
+        String [] overall = new String[this.suplentes.size()];
         int i = 0;
-        for(Jogador j : this.suplentes.values()){
+
+        tm.addAll(suplentes.values());
+
+        for(Jogador j : tm){
             nomes[i] = j.getNome();
             numeros[i] = Integer.toString(j.getNumero());
             posicoes[i] = abvPosicao(j.getPosicao());
@@ -424,12 +427,15 @@ public class Plantel implements Serializable {
      * @return Array de strings
      */
     public String[][] nomesTitulares (){
+        TreeSet<Jogador> tm = new TreeSet<>(new CompPosicao());
         String [] nomes = new String[this.titulares.size()];
         String [] numeros = new String[this.titulares.size()];
         String [] posicoes = new String[this.titulares.size()];
         String [] overall = new String[this.titulares.size()];
         int i = 0;
-        for(Jogador j : this.titulares.values()){
+        tm.addAll(titulares.values());
+
+        for(Jogador j : tm){
             nomes[i] = j.getNome();
             numeros[i] = Integer.toString(j.getNumero());
             posicoes[i] = abvPosicao(j.getPosicao());
