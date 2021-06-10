@@ -15,7 +15,7 @@ public class Jogador implements Serializable {
     private List <String> historial;
     private Atributos atributos;
 
-    //30
+    //Array de strings com nomes próprios possíveis de ser escolhidos aleatoriamente
     private final String[] nomesProprios = {
             "Simao","Tiago","Joao","Nuno","Luis","Geremias","Paulo","Goncalo",
             "Pedro","Nelson","Fabio","Gil","Antonio","Miguel","Rogério",
@@ -23,7 +23,7 @@ public class Jogador implements Serializable {
             "Diogo","Tomas","Tobias","Raul","Jorge","Hugo","Andre"
     };
 
-    //30
+    //Array de strings com apelidos possíveis de ser escolhidos aleatoriamente
     private final String[] nomesApelidos = {
             "Sa","Silva","Barbosa","Geremias","Barroso","Cunha","Carvalho","Sousa","Carneiro",
             "Braz","Alvim","Saraiva","Dias","Fernandes","Rocha","Cardozo","Rodrigues","Ribeiro",
@@ -461,11 +461,23 @@ public class Jogador implements Serializable {
         return sb.toString();
     }
 
+    /**
+     * Método que compara os jogadores. O critério é a camisola do jogador.
+     * Se o resultado for > 0, o jogador atual vem em primeiro lugar;
+     * Se o resultado for < 0, o jogador j vem em primeiro lugar
+     * Caso contrário, os 2 jogadores são iguais
+     * @param j Objeto jogador original
+     * @return Valor > 0, < 0 ou = 0
+     */
     public int compareTo(Jogador j){
         int c = this.posicaoNivel() - j.posicaoNivel();
         return (c != 0) ? c : this.getNumero()-j.getNumero();
     }
 
+    /**
+     * Devolve um número identificativo para cada posição
+     * @return 1 a 5 caso seja uma posição válida, 0 caso contrário
+     */
     private int posicaoNivel(){
         int pn = 0;
         if(this.getPosicao().equals("Guarda-Redes"))
@@ -481,6 +493,9 @@ public class Jogador implements Serializable {
         return pn;
     }
 
+    /**
+     * Método que gere jogadores aleatórios.
+     */
     public void random(){
         Random r = new Random();
         int n1 = r.nextInt(30);
@@ -489,32 +504,32 @@ public class Jogador implements Serializable {
         String [] posicoes = {"Guarda-Redes","Defesa","Lateral","Medio","Avancado"};
         int pos = r.nextInt(5);
         this.posicao = posicoes[pos];
-        int [] atributos = new int[9];
+        int [] atb = new int[9];
         for(int i = 0; i < 9;i++){
-            atributos[i] = r.nextInt(101);
+            atb[i] = r.nextInt(101);
         }
         while(this.numero == 0){
             this.numero =  r.nextInt(100);
         }
         if(this.posicaoNivel() == 1){
-            this.atributos = new AtributosGR(atributos[0],atributos[1],atributos[2],atributos[3],
-                    atributos[4],atributos[5],atributos[6],atributos[7],atributos[8]);
+            this.atributos = new AtributosGR(atb[0],atb[1],atb[2],atb[3],
+                    atb[4],atb[5],atb[6],atb[7],atb[8]);
         }
         else if(this.posicaoNivel() == 2){
-            this.atributos = new AtributosDefesa(atributos[0],atributos[1],atributos[2],atributos[3],
-                    atributos[4],atributos[5],atributos[6],atributos[7],atributos[8]);
+            this.atributos = new AtributosDefesa(atb[0],atb[1],atb[2],atb[3],
+                    atb[4],atb[5],atb[6],atb[7],atb[8]);
         }
         else if(this.posicaoNivel() == 3){
-            this.atributos = new AtributosLateral(atributos[0],atributos[1],atributos[2],atributos[3],
-                    atributos[4],atributos[5],atributos[6],atributos[7],atributos[8]);
+            this.atributos = new AtributosLateral(atb[0],atb[1],atb[2],atb[3],
+                    atb[4],atb[5],atb[6],atb[7],atb[8]);
         }
         else if(this.posicaoNivel() == 4){
-            this.atributos = new AtributosMedio(atributos[0],atributos[1],atributos[2],atributos[3],
-                    atributos[4],atributos[5],atributos[6],atributos[7],atributos[8]);
+            this.atributos = new AtributosMedio(atb[0],atb[1],atb[2],atb[3],
+                    atb[4],atb[5],atb[6],atb[7],atb[8]);
         }
         else if(this.posicaoNivel() == 5){
-            this.atributos = new AtributosAvancado(atributos[0],atributos[1],atributos[2],atributos[3],
-                    atributos[4],atributos[5],atributos[6],atributos[7],atributos[8]);
+            this.atributos = new AtributosAvancado(atb[0],atb[1],atb[2],atb[3],
+                    atb[4],atb[5],atb[6],atb[7],atb[8]);
         }
 
     }
