@@ -1,0 +1,264 @@
+% !TeX spellcheck = pt_PT
+\documentclass[a4paper]{report}
+\usepackage[portuguese]{babel}
+\usepackage{a4wide}
+
+\usepackage{graphicx}
+\usepackage{hyperref}
+\usepackage{listings}
+\usepackage{indentfirst}
+\usepackage{float}
+
+\setlength{\parskip}{1em}
+
+\title{POO - Trabalho Prático\\
+	\large Grupo 05}
+\author{João Barbosa (a93270)
+	\and Simão Cunha (a93262)
+	\and Tiago Silva (a93277)}
+\date{Ano Letivo 2020/2021}
+
+\begin{document}
+	\begin{minipage}{0.9\linewidth}
+        \centering
+		\includegraphics[width=0.4\textwidth]{eng.jpeg}\par\vspace{1cm}
+		\href{https://www.uminho.pt/PT}
+		{\scshape\LARGE Universidade do Minho} \par
+		\vspace{0.6cm}
+		\href{https://miei.di.uminho.pt/}
+		{\scshape\Large Mestrado Integrado em Engenharia Informática} \par
+		\maketitle
+		\begin{figure}[H]
+			\includegraphics[width=0.32\linewidth]{joao.png}
+			\includegraphics[width=0.32\linewidth]{simao.png}
+			\includegraphics[width=0.32\linewidth]{tiago.png}
+		\end{figure}
+	\end{minipage}
+	
+	\tableofcontents
+	
+	\pagebreak
+	
+	\chapter{Introdução e principais desafios}
+%
+	Este projeto consistiu em criar um sistema de gestão e simulação de equipas de um determinado
+	desporto (neste caso futebol) muito semelhante ao jogo \textit{Football Manager}, de forma a
+	aplicarmos os vários conhecimentos adquiridos nas aulas ao longo do semestre.
+	
+	Tivemos alguns obstáculos para a concessão deste projeto, como a falta de tempo para conseguir uma aplicação que respeitasse melhor os princípios de programação orientada a objetos.
+	
+	\chapter{Classes}
+	\section{Main}
+	Classe responsável pelo arranque do programa. Para isto, o método \texttt{main} invoca o método \texttt{run} da classe \texttt{Controlo}.
+	
+	\section{Controlo}
+	\begin{lstlisting}[language=Java]
+    private ControloDados cd;
+    private Scanner scan;
+    private final String[] menuPrincipal;
+    private final String[] menuCarregarDados;
+    private final String[] menuSimulacao;
+    private final String[] menuEditarEquipa;
+    private final String[] menuEditarJogador;
+    private final String[] menuCriarDados;
+    private final String[] menuCriarJogador;
+    private final String[] menuPosicao;
+    private final String[] menuEscolheTatica;
+    
+	\end{lstlisting}
+	\texttt{Controlo} é a classe responsável pelo controlo da aplicação. Associa um menu a uma funcionalidade do programa. Por exemplo, mostra no ecrã a simulação de um jogo de futebol, recorrendo a métodos da classe \texttt{ExecutaPartida} e com mensagens pré-concebidas para vários momentos do jogo. 
+	
+	 Neste menu temos as seguintes opções: \par
+	 \vspace{0.05cm}
+1. \textit{Simular uma partida de futebol}: é possível escolher equipas, definir o seu onze inicial, esquema tático, efetuar um jogo, etc \par
+2. \textit{Manipular dados}: é possível carregar, criar, ver/editar, gravar e fazer reset a dados
+
+      
+	
+	\section{ControloDados}
+	\begin{lstlisting}[language=Java]
+private Map<String,EquipaFutebol>equipas;//nome + equipa
+private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos 
+	\end{lstlisting}
+	
+\texttt{Controlo de dados} é a classe de controlo para a execução de partidas de futebol, que inclui uma \texttt{HashMap} de equipas de futebol que são identificadas pelo seu nome e um \texttt{HashMap} de partidas de futebol onde é possivel associar o nome de uma equipa à lista de todos os seus jogos efetuados.
+ 
+	
+	\section{ViewJogo}
+	\begin{lstlisting}[language=Java]
+    private static Scanner is;
+    private boolean continuacao;
+    private List<String> opcoes;        
+    private List<PreCondition> disponivel; 
+    private List<Handler> handlers;     
+	\end{lstlisting}
+	A classe \texttt{ViewJogo} gere o fluxo do programa através da gestão de menus. Esta é a classe responsável por gerir o menu inicial, disponível para todas as entidades como \textit{JogoFutebol} ou \textit{EquipaFutebol}, que interage com outras classes controladoras que gerem os menus de cada entidade em particular.
+
+    \section{Jogador}
+    \begin{lstlisting}[language=Java]
+    private int numero; 
+    private String nome; 
+    private String posicao; 
+    private List <String> historial; 
+    private Atributos atributos; 
+    \end{lstlisting}
+    
+      Esta é uma das classes essenciais da aplicação. A classe \texttt{jogador} representa um jogador de futebol, onde são armazenados o número da camisola, o seu nome, a sua posição em campo, o historial dos clubes por onde passou e os seus atributos (como a capacidade de remate, velocidade, passe,...). Existem \textbf{5} tipos de jogador: guarda-redes, defesa, lateral, médio e avançado.
+      
+      
+    \section{CompPosicao}
+    
+    A classe \texttt{CompPosicao} implementa um \textit{Comparator} para a classe \texttt{Jogador}.
+    Este \texttt{Comparator} compara dois jogadores através dos números da camisola. 
+    
+	\section{Atributos}
+	\begin{lstlisting}[language=Java]
+    private int velocidade;
+    private int resistencia;
+    private int destreza;
+    private int impulsao;
+    private int jogoDeCabeca;
+    private int remate;
+    private int controloDePasse;
+    \end{lstlisting}
+    
+    A classe \texttt{Atributos} é abstrata, pois os valores atribuídos para cada parâmetro variam conforme a posição do jogador. Como será visível mais à frente, decidimos adicionar mais atributos 
+    a cada tipo de jogador, mais própriamente em classe hereditárias. 
+	
+	\subsection{AtributosGR}
+	\begin{lstlisting}[language=Java]
+    private int elasticidade;
+    private int reflexos;
+    \end{lstlisting}
+    
+    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a elasticidade e os reflexos.
+    
+    \subsection{AtributosLateral}
+    \begin{lstlisting}[language=Java]
+    private int precisaoCruzamentos;
+    private int drible;
+    \end{lstlisting}
+
+    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a precisão em efetuar cruzamentos e a capacidade de driblar um adversário.
+	
+	\subsection{AtributosDefesa}
+    \begin{lstlisting}[language=Java]
+    private int posicionamentoDefensivo;
+    private int cortes;
+    \end{lstlisting}
+    
+    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: o posicionamento defensivo e a capacidade de cortar a bola.
+        
+        
+    \subsection{AtributosMedio}
+    \begin{lstlisting}[language=Java]
+    private int recuperacaoDeBolas;
+    private int visaoDeJogo;
+    \end{lstlisting}
+    
+    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a capacidade de recuperação da bola e a visão de jogo.
+    
+    \subsection{AtributosAvancado}
+    \begin{lstlisting}[language=Java]
+    private int penaltis;
+    private int desmarcacao;
+    \end{lstlisting}
+    
+    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos:
+    a capacidade de marcação da marca dos onze metros e a desmarcação para se isolar dos adversários.    
+	\section{Plantel}
+	
+	\begin{lstlisting}[language=Java]
+    private Map<Integer,Jogador> titulares; 
+    private Map<Integer,Jogador> suplentes; 
+    private int nJogadoresNoPlantel; 
+    private Tatica tatica; 
+	\end{lstlisting}
+    
+    A classe \texttt{Plantel} representa um plantel de futebol, com um \textit{map} de jogadores no onze inicial,
+    um \textit{map} de jogadores no banco, o número total de jogadores num plantel e o esquema tático adotado pela equipa.
+	 
+	
+	\section{Tatica}
+	\begin{lstlisting}[language=Java]
+    private int nGR;
+    private int nDF;
+    private int nLT;
+    private int nMD;
+    private int nPL;
+	\end{lstlisting}
+    A classe \texttt{Tatica} define o esquema tático de uma equipa. Para tal, será necessário saber o número de guarda-redes (que será sempre 1), o número de defesas, o número de laterais, o número de médios e o número de avançados
+	
+	\section{EquipaFutebol}
+	\begin{lstlisting}[language=Java]
+    private String nome;
+    private Plantel plantel;
+	\end{lstlisting}
+    O conceito da classe \texttt{EquipaFutebol} pode ser confundido com o conceito da classe
+    \texttt{Plantel}. 
+    Uma \texttt{Plantel} é dividido em vários parâmetros para serem mais facilmente acedidos pelo
+    utilizado. 
+    Já uma \texttt{EquipaFutebol} engloba todos estes parâmetros num objeto \texttt{Plantel}, incluindo o nome da equipa.
+	
+	
+	
+	\section{PartidaFutebol}
+	\begin{lstlisting}[language=Java]
+    private double tempo;
+    private int golosVisitante;
+    private int golosVisitado;
+    private int substituicoesVisitante, substituicoesVisitados;
+    private int[][] subsVisitante, subsVisitada;
+    private EquipaFutebol equipaVisitante, equipaVisitada;
+    private LocalDate data;
+};
+   
+	\end{lstlisting}
+    A classe \texttt{PartidaFutebol} representa uma partida de futebol. São incluídos o tempo de jogo, o número de golos da equipa visitante, o número de golos da equipa da casa, o número de substituições que a equipa visitante pode efetuar, o número de substituições da equipa da casa que ainda pode fazer, um \textit{array} de substituições de uma equipa (visitante ou visitada) onde cada jogador é representado
+    pelo seu número de camisola, os equipas que vão jogar e a data da realização do jogo.
+	  
+		\section{ExecutaPartida}
+	\begin{lstlisting}[language=Java]
+    private PartidaFutebol partida;
+    private Jogador jogadorAtual;
+    private Boolean casa; 
+    private Boolean comecou;
+    private Random random;
+    private static final double acaoRapida = 0.5;
+    private static final double acaoMedia = 1.0;
+	
+	\end{lstlisting}
+		A classe \texttt{ExecutaPartida} é responsável por, tal como diz o nome, executar uma partida de futebol.
+		É constituído por uma partida de futebol, pelo jogador que possui atualmente a bola, um booleano que verifica se o jogador é da equipa adversária, um booleano que verifica se um jogo já começou, um objeto \texttt{Random} para gerar números aleatórios (por exemplo) e duas constantes que simbolizam uma \textit{ação rápida} (por exemplo, tentar rematar a bola) e uma \textit{ação média} (por exemplo, marcar golo).
+		
+
+	\chapter{Estrutura do projeto}
+	
+	O nosso projeto segue a estrutura \textit{Model View Controller} (MVC), estando por isso organizado em três camadas:
+	\begin{itemize}
+		\item A camada de dados (o \textbf{"Model"}) é composta pelas classes Jogador, Atributos, AtributosGR, AtributosDefesa, AributosLateral, AtributosMedio, AtributosAvancado, EquipaFutebol, Plantel, Tatica e PartidaFutebol e pela interface CompPosicao.
+		\item A camada de interação com o utilizador (a \textbf{"View"}, ou apresentação) é composta unicamente pela classe ViewJogo, embora existam algumas mensagens impressas para o \textit{stdout} noutras classes de outras camadas.
+		\item A camada de controlo do fluxo do programa (o \textbf{"Controller}) é composta pela classe ExecutaPartida, ControloDados. Controlo e pelo Main.
+	\end{itemize}
+	
+	Todo este projeto cumpriu um princípio principal da programação orientada aos objetos: o \textit{encapsulamento}. São exemplos notórios deste cumprimento os \textit{getters} e \textit{setters} de todas as classes tanto para objetos imutáveis (por exemplo, \textit{string} ou \textit{integer}) como para objetos mutáveis (por exemplo \textit{Jogador} ou \textit{Equipa}).
+    
+      
+
+	
+	
+
+	\chapter{Conclusão}
+
+	A nível geral, e tendo em conta o que foi explicado nos capítulos anteriores, podemos afirmar que temos um projeto bem conseguido, apesar de não estar exatamente igual ao que idealizávamos. Acreditamos que respondemos de forma correta à simulação de uma partida de futebol, que foi um dos pontos mais trabalhosos do nosso projeto. Além disso, é possível um crescimento controlado da nossa aplicação, uma vez que é possível adicionar mais desportos no diretório \textit{Desporto} do nosso projeto.
+	
+	\appendix
+	
+	\chapter{Diagrama de Classes}
+	\begin{figure}[H]
+		\begin{center}
+			\includegraphics[height=0.6\textheight]{diagrama.png}
+			\caption{Diagrama de classes do programa, gerado pelo \emph{IntelliJ}}
+		\end{center}
+	\end{figure}
+\end{document}
