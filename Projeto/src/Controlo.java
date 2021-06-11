@@ -212,7 +212,7 @@ public class Controlo implements ANSIIColour{
         ViewJogo v = new ViewJogo(menuSimulacao);
         v.limpaTela();
         v.setHandler(1,()->{escolheSimulacao(equipaVisitada,equipaVisitante);v.stop();});
-        v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,}, 3,true));
+        v.setHandler(2, ()->editarDados(new String[]{"",equipaVisitada,equipaVisitante,},true));
         v.run();
         v.limpaTela();
         v.welcome();
@@ -226,8 +226,8 @@ public class Controlo implements ANSIIColour{
      */
     private void escolheSimulacao (String equipaVisitada, String equipaVisitante){
         ViewJogo v = new ViewJogo(menuSimulacoes);
-        v.setHandler(1,()->{simulacaoRapida(equipaVisitada,equipaVisitante);});
-        v.setHandler(2,()->{simulacao(equipaVisitada,equipaVisitante);});
+        v.setHandler(1,()-> simulacaoRapida(equipaVisitada,equipaVisitante));
+        v.setHandler(2,()-> simulacao(equipaVisitada,equipaVisitante));
         v.run();
     }
 
@@ -247,8 +247,8 @@ public class Controlo implements ANSIIColour{
         AtomicBoolean sair = new AtomicBoolean(false);
         AtomicInteger s1 = new AtomicInteger(3);
         AtomicInteger s2 = new AtomicInteger(3);
-        int subs1[][] = new int[][]{new int[]{0, 0, 0}, new int[]{0, 0, 0}};
-        int subs2[][] = new int[][]{new int[]{0, 0, 0}, new int[]{0, 0, 0}};
+        int[][] subs1 = new int[][]{new int[]{0, 0, 0}, new int[]{0, 0, 0}};
+        int[][] subs2 = new int[][]{new int[]{0, 0, 0}, new int[]{0, 0, 0}};
         EquipaFutebol equipa1 = visitadaO.clone();
         EquipaFutebol equipa2 = visitanteO.clone();
         while (!comecar.get() && !sair.get()) {
@@ -338,7 +338,7 @@ public class Controlo implements ANSIIColour{
         AtomicBoolean intervalo = new AtomicBoolean(false);
         boolean posIntervalo = false;
 
-        String resultado = exp.getPartida().resultado();
+        String resultado;
         AtomicBoolean substituicoes = new AtomicBoolean(false);
         AtomicBoolean continuar = new AtomicBoolean(true);
 
@@ -521,19 +521,13 @@ public class Controlo implements ANSIIColour{
     private void dados(){
         ViewJogo menu = new ViewJogo(menuDados);
         menu.limpaTela();
-        String [] equipas = cd.nomesEquipas();
-        int size = equipas.length+1, x = 0;
-        String [] menuEquipas = new String[size];
-        for (String e : equipas){
-            x++;
-            menuEquipas[x] = e;
-        }
+
         menu.setHandler(1,()->{lerDados();menu.stop();});
         menu.setPreCondition(3,()->cd.existeEquipas());
         menu.setHandler(2, this::criarDados);
-        menu.setHandler(3, ()->{editarDados(menuEquipas, size,false);menu.stop();});
-        menu.setHandler(4, ()->{gravarDados();menu.stop();});
-        menu.setHandler(5,()->{resetDados();menu.stop();});
+        menu.setHandler(3, ()->editarDados(null,false));
+        menu.setHandler(4, this::gravarDados);
+        menu.setHandler(5, this::resetDados);
         menu.run();
         menu.limpaTela();
         menu.welcome();
@@ -608,17 +602,32 @@ public class Controlo implements ANSIIColour{
 
     /**
      * Menu para a edição de dados
-     * @param menu Menu inicial que vai ser alterado
-     * @param size numero de equipas
+     * @param menuSimulacao caso seja uma simulação necessita do menu com as equipas
      * @param simulacao true(se for na simulação) false(se não)
      */
-    private void editarDados(String[] menu, int size, boolean simulacao){
-        menu[0] = "Editar Equipas";
-        ViewJogo v = new ViewJogo(menu);
+    private void editarDados(String[] menuSimulacao, boolean simulacao){
+        ViewJogo v;
+        String[] equipas = cd.nomesEquipas();
+        int size = equipas.length + 1;
+        String[] menuEquipas = new String[size];
+        if(!simulacao) {
+            int x = 0;
+            for (String e : equipas) {
+                x++;
+                menuEquipas[x] = e;
+            }
+            menuEquipas[0] = "Editar Equipas";
+            v = new ViewJogo(menuEquipas);
+        }
+        else {
+            v = new ViewJogo(menuSimulacao);
+            size = 3;
+        }
         for(int i = 1; i < size; i++){
             int finalI = i;
             v.setHandler(i,()->{
-                editarEquipa(menu[finalI],simulacao);
+                if(simulacao) editarEquipa(menuSimulacao[finalI], true);
+                else editarEquipa(menuEquipas[finalI],false);
                 v.stop();
             });
         }
@@ -959,8 +968,8 @@ public class Controlo implements ANSIIColour{
      */
     private void criarDados(){
         ViewJogo menu = new ViewJogo(menuCriarDados);
-        menu.setHandler(1, this::criarJogador);
-        menu.setHandler(2, this::criarEquipa);
+        menu.setHandler(1, ()->{criarJogador();menu.stop();});
+        menu.setHandler(2, ()->{criarEquipa();menu.stop();});
         menu.run();
     }
 
@@ -997,31 +1006,35 @@ public class Controlo implements ANSIIColour{
     private boolean auxCriarJogador (String[] ss, Jogador j){
         ViewJogo jogadormenu = new ViewJogo(ss);
         jogadormenu.limpaTela();
-        AtomicBoolean control = new AtomicBoolean(true);
+        AtomicBoolean control = new AtomicBoolean(false);
         jogadormenu.setPreCondition(new int []{2,3,4},()->!j.getNome().equals(""));
         jogadormenu.setPreCondition(4,()->!j.getPosicao().equals(""));
         jogadormenu.setPreCondition(5,()->j.getNumero()!=0 && !j.getPosicao().equals("") && j.getAtributos().overall() != 0);
         jogadormenu.setHandler(1,()->{
             j.setNome(auxScan());
             jogadormenu.stop();
+            control.set(true);
         });
         jogadormenu.setHandler(2,()->{
             j.setNumero(auxScanInt());
             jogadormenu.stop();
+            control.set(true);
         });
         jogadormenu.setHandler(3,()->{
             j.setPosicao(escolhePosicao());
             jogadormenu.stop();
+            control.set(true);
         });
         jogadormenu.setHandler(4,()->{
             j.setAtributos(getAtributos(j.getAtributos()));
-            jogadormenu.stop();});
+            jogadormenu.stop();
+            control.set(true);
+        });
         jogadormenu.setHandler(5,()->{
             jogadormenu.lerEquipa();
             String nome = scan.nextLine();
             colocaJogadarNaEquipa(j,nome);
             jogadormenu.stop();
-            control.set(false);
         });
         jogadormenu.run();
         jogadormenu.limpaTela();

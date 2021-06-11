@@ -21,7 +21,7 @@ public class ViewJogo implements ANSIIColour{
 
     // Varíável de classe para suportar leitura
 
-    private static Scanner is = new Scanner(System.in);
+    private static final Scanner is = new Scanner(System.in);
 
     // Variáveis de instância
 
@@ -187,7 +187,7 @@ public class ViewJogo implements ANSIIColour{
 
     /**
      * Mensagem de classificação de um atributo
-     * @param atributo
+     * @param atributo nome do atributo.
      */
     public void atributosMessage(String atributo){
         System.out.print("Classifique o "+atributo+" do Jogador de [1-100]: ");

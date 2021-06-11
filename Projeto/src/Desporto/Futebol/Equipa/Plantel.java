@@ -506,20 +506,17 @@ public class Plantel implements Serializable {
      * @return Posição abreviada
      */
     public String abvPosicao(String posicao){
-        if(posicao.equals("Guarda-Redes")){
-            return "GR";
-        }
-        else if(posicao.equals("Lateral")){
-            return "LT";
-        }
-        else if(posicao.equals("Defesa")){
-            return "DF";
-        }
-        else if(posicao.equals("Medio")){
-            return "MD";
-        }
-        else if(posicao.equals("Avancado")){
-            return "AV";
+        switch (posicao) {
+            case "Guarda-Redes":
+                return "GR";
+            case "Lateral":
+                return "LT";
+            case "Defesa":
+                return "DF";
+            case "Medio":
+                return "MD";
+            case "Avancado":
+                return "AV";
         }
         return "";
 

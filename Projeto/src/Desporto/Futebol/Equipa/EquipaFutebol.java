@@ -3,6 +3,7 @@ package Desporto.Futebol.Equipa;
 import Desporto.Futebol.Equipa.Jogador.Jogador;
 
 import java.io.Serializable;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -52,7 +53,16 @@ public class EquipaFutebol implements Serializable {
      * @return true se possui, false caso contrário
      */
     public boolean equipaPronta(){
-        return this.plantel.getTitulares().size() == 11 && this.plantel.getTatica().taticaValida();
+        Map<Integer,Jogador> titulares = this.plantel.getTitulares();
+        Tatica t = this.plantel.getTatica();
+        int nGR = t.getnGR(), nDF = t.getnDF(), nLT = t.getnLT(), nMD = t.getnMD(), nPL = t.getnPL();
+        int nGRT = (int) titulares.values().stream().filter(j -> j.getPosicao().equals("Guarda-Redes")).count();
+        int nDFT = (int) titulares.values().stream().filter(j -> j.getPosicao().equals("Defesa")).count();
+        int nLTT = (int) titulares.values().stream().filter(j -> j.getPosicao().equals("Lateral")).count();
+        int nMDT = (int) titulares.values().stream().filter(j -> j.getPosicao().equals("Medio")).count();
+        int nPLT = (int) titulares.values().stream().filter(j -> j.getPosicao().equals("Avancado")).count();
+        return this.plantel.getTitulares().size() == 11 && this.plantel.getTatica().taticaValida()
+                && nGR == nGRT && nDF == nDFT && nLTT == nLT && nMDT == nMD && nPLT == nPL;
     }
 
     /**

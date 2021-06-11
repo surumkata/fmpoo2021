@@ -30,18 +30,13 @@ public class TratamentoDados implements Serializable{
         EquipaFutebol eA = new EquipaFutebol("TeamA");
         EquipaFutebol eB = new EquipaFutebol("TeamB");
 
-        Tatica t422 = new Tatica(1,2,2,4,2);
+        Tatica t = new Tatica(1,2,2,4,2);
+        eA.setTatica(t);
+        eB.setTatica(t);
 
         this.fillEquipa(eA);
         this.fillEquipa(eB);
-        eA.setTatica(t422); eB.setTatica(t422);
-        while(equipasProntas()<2){
-            removeEquipa(eA.getNome());
-            removeEquipa(eB.getNome());
-            this.fillEquipa(eA);
-            this.fillEquipa(eB);
-            eA.setTatica(t422); eB.setTatica(t422);
-        }
+
     }
 
     /**
@@ -404,9 +399,23 @@ public class TratamentoDados implements Serializable{
      * @param e Equipa de futebol a preencher
      */
     public void fillEquipa(EquipaFutebol e){
+        Tatica t = e.getPlantel().getTatica();
         while(e.getPlantel().getnJogadoresNoPlantel() < 22){
             Jogador j = new Jogador();
-            j.random();
+            if(e.getPlantel().getTitulares().size() < 11) {
+                if (e.getPlantel().contaPorPosicaoTitulares("Guarda-Redes") < t.getnGR())
+                    j.random("Guarda-Redes");
+                else if (e.getPlantel().contaPorPosicaoTitulares("Defesa") < t.getnDF())
+                    j.random("Defesa");
+                else if (e.getPlantel().contaPorPosicaoTitulares("Lateral") < t.getnLT())
+                    j.random("Lateral");
+                else if (e.getPlantel().contaPorPosicaoTitulares("Medio") < t.getnMD())
+                    j.random("Medio");
+                else if (e.getPlantel().contaPorPosicaoTitulares("Avancado") < t.getnPL())
+                    j.random("Avancado");
+                else j.random();
+            }
+            else j.random();
             e.adicionaPlantel(j);
         }
 

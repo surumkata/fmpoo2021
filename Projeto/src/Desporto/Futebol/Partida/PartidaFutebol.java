@@ -176,19 +176,6 @@ public class PartidaFutebol implements Serializable {
      */
     public void setTempo(double tempo) {
         this.tempo = tempo;
-    }   
-
-    /**
-     * Devolve um jogador de uma equipa de futebol
-     * @param visitada Booleano que verifica se um jogador é da equipa da casa
-     * @param numero Número do jogador a descobrir
-     * @return Jogador pretendido
-     */
-    public Jogador getJogador(boolean visitada, int numero){
-        if(visitada){
-            return this.equipaVisitada.getJogador(numero);
-        }
-        else return this.equipaVisitante.getJogador(numero);
     }
 
     /**
@@ -247,7 +234,7 @@ public class PartidaFutebol implements Serializable {
 
     /**
      * Devolve o resultado em forma de string
-     * @return
+     * @return String do resultado
      */
     public String resultado(){
         StringBuilder sb = new StringBuilder();
@@ -275,18 +262,6 @@ public class PartidaFutebol implements Serializable {
         else this.golosVisitante++;
     }
 
-
-    /**
-     * Atualiza uma equipa (casa ou fora de acordo com o booleano)
-     * @param e Equipa de futebol da casa
-     * @param visitada Booleano que verifica se é a equipa da casa
-     */
-    public void atualizaEquipa (EquipaFutebol e, boolean visitada){
-        if(visitada)
-            atualizaVisitado(e);
-        else
-            atualizaVisitante(e);
-    }
 
     /**
      * Atualiza a equipa da casa
@@ -397,26 +372,23 @@ public class PartidaFutebol implements Serializable {
 
 
 /*
+//TATICA|| NAO USA
 //4-4-2 || 2 - 6 - 7 - 8 - 12 - 15
 //4-3-3 || 2 - 6 - 7 - 9 - 11 - 13
 //3-5-2 || 4 - 5 - 9 - 11 - 13 - 15
 //3-6-1 || 4 - 5 - 9 - 11 - 14 - 16
 //5-4-1 || 6 - 7 - 9 - 11 - 14 - 16
 //5-3-2 || 6 - 7 - 9 - 11 - 13 - 15
-    public String campo(String[] numeros){
-        StringBuilder sb = new StringBuilder();
-        sb.append("      _______________________________________  \n");
-        sb.append("     |                   |                   |  \n");
-        sb.append("     |____ 0406          |          LTLT ____|  \n");
-        sb.append("     |__  |01  08    14  |  AV    MD  DF|  __|  \n");
-        sb.append("    .|  | |.   09       .|.       MD   .| |  |. \n");
-        sb.append("    ||00| |02  10 13 15( | )15 13 10  02| |00|| \n");
-        sb.append("    '|__| |'   11       '|'       MD   '| |__|' \n");
-        sb.append("     |____|03  12    16  |  AV    MD  DF|____|  \n");
-        sb.append("     |     0507          |          LTLT     |  \n");
-        sb.append("     |___________________|___________________|  \n");
-        return sb.toString();
-    }
+          _______________________________________
+         |                   |                   |
+         |____ 0406          |          LTLT ____|
+         |__  |01  08    14  |  AV    MD  DF|  __|
+        .|  | |.   09       .|.       MD   .| |  |.
+        ||00| |02  10 13 15( | )AV MD MD  DF| |GR||
+        '|__| |'   11       '|'       MD   '| |__|'
+         |____|03  12    16  |  AV    MD  DF|____|
+         |     0507          |          LTLT     |
+         |___________________|___________________|
  */
 
     /**

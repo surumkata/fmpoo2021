@@ -214,7 +214,7 @@ public class Jogador implements Serializable {
 
     /**
      * Devolve a posição de um jogador
-     * @return
+     * @return String posicao
      */
     public String getPosicao() {
         return posicao;
@@ -486,31 +486,36 @@ public class Jogador implements Serializable {
      */
     private int posicaoNivel(){
         int pn = 0;
-        if(this.getPosicao().equals("Guarda-Redes"))
-            pn = 1;
-        else if(this.getPosicao().equals("Defesa"))
-            pn = 2;
-        else if(this.getPosicao().equals("Lateral"))
-            pn = 3;
-        else if(this.getPosicao().equals("Medio"))
-            pn = 4;
-        else if(this.getPosicao().equals("Avancado"))
-            pn = 5;
+        switch (this.getPosicao()) {
+            case "Guarda-Redes":
+                pn = 1;
+                break;
+            case "Defesa":
+                pn = 2;
+                break;
+            case "Lateral":
+                pn = 3;
+                break;
+            case "Medio":
+                pn = 4;
+                break;
+            case "Avancado":
+                pn = 5;
+                break;
+        }
         return pn;
     }
 
     /**
-     * Método que gere jogadores aleatórios.
+     * Método que gere jogadores aleatórios de uma determinada posicão.
      */
-    public void random(){
+    public void random(String posicao){
         Random r = new Random();
 
         int n1 = r.nextInt(50);
         int n2 = r.nextInt(50);
         this.nome = nomesProprios[n1]+" "+nomesApelidos[n2];
-        String [] posicoes = {"Guarda-Redes","Defesa","Lateral","Medio","Avancado"};
-        int pos = r.nextInt(5);
-        this.posicao = posicoes[pos];
+        this.posicao = posicao;
         int [] atb = new int[9];
         for(int i = 0; i < 9;i++){
             atb[i] = r.nextInt(101);
@@ -539,6 +544,18 @@ public class Jogador implements Serializable {
                     atb[4],atb[5],atb[6],atb[7],atb[8]);
         }
 
+    }
+
+
+
+    /**
+     * Método que gere jogadores aleatórios.
+     */
+    public void random(){
+        Random r = new Random();
+        String [] posicoes = {"Guarda-Redes","Defesa","Lateral","Medio","Avancado"};
+        int pos = r.nextInt(5);
+        this.random(posicoes[pos]);
     }
 
 }

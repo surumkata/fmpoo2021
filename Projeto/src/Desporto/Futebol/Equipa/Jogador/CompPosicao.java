@@ -8,7 +8,6 @@ import java.util.Comparator;
  */
 public class CompPosicao implements Comparator<Jogador> {
 
-    @Override
     /**
      * Comparador de jogadores
      */
