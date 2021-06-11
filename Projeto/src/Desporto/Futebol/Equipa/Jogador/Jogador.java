@@ -18,18 +18,24 @@ public class Jogador implements Serializable {
     //Array de strings com nomes próprios possíveis de ser escolhidos aleatoriamente
     private final String[] nomesProprios = {
             "Simao","Tiago","Joao","Nuno","Luis","Geremias","Paulo","Goncalo",
-            "Pedro","Nelson","Fabio","Gil","Antonio","Miguel","Rogério",
+            "Pedro","Nelson","Fabio","Gil","Antonio","Miguel","Rogerio",
             "Guilherme","Jose","Chico","Rafael","Eduardo","Jonas","Rodrigo","Rui",
-            "Diogo","Tomas","Tobias","Raul","Jorge","Hugo","Andre"
-    };
+            "Diogo","Tomas","Tobias","Raul","Jorge","Hugo","Andre","Runlo","Ricardo",
+            "Eder", "Helder","Cristiano","Armindo","Zeferino","Bernardo","Bruno","Xavier",
+            "Joaquim", "Claudio", "Patricio", "Gustavo", "Ruben","Francisco", "Oscar",
+            "Alexandre","Amilcar", "Jo"
+
+    };//50
 
     //Array de strings com apelidos possíveis de ser escolhidos aleatoriamente
     private final String[] nomesApelidos = {
             "Sa","Silva","Barbosa","Geremias","Barroso","Cunha","Carvalho","Sousa","Carneiro",
             "Braz","Alvim","Saraiva","Dias","Fernandes","Rocha","Cardozo","Rodrigues","Ribeiro",
             "Dinis","Tina","Guimaraes","Alves","Pereira","Freitas","Queiros","Costa","Pato","Daniel",
-            "Oliveira","Santos"
-    };
+            "Oliveira","Santos","Cerqueira","Correia","Palmeira","Faria","Fagundes","Ramos","Cruz","Ronaldo",
+            "Meireles","Coelho","Afonso","Marchel", "Jo", "Jacinto", "Manafa", "Conceicao", "Leite", "Martins",
+            "Leal", "Amorim"
+    };//50
 
     /**
      * Construtor vazio de um jogador
@@ -498,8 +504,9 @@ public class Jogador implements Serializable {
      */
     public void random(){
         Random r = new Random();
-        int n1 = r.nextInt(30);
-        int n2 = r.nextInt(30);
+
+        int n1 = r.nextInt(50);
+        int n2 = r.nextInt(50);
         this.nome = nomesProprios[n1]+" "+nomesApelidos[n2];
         String [] posicoes = {"Guarda-Redes","Defesa","Lateral","Medio","Avancado"};
         int pos = r.nextInt(5);

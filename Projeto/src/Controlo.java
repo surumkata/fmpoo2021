@@ -8,6 +8,7 @@ import Desporto.Futebol.Partida.PartidaFutebol;
 import Desporto.Futebol.ViewJogo;
 
 import java.io.IOException;
+import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -928,13 +929,14 @@ public class Controlo {
      */
     private int auxScanInt(){
         ViewJogo v = new ViewJogo();
-        v.scan();
-        int i;
-        try{
-            i = scan.nextInt();
-        }
-        catch(NumberFormatException e){
-            return auxScanInt();
+        int i = -1;
+        while(i == -1) {
+            v.scan();
+            try {
+                i = Integer.parseInt(scan.nextLine());
+            } catch (NumberFormatException e) {
+                i = -1;
+            }
         }
         if(i > 0 && i <= 99){
             return i;
