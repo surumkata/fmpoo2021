@@ -4,6 +4,7 @@ import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.*;
 
 import Desporto.Futebol.ViewJogo;
+import Desporto.Futebol.ANSIIColour;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicBoolean;
 
@@ -12,7 +13,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
  * um booleano a representar se é um jogador visitante ou visitado, um booleano que representa se a partida começou ou não e uma 
  * variável de instância que gera algo aleatório
  */
-public class ExecutaPartida {
+public class ExecutaPartida implements ANSIIColour{
     private PartidaFutebol partida;
     private Jogador jogadorAtual;
     private Boolean casa; //0 -> Jogador é visitante //1 -> Jogador é visitado
@@ -21,11 +22,6 @@ public class ExecutaPartida {
     private final ViewJogo v;
     private boolean comentariosON;
 
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_GREEN = "\u001B[32m";
-    public static final String ANSI_YELLOW = "\u001B[33m";
-    public static final String ANSI_CYAN = "\u001B[36m";
 
     private static final double acaoRapida = 0.5, acaoMedia = 1.0; 
 
@@ -75,7 +71,6 @@ public class ExecutaPartida {
      */
     public boolean run (AtomicBoolean intervalo, AtomicBoolean substituicoes){
         if(!substituicoes.get()) {
-            ViewJogo v = new ViewJogo();
             if (this.partida.getTempo() == 0 && comentariosON) {
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "Faltam poucos momentos para começar o encontro." + ANSI_RESET);
                 v.comentariosJogo(partida.getTempo(), ANSI_CYAN + "Já rola a bola." + ANSI_RESET);
@@ -408,7 +403,6 @@ public class ExecutaPartida {
      */
     public void decSubs (boolean visitado, String com, int n1, int n2){
         this.partida.decSubstituicoes(visitado, n1, n2);
-        ViewJogo v = new ViewJogo();
         if(comentariosON) v.comentariosJogo(this.partida.getTempo(), com);
     }
 

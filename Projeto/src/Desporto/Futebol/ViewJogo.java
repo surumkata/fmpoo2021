@@ -5,7 +5,7 @@ import java.util.*;
 /**
  * Classe para o menu do jogo
  */
-public class ViewJogo {
+public class ViewJogo implements ANSIIColour{
 
     // Interfaces auxiliares
 
@@ -143,7 +143,7 @@ public class ViewJogo {
         System.out.println("█████╗░░██╔████╔██║    ██████╔╝██║░░██║██║░░██║    ░░███╔═╝██║░░██║░░███╔═╝██╔██║░░");
         System.out.println("██╔══╝░░██║╚██╔╝██║    ██╔═══╝░██║░░██║██║░░██║    ██╔══╝░░██║░░██║██╔══╝░░╚═╝██║░░");
         System.out.println("██║░░░░░██║░╚═╝░██║    ██║░░░░░╚█████╔╝╚█████╔╝    ███████╗╚█████╔╝███████╗███████╗");
-        System.out.println("\u001B[32m                          _________________________________                         ");
+        System.out.println(ANSI_GREEN+"                          _________________________________                         ");
         System.out.println("                         |                |                |                        ");
         System.out.println("                         |___             |             ___|                        ");
         System.out.println("                         |_  |            |            |  _|                        ");
@@ -152,7 +152,7 @@ public class ViewJogo {
         System.out.println("                        '|_| |'          `|'          `| |_|'                       ");
         System.out.println("                         |___|            |            |___|                        ");
         System.out.println("                         |                |                |                        ");
-        System.out.println("                         |________________|________________|               \u001B[0m");
+        System.out.println("                         |________________|________________|               "+ANSI_RESET);
     }
 
     /**

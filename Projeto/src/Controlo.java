@@ -1,3 +1,4 @@
+import Desporto.Futebol.ANSIIColour;
 import Desporto.Futebol.TratamentoDados;
 import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.*;
@@ -19,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * para o menu da simulação de uma partida, para o menu da edição de equipas, para o menu de edição de jogadores, para o menu de criação de dados,
  * para o menu da criação de jogadores, para o menu das posições dos jogadores, para o menu da escolha do esquema tático e dos atributos dos jogadores
  */
-public class Controlo {
+public class Controlo implements ANSIIColour{
     private TratamentoDados cd;
     private final Scanner scan = new Scanner(System.in);
     private final String[] menuPrincipal = new String[]{
@@ -218,6 +219,11 @@ public class Controlo {
 
     }
 
+    /**
+     * Menu para a escolha do tipo de simulação.
+     * @param equipaVisitada Equipa da casa que vai jogar
+     * @param equipaVisitante Equipa visitante que vai jogar
+     */
     private void escolheSimulacao (String equipaVisitada, String equipaVisitante){
         ViewJogo v = new ViewJogo(menuSimulacoes);
         v.setHandler(1,()->{simulacaoRapida(equipaVisitada,equipaVisitante);});
@@ -226,6 +232,11 @@ public class Controlo {
     }
 
 
+    /**
+     * Simula uma partida de futebol, mas não mostra os comentários no menu
+     * @param equipaVisitada Equipa da casa que vai jogar
+     * @param equipaVisitante Equipa visitante que vai jogar
+     */
     private void simulacaoRapida(String equipaVisitada, String equipaVisitante) {
         String[] menu = new String[4];
         menu[0] = menuSimulacaoRapida[0];
@@ -415,10 +426,10 @@ public class Controlo {
         for(x = 1; x <= tamT;x++){
             int overall = Integer.parseInt(titulares[3][x-1]);
             if(overall >= 70)
-                menu[x] = "\u001B[32m["+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")\u001B[0m";
+                menu[x] = ANSI_GREEN+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")"+ANSI_RESET;
             else if (overall >= 40)
-                menu[x] = "\u001B[33m["+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")\u001B[0m";
-            else menu[x] = "\u001B[31m["+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")\u001B[0m";
+                menu[x] = ANSI_YELLOW+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")"+ANSI_RESET;
+            else menu[x] = ANSI_YELLOW+titulares[1][x-1]+"] "+titulares[0][x-1]+" ["+titulares[2][x-1]+"] ("+overall+")"+ANSI_RESET;
         }
         ViewJogo mT = new ViewJogo(menu);
         AtomicInteger index = new AtomicInteger(0);
@@ -440,11 +451,11 @@ public class Controlo {
             for (x = 1; y < tamT; x++, y++) {
                 int overallS = Integer.parseInt(titulares[3][y]);
                 if (overallS > overallT && titulares[2][index.get()].equals(titulares[2][y]))
-                    menu[x] = "\u001B[32m[" + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ")\u001B[0m";
+                    menu[x] = ANSI_GREEN + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ANSI_RESET;
                 else if (titulares[2][index.get()].equals(titulares[2][y]))
-                    menu[x] = "\u001B[33m[" + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ")\u001B[0m";
+                    menu[x] = ANSI_YELLOW + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ANSI_RESET;
                 else
-                    menu[x] = "\u001B[31m[" + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ")\u001B[0m";
+                    menu[x] = ANSI_RED + titulares[1][y] + "] " + titulares[0][y] + " [" + titulares[2][y] + "] (" + titulares[3][y] + ANSI_RESET;
 
                 if (y == index.get() - 1) {
                     y++;
@@ -454,11 +465,11 @@ public class Controlo {
             for (y = 0; y < tamS; y++) {
                 int overallS = Integer.parseInt(suplentes[3][y]);
                 if (overallS > overallT && titulares[2][index.get()].equals(suplentes[2][y]))
-                    menu[y + x] = "\u001B[32m[" + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ")\u001B[0m";
+                    menu[y + x] = ANSI_GREEN + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ANSI_RESET;
                 else if (titulares[2][index.get()].equals(suplentes[2][y]))
-                    menu[y + x] = "\u001B[33m[" + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ")\u001B[0m";
+                    menu[y + x] = ANSI_YELLOW + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ANSI_RESET;
                 else
-                    menu[y + x] = "\u001B[31m[" + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ")\u001B[0m";
+                    menu[y + x] = ANSI_RED + suplentes[1][y] + "] " + suplentes[0][y] + " [" + suplentes[2][y] + "] (" + suplentes[3][y] + ANSI_RESET;
 
             }
             AtomicBoolean suplente = new AtomicBoolean(false);
@@ -978,7 +989,7 @@ public class Controlo {
     }
 
     /**
-     * Controlador para o menu da ciração de um jogador
+     * Controlador para o menu da criação de um jogador
      * @param ss Array de strings com os parâmetros de um menu
      * @param j Jogador a criar
      * @return true se foi bem sucedido, false caso contrário

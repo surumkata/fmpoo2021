@@ -399,8 +399,11 @@ public class TratamentoDados implements Serializable{
         oos.close();
     }
 
+    /**
+     * Preenche de forma aleatória uma equipa de futebol
+     * @param e Equipa de futebol a preencher
+     */
     public void fillEquipa(EquipaFutebol e){
-//
         while(e.getPlantel().getnJogadoresNoPlantel() < 22){
             Jogador j = new Jogador();
             j.random();

@@ -45,44 +45,55 @@
 	desporto (neste caso futebol) muito semelhante ao jogo \textit{Football Manager}, de forma a
 	aplicarmos os vários conhecimentos adquiridos nas aulas ao longo do semestre.
 	
-	Tivemos alguns obstáculos para a concessão deste projeto, como a falta de tempo para conseguir uma aplicação que respeitasse melhor os princípios de programação orientada a objetos.
+	Tivemos alguns obstáculos para a concessão deste projeto, como o planeamento da arquitetura do programa (principalmente a hierarquia dos \texttt{atributos}) e a gestão de tempo que condicionaram o resultado final.
 	
 	\chapter{Classes}
 	\section{Main}
-	Classe responsável pelo arranque do programa. Para isto, o método \texttt{main} invoca o método \texttt{run} da classe \texttt{Controlo}.
+	Classe responsável pelo arranque do programa. Para isso, o método \texttt{main} invoca o método \texttt{run} da classe \texttt{Controlo}.
 	
 	\section{Controlo}
 	\begin{lstlisting}[language=Java]
-    private ControloDados cd;
-    private Scanner scan;
+    private TratamentoDados cd;
+    private final Scanner scan;
     private final String[] menuPrincipal;
-    private final String[] menuCarregarDados;
+    private final String[] menuDados;
+    private final String[] gravarDados;
+    private final String[] lerDados;
     private final String[] menuSimulacao;
+    private final String[] menuSimulacoes;
+    private final String[] menuSimulacaoRapida;
     private final String[] menuEditarEquipa;
     private final String[] menuEditarJogador;
     private final String[] menuCriarDados;
     private final String[] menuCriarJogador;
     private final String[] menuPosicao;
     private final String[] menuEscolheTatica;
-    
+    private final String[] menuAtributos;
+    private final String[] menuatributosGR;
+    private final String[] menuatributosDF;
+    private final String[] menuatributosMD;
+    private final String[] menuatributosLT;
+    private final String[] menuatributosAV;
+    private final String[] simulacao;
+
 	\end{lstlisting}
 	\texttt{Controlo} é a classe responsável pelo controlo da aplicação. Associa um menu a uma funcionalidade do programa. Por exemplo, mostra no ecrã a simulação de um jogo de futebol, recorrendo a métodos da classe \texttt{ExecutaPartida} e com mensagens pré-concebidas para vários momentos do jogo. 
 	
 	 Neste menu temos as seguintes opções: \par
 	 \vspace{0.05cm}
-1. \textit{Simular uma partida de futebol}: é possível escolher equipas, definir o seu onze inicial, esquema tático, efetuar um jogo, etc \par
+1. \textit{Simular uma partida de futebol}: é possível escolher equipas, definir o seu onze inicial, esquema tático, efetuar um jogo, fazer simulações \textit{rápidas} e \textit{normais},etc \par
 2. \textit{Manipular dados}: é possível carregar, criar, ver/editar, gravar e fazer reset a dados
 
       
 	
-	\section{ControloDados}
+	\section{TratamentoDados}
 	\begin{lstlisting}[language=Java]
-private Map<String,EquipaFutebol>equipas;//nome + equipa
-private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos 
+private Map<String,EquipaFutebol>equipas;
+private Map<String,List<PartidaFutebol>>partidas;
 	\end{lstlisting}
 	
-\texttt{Controlo de dados} é a classe de controlo para a execução de partidas de futebol, que inclui uma \texttt{HashMap} de equipas de futebol que são identificadas pelo seu nome e um \texttt{HashMap} de partidas de futebol onde é possivel associar o nome de uma equipa à lista de todos os seus jogos efetuados.
- 
+\texttt{Controlo de dados} é a classe que guarda todos os dados da aplicação, como as equipas com os seus jogadores (num \textit{HashMap} onde cada chave é o nome da equipa) e as partidas de futebol executadas por cada equipa (informação que é guardada num \textit{ArrayList} que está numa \textit{HashMap} onde a chave é o nome da equipa). \par
+Obviamente, ao adicionar cada partida, vai ter 2 entradas na \textit{HashMap} de partidas, pois uma partida é realizada por 2 equipas.
 	
 	\section{ViewJogo}
 	\begin{lstlisting}[language=Java]
@@ -92,7 +103,7 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     private List<PreCondition> disponivel; 
     private List<Handler> handlers;     
 	\end{lstlisting}
-	A classe \texttt{ViewJogo} gere o fluxo do programa através da gestão de menus. Esta é a classe responsável por gerir o menu inicial, disponível para todas as entidades como \textit{JogoFutebol} ou \textit{EquipaFutebol}, que interage com outras classes controladoras que gerem os menus de cada entidade em particular.
+	A classe \texttt{ViewJogo}(criada a partir do exemplo \texttt{DriveIt} das aulas práticas), tal como o nome indica, oferece toda a visualização à nossa aplicação. Gere tanto o fluxo do programa através da gestão de menus controlada pela classe \texttt{Controlo} como oferece um suporte visual à \texttt{ExecutaPartida}, como, por exemplo, o método \texttt{comentarioJogo}, que mostra vários comentários durante a execução de uma partida.  
 
     \section{Jogador}
     \begin{lstlisting}[language=Java]
@@ -109,7 +120,9 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     \section{CompPosicao}
     
     A classe \texttt{CompPosicao} implementa um \textit{Comparator} para a classe \texttt{Jogador}.
-    Este \texttt{Comparator} compara dois jogadores através dos números da camisola. 
+    Este \texttt{Comparator} compara dois jogadores através das suas posições ocupadas em campo. Se forem iguais, o critério passa a ser o número da camisola. \par 
+    \textbf{NB:} Guarda-Redes \rightarrow Defesa \rightarrow Lateral \rightarrow Médio 
+    \rightarrow Avançado 
     
 	\section{Atributos}
 	\begin{lstlisting}[language=Java]
@@ -123,7 +136,7 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     \end{lstlisting}
     
     A classe \texttt{Atributos} é abstrata, pois os valores atribuídos para cada parâmetro variam conforme a posição do jogador. Como será visível mais à frente, decidimos adicionar mais atributos 
-    a cada tipo de jogador, mais própriamente em classe hereditárias. 
+    a jogadores com posições diferentes, mais própriamente em classe hereditárias. Esta classe obriga a criação de 2 métodos abstratos: \textit{overall} e \textit{desgaste}.
 	
 	\subsection{AtributosGR}
 	\begin{lstlisting}[language=Java]
@@ -131,7 +144,8 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     private int reflexos;
     \end{lstlisting}
     
-    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a elasticidade e os reflexos.
+    Esta classe refere-se aos atributos de um guarda-redes. Herda os atributos da classe \texttt{Atributos} e acrescenta mais 2 atributos extra: a elasticidade e os reflexos.
+    O \textit{overall} faz uma média pesada dos atributos, tendo maior peso os atributos \textit{reflexos}, \textit{elasticidade} e \textit{impulsão}. O desgaste de um guarda-redes é menor do que para as outras posições e descresce um pouco todos os atributos consoante a sua resistência.
     
     \subsection{AtributosLateral}
     \begin{lstlisting}[language=Java]
@@ -140,14 +154,18 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     \end{lstlisting}
 
     Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a precisão em efetuar cruzamentos e a capacidade de driblar um adversário.
+    O \textit{overall} faz uma média pesada dos atributos, tendo maior peso os atributos \textit{precisão de cruzamentos} e \textit{resistência}. O desgaste de um lateral descresce um pouco todos os atributos consoante a sua resistência.
+	
+	\pagebreak
 	
 	\subsection{AtributosDefesa}
     \begin{lstlisting}[language=Java]
     private int posicionamentoDefensivo;
     private int cortes;
     \end{lstlisting}
-    
     Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: o posicionamento defensivo e a capacidade de cortar a bola.
+    O \textit{overall} faz uma média pesada dos atributos, tendo maior peso os atributos \textit{posicionamento defensivo} e \textit{cortes}. O desgaste de um defesa descresce um pouco todos os atributos consoante a sua resistência.
+
         
         
     \subsection{AtributosMedio}
@@ -157,6 +175,8 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     \end{lstlisting}
     
     Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a capacidade de recuperação da bola e a visão de jogo.
+    O \textit{overall} faz uma média pesada dos atributos, tendo maior peso os atributos \textit{visão de jogo} e \textit{controlo de passe}. O desgaste de um médio descresce um pouco todos os atributos consoante a sua resistência.
+    
     
     \subsection{AtributosAvancado}
     \begin{lstlisting}[language=Java]
@@ -164,8 +184,9 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     private int desmarcacao;
     \end{lstlisting}
     
-    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos:
-    a capacidade de marcação da marca dos onze metros e a desmarcação para se isolar dos adversários.    
+    Esta classe herda atributos da classe \texttt{Atributos} e decidimos acrescentar mais 2 atributos: a capacidade de marcação da marca dos onze metros e a desmarcação para se isolar dos adversários.
+    O \textit{overall} faz uma média pesada dos atributos, tendo maior peso os atributos \textit{remate}, \textit{desmarcação} e \textit{jogo de cabeça}. O desgaste de um avançado descresce um pouco todos os atributos consoante a sua resistência.
+    
 	\section{Plantel}
 	
 	\begin{lstlisting}[language=Java]
@@ -176,7 +197,7 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
 	\end{lstlisting}
     
     A classe \texttt{Plantel} representa um plantel de futebol, com um \textit{map} de jogadores no onze inicial,
-    um \textit{map} de jogadores no banco, o número total de jogadores num plantel e o esquema tático adotado pela equipa.
+    um \textit{map} de jogadores no banco, o número total de jogadores num plantel e o esquema tático adotado pela equipa. \par \textbf{NB:} o número total de jogadores de um plantel não excede 22.
 	 
 	
 	\section{Tatica}
@@ -214,7 +235,7 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
 };
    
 	\end{lstlisting}
-    A classe \texttt{PartidaFutebol} representa uma partida de futebol. São incluídos o tempo de jogo, o número de golos da equipa visitante, o número de golos da equipa da casa, o número de substituições que a equipa visitante pode efetuar, o número de substituições da equipa da casa que ainda pode fazer, um \textit{array} de substituições de uma equipa (visitante ou visitada) onde cada jogador é representado
+    A classe \texttt{PartidaFutebol} representa uma partida de futebol. São incluídos o tempo de jogo, o número de golos da equipa visitante, o número de golos da equipa da casa, o número de substituições que a equipa visitante pode efetuar, o número de substituições da equipa da casa que ainda pode fazer, um \textit{array} de substituições para cada equipa (visitante ou visitada) onde o jogador é representado
     pelo seu número de camisola, os equipas que vão jogar e a data da realização do jogo.
 	  
 		\section{ExecutaPartida}
@@ -224,24 +245,28 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
     private Boolean casa; 
     private Boolean comecou;
     private Random random;
+    private final ViewJogo v;
+    private boolean comentariosON;
     private static final double acaoRapida = 0.5;
     private static final double acaoMedia = 1.0;
 	
 	\end{lstlisting}
 		A classe \texttt{ExecutaPartida} é responsável por, tal como diz o nome, executar uma partida de futebol.
-		É constituído por uma partida de futebol, pelo jogador que possui atualmente a bola, um booleano que verifica se o jogador é da equipa adversária, um booleano que verifica se um jogo já começou, um objeto \texttt{Random} para gerar números aleatórios (por exemplo) e duas constantes que simbolizam uma \textit{ação rápida} (por exemplo, tentar rematar a bola) e uma \textit{ação média} (por exemplo, marcar golo).
-		
+		É constituído por uma partida de futebol, pelo jogador que possui atualmente a bola, um booleano que verifica se o jogador é da equipa caseira, um booleano que verifica que equipa começa o jogo com a posse de bola (já que ao intervalo a posse é dada à equipa contrária), um objeto \texttt{Random} para gerar imprevisibilidade ao jogo e duas constantes que simbolizam uma \textit{ação rápida} (por exemplo, tentar passar a bola) e uma \textit{ação média} (por exemplo, marcar golo). Tem ainda uma variável da classe \textit{ViewJogo} que oferece suporte visual à partida e um booleano \textit{comentariosON} que liga/desliga os comentários durante o jogo.
+
+\par \par
+    \textbf{NB:} Ao longo do projeto foi usada a interface \textit{ANSIIColour} que possibilita colorir \textit{strings}.
 
 	\chapter{Estrutura do projeto}
 	
 	O nosso projeto segue a estrutura \textit{Model View Controller} (MVC), estando por isso organizado em três camadas:
 	\begin{itemize}
-		\item A camada de dados (o \textbf{"Model"}) é composta pelas classes Jogador, Atributos, AtributosGR, AtributosDefesa, AributosLateral, AtributosMedio, AtributosAvancado, EquipaFutebol, Plantel, Tatica e PartidaFutebol e pela interface CompPosicao.
-		\item A camada de interação com o utilizador (a \textbf{"View"}, ou apresentação) é composta unicamente pela classe ViewJogo, embora existam algumas mensagens impressas para o \textit{stdout} noutras classes de outras camadas.
-		\item A camada de controlo do fluxo do programa (o \textbf{"Controller}) é composta pela classe ExecutaPartida, ControloDados. Controlo e pelo Main.
+		\item A camada de dados (o \textbf{"Model"}) é composta pelas classes Jogador, Atributos, AtributosGR, AtributosDefesa, AributosLateral, AtributosMedio, AtributosAvancado, EquipaFutebol, Plantel, Tatica, PartidaFutebol, ExecutaPartida e TratamentoDados e pela interface CompPosicao.
+		\item A camada de interação com o utilizador (a \textbf{"View"}, ou apresentação) é composta unicamente pela classe ViewJogo.
+		\item A camada de controlo do fluxo do programa (o \textbf{"Controller}) é composta unicamente pela classe Controlo.
 	\end{itemize}
 	
-	Todo este projeto cumpriu um princípio principal da programação orientada aos objetos: o \textit{encapsulamento}. São exemplos notórios deste cumprimento os \textit{getters} e \textit{setters} de todas as classes tanto para objetos imutáveis (por exemplo, \textit{string} ou \textit{integer}) como para objetos mutáveis (por exemplo \textit{Jogador} ou \textit{Equipa}).
+	Achamos que o nosso projeto cumpriu o princípio da programação orientada aos objetos: o \textit{encapsulamento}. São exemplos notórios deste cumprimento os métodos \textit{getters} e \textit{setters} nas classes com objetos privados mutáveis, pois estes invocam sempre o método \texttt{clone}.
     
       
 
@@ -250,7 +275,7 @@ private Map<String,List<PartidaFutebol>>partidas;//Nome + Lista dos jogos
 
 	\chapter{Conclusão}
 
-	A nível geral, e tendo em conta o que foi explicado nos capítulos anteriores, podemos afirmar que temos um projeto bem conseguido, apesar de não estar exatamente igual ao que idealizávamos. Acreditamos que respondemos de forma correta à simulação de uma partida de futebol, que foi um dos pontos mais trabalhosos do nosso projeto. Além disso, é possível um crescimento controlado da nossa aplicação, uma vez que é possível adicionar mais desportos no diretório \textit{Desporto} do nosso projeto.
+	A nível geral, e tendo em conta o que foi explicado nos capítulos anteriores, podemos afirmar que temos um projeto bem conseguido, apesar de não estar exatamente igual ao que idealizávamos. Acreditamos que respondemos de forma correta à simulação de uma partida de futebol, que foi um dos pontos mais trabalhosos do nosso projeto. Além disso, é possível um crescimento controlado da nossa aplicação, uma vez que é possível, por exemplo, adicionar mais desportos no diretório \textit{Desporto}, adicionar posições mais específicas aos jogadores, assim como aumentar a hierarquia de atributos.
 	
 	\appendix
 	
