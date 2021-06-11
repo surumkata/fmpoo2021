@@ -1,4 +1,4 @@
-import Desporto.Futebol.ControloDados;
+import Desporto.Futebol.TratamentoDados;
 import Desporto.Futebol.Equipa.EquipaFutebol;
 import Desporto.Futebol.Equipa.Jogador.*;
 import Desporto.Futebol.Equipa.Plantel;
@@ -8,7 +8,6 @@ import Desporto.Futebol.Partida.PartidaFutebol;
 import Desporto.Futebol.ViewJogo;
 
 import java.io.IOException;
-import java.util.InputMismatchException;
 import java.util.List;
 import java.util.Scanner;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -21,7 +20,7 @@ import java.util.concurrent.atomic.AtomicInteger;
  * para o menu da criação de jogadores, para o menu das posições dos jogadores, para o menu da escolha do esquema tático e dos atributos dos jogadores
  */
 public class Controlo {
-    private ControloDados cd;
+    private TratamentoDados cd;
     private final Scanner scan = new Scanner(System.in);
     private final String[] menuPrincipal = new String[]{
             "Menu Principal",
@@ -116,7 +115,7 @@ public class Controlo {
             "5-4-1 (1GR|2LT|3DF|4MD|1AV)",
             "5-3-2 (1GR|2LT|3DF|3MD|2AV)"};
 
-    public final String[] menuAtributos = new String[]{
+    private final String[] menuAtributos = new String[]{
             "Atributos",
             "Velocidade:",
             "Resistência:",
@@ -127,23 +126,23 @@ public class Controlo {
             "Controlo de passe:",
             "Gravar"};
 
-    public final String[] menuatributosGR = new String[]{
+    private final String[] menuatributosGR = new String[]{
             "Elasticidade:",
             "Reflexos:"};
 
-    public final String[] menuatributosDF = new String[]{
+    private final String[] menuatributosDF = new String[]{
             "Posicionamento Defensivo:",
             "Cortes:"};
 
-    public final String[] menuatributosMD = new String[]{
+    private final String[] menuatributosMD = new String[]{
             "Recuperação de Bolas:",
             "Visão de Jogo:"};
 
-    public final String[] menuatributosLT = new String[]{
+    private final String[] menuatributosLT = new String[]{
             "Precisão de cruzamentos:",
             "Drible:"};
 
-    public final String[] menuatributosAV = new String[]{
+    private final String[] menuatributosAV = new String[]{
             "Desmarcação:",
             "Penáltis:"};
 
@@ -157,7 +156,7 @@ public class Controlo {
      * Construtor vazio de controlo
      */
     public Controlo() {
-        this.cd = new ControloDados();
+        this.cd = new TratamentoDados();
     }
 
     /**
@@ -593,7 +592,7 @@ public class Controlo {
      * Reset dos dados
      */
     private void resetDados(){
-        this.cd = new ControloDados();
+        this.cd = new TratamentoDados();
     }
 
     /**
